@@ -27,7 +27,7 @@ require (
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
 	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d
 	gopkg.in/yaml.v2 v2.4.0
-	gorm.io/gorm v1.23.4
+	gorm.io/gorm v1.23.8
 )
 
 require (
@@ -40,7 +40,7 @@ require (
 	github.com/google/btree v1.0.1 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.4 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/lestrrat/go-envload v0.0.0-20180220120943-6ed08b54a570 // indirect
