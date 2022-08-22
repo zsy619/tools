@@ -1,14 +1,14 @@
 module haedu.gov.cn/tools
 
-go 1.18
+go 1.19
 
 require (
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.2
 	github.com/beeker1121/mailchimp-go v0.0.0-20160721165115-7c5f827423b2
 	github.com/cespare/xxhash v1.1.0
-	github.com/chromedp/cdproto v0.0.0-20220106001210-12edfdeb56f8
-	github.com/chromedp/chromedp v0.7.6
-	github.com/ethereum/go-ethereum v1.10.15
+	github.com/chromedp/cdproto v0.0.0-20220816211547-b8b15824df23
+	github.com/chromedp/chromedp v0.8.4
+	github.com/ethereum/go-ethereum v1.10.21
 	github.com/g3n/engine v0.2.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/glog v1.0.0
@@ -19,13 +19,13 @@ require (
 	github.com/peterbourgon/diskv v2.0.1+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/rifflock/lfshook v0.0.0-20180920164130-b9218ef580f5
-	github.com/sendgrid/sendgrid-go v3.10.4+incompatible
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sendgrid/sendgrid-go v3.11.1+incompatible
+	github.com/sirupsen/logrus v1.9.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
-	golang.org/x/image v0.0.0-20211028202545-6944b10bf410
-	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d
+	golang.org/x/image v0.0.0-20220722155232-062f8c9fd539
+	golang.org/x/net v0.0.0-20220812174116-3211cb980234
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/gorm v1.23.8
 )
@@ -37,21 +37,22 @@ require (
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.1.0 // indirect
-	github.com/google/btree v1.0.1 // indirect
+	github.com/google/btree v1.1.2 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/jonboulle/clockwork v0.2.2 // indirect
+	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/lestrrat/go-envload v0.0.0-20180220120943-6ed08b54a570 // indirect
 	github.com/lestrrat/go-strftime v0.0.0-20180220042222-ba3bf9c1d042 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/sendgrid/rest v2.6.6+incompatible // indirect
+	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/tebeka/strftime v0.1.5 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
+	golang.org/x/sys v0.0.0-20220817070843-5a390386f1f2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
