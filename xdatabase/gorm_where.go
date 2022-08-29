@@ -48,28 +48,33 @@ func (e *GormWhere) Length() int {
 	return len(e.where)
 }
 
-func (e *GormWhere) Add(key string, value interface{}) {
+func (e *GormWhere) Add(key string, value interface{}) *GormWhere {
 	e.where[key] = value
+	return e
 }
 
-func (e *GormWhere) AddInt(key string, value int) {
+func (e *GormWhere) AddInt(key string, value int) *GormWhere {
 	e.where[key] = strconv.Itoa(value)
+	return e
 }
 
-func (e *GormWhere) AddString(key string, value string) {
+func (e *GormWhere) AddString(key string, value string) *GormWhere {
 	e.where[key] = e.ForamtString(value)
+	return e
 }
 
-func (e *GormWhere) AddExp(expKey string, value string) {
+func (e *GormWhere) AddExp(expKey string, value string) *GormWhere {
 	e.where[GormWhere_ExpPrefix+expKey] = e.ForamtString(value)
+	return e
 }
 
 func (e *GormWhere) ForamtString(value string) string {
 	return "'" + value + "'"
 }
 
-func (e *GormWhere) AddDatetime(key string, value string) {
+func (e *GormWhere) AddDatetime(key string, value string) *GormWhere {
 	e.where[key] = e.ForamtString(value)
+	return e
 }
 
 func (e *GormWhere) ForamtDatetime(value string) string {

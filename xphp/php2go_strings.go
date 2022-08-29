@@ -520,6 +520,24 @@ func MbStrlen(str string) int {
 	return utf8.RuneCountInString(str)
 }
 
+func MbSubstr(str string, start, length int) string {
+	runes := []rune(str)
+	if start < 0 {
+		start = 0
+	}
+	if start > len(runes) {
+		start = len(runes)
+	}
+	end := start + length
+	if end < 0 {
+		end = 0
+	}
+	if end > len(runes) {
+		end = len(runes)
+	}
+	return string(runes[start:end])
+}
+
 // StrRepeat str_repeat()
 func StrRepeat(input string, multiplier int) string {
 	return strings.Repeat(input, multiplier)
