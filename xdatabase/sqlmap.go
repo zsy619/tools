@@ -110,6 +110,26 @@ func Rows2StringInterfaceMapSlice(rows *sql.Rows, cols ...string) ([]map[string]
 			switch v := v.(type) {
 			case []byte:
 				row[cols[i]] = string(v)
+			case string:
+				row[cols[i]] = string(v)
+			case int64:
+				row[cols[i]] = int64(v)
+			case int32:
+				row[cols[i]] = int32(v)
+			case int16:
+				row[cols[i]] = int16(v)
+			case int8:
+				row[cols[i]] = int8(v)
+			case int:
+				row[cols[i]] = int(v)
+			case float32:
+				row[cols[i]] = float32(v)
+			case float64:
+				row[cols[i]] = float64(v)
+			case bool:
+				row[cols[i]] = bool(v)
+			case nil:
+				row[cols[i]] = ""
 			default:
 				row[cols[i]] = v
 			}

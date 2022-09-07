@@ -24,3 +24,11 @@ func Update(mainObj interface{}, newData interface{}) bool {
 	}
 	return changed
 }
+
+func IsNil(i interface{}) bool {
+	defer func() {
+		recover()
+	}()
+	vi := reflect.ValueOf(i)
+	return vi.IsNil()
+}
