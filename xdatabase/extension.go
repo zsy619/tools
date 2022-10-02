@@ -2,7 +2,7 @@ package xdatabase
 
 import "fmt"
 
-func Limit(page, pageSize int) (limit string) {
+func Limit[T int16 | int | int32 | int64](page, pageSize T) (limit string) {
 	if page <= 0 {
 		page = 1
 	}
@@ -13,7 +13,7 @@ func Limit(page, pageSize int) (limit string) {
 	return
 }
 
-func Offset(page, pageSize int) (offset int) {
+func Offset[T int16 | int | int32 | int64](page, pageSize T) (offset T) {
 	if page <= 0 {
 		page = 1
 	}
