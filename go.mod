@@ -24,6 +24,7 @@ require (
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/stretchr/testify v1.8.0
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
+	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/image v0.0.0-20220722155232-062f8c9fd539
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234
 	gopkg.in/yaml.v2 v2.4.0
@@ -53,6 +54,6 @@ require (
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/tebeka/strftime v0.1.5 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
-	golang.org/x/sys v0.0.0-20220817070843-5a390386f1f2 // indirect
+	golang.org/x/sys v0.1.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
