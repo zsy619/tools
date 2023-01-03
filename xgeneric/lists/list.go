@@ -1,4 +1,4 @@
-package xgeneric
+package lists
 
 type List[T any] []T
 
