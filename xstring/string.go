@@ -159,14 +159,122 @@ func SubString(source string, start int, end int) string {
 	return string(r[start:end])
 }
 
-// StrToUint8 字符串转换为uint8
-func StrToUint8(input string) uint8 {
+// ToInt 字符串转换为int
+func ToInt(input string) int {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return i
+	}
+	return 0
+}
+
+// ToInt8 字符串转换为int8
+func ToInt8(input string) int8 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return int8(i)
+	}
+	return 0
+}
+
+// ToInt16 字符串转换为int16
+func ToInt16(input string) int16 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return int16(i)
+	}
+	return 0
+}
+
+// ToInt32 字符串转换为int32
+func ToInt32(input string) int32 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return int32(i)
+	}
+	return 0
+}
+
+// ToInt64 字符串转换为int64
+func ToInt64(input string) int64 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return int64(i)
+	}
+	return 0
+}
+
+// ToUint 字符串转换为uint
+func ToUnit(input string) uint {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return uint(i)
+	}
+	return 0
+}
+
+// ToUint8 字符串转换为uint8
+func ToUint8(input string) uint8 {
 	if len(input) > 0 {
 		i, err := strconv.Atoi(input)
 		if err != nil {
 			return 0
 		}
 		return uint8(i)
+	}
+	return 0
+}
+
+// ToUint16 字符串转换为uint16
+func ToUint16(input string) uint16 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return uint16(i)
+	}
+	return 0
+}
+
+// ToUint32 字符串转换为uint32
+func ToUint32(input string) uint32 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return uint32(i)
+	}
+	return 0
+}
+
+// ToUint64 字符串转换为uint64
+func ToUint64(input string) uint64 {
+	if len(input) > 0 {
+		i, err := strconv.Atoi(input)
+		if err != nil {
+			return 0
+		}
+		return uint64(i)
 	}
 	return 0
 }

@@ -233,7 +233,7 @@ func TestStrToUint8(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := StrToUint8(tt.args.input); got != tt.want {
+			if got := ToUint8(tt.args.input); got != tt.want {
 				t.Errorf("StrToUint8() = %v, want %v", got, tt.want)
 			}
 		})
