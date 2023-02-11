@@ -309,7 +309,7 @@ func ToUintArray(input, sep string) []uint {
 		var intArr []uint
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
-			intArr = append(intArr, ToUint(str))
+			intArr = append(intArr, ToUnit(str))
 		}
 		return intArr
 	}
