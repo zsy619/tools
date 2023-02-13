@@ -12,6 +12,10 @@ import (
 
 var fileTypeMap sync.Map
 
+/**
+ * @description: 初始化文件类型
+ * @return {*}
+ */
 func init() {
 	fileTypeMap.Store("ffd8ffe000104a464946", "jpg")  // JPEG (jpg)
 	fileTypeMap.Store("89504e470d0a1a0a0000", "png")  // PNG (png)
@@ -71,7 +75,12 @@ func init() {
 	fileTypeMap.Store("2E7261FD", "ram")         // Real Audio (ram)
 }
 
-// 获取前面结果字节的二进制
+// BytesToHexString
+/**
+ * @description: 获取前面结果字节的二进制
+ * @param {[]byte} src
+ * @return string
+ */
 func BytesToHexString(src []byte) string {
 	res := bytes.Buffer{}
 	if src == nil || len(src) <= 0 {
@@ -89,8 +98,12 @@ func BytesToHexString(src []byte) string {
 	return res.String()
 }
 
-// 用文件前面几个字节来判断
-// fSrc: 文件字节流（就用前面几个字节）
+// GetFileType
+/**
+ * @description: 用文件前面几个字节来判断
+ * @param {[]byte} fSrc 文件字节流（就用前面几个字节）
+ * @return string
+ */
 func GetFileType(fSrc []byte) string {
 	var fileType string
 	fileCode := BytesToHexString(fSrc)
@@ -108,7 +121,11 @@ func GetFileType(fSrc []byte) string {
 	return fileType
 }
 
-// 根据文件名获取扩展
+// GetFileTypeByFileName
+/**
+ * @description: 根据文件名获取扩展
+ * @return string
+ */
 func GetFileTypeByFileName(fn string) string {
 	f, err := os.Open(fn)
 	if err != nil {

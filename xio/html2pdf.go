@@ -10,6 +10,7 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+// PrintToPDFParams 打印参数
 type PrintToPDFParams struct {
 	Landscape               bool    `json:"landscape,omitempty"`               // 横向打印. 默认false.
 	DisplayHeaderFooter     bool    `json:"displayHeaderFooter,omitempty"`     // 打印header和footer. 默认false.
@@ -29,6 +30,13 @@ type PrintToPDFParams struct {
 	// TransferMode            PrintToPDFTransferMode `json:"transferMode,omitempty"`            // 返回stream
 }
 
+// ChromedpPrintPdf
+/**
+ * @description: Chromedp打印pdf
+ * @param {string} url
+ * @param {string} to
+ * @return {error}
+ */
 func ChromedpPrintPdf(url string, to string) error {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
@@ -52,13 +60,20 @@ func ChromedpPrintPdf(url string, to string) error {
 	if err != nil {
 		return fmt.Errorf("chromedp Run failed,err:%+v", err)
 	}
-	if err := ioutil.WriteFile(to, buf, 0644); err != nil {
+	if err := ioutil.WriteFile(to, buf, 0o644); err != nil {
 		return fmt.Errorf("write to file failed,err:%+v", err)
 	}
 	return nil
 }
 
-// https://wkhtmltopdf.org/downloads.html
+// GoWkhtmlPrintPdf
+/**
+ * @description: wkhtmltopdf打印pdf
+ * @param {string} url
+ * @param {string} to
+ * @return {*}
+ * @see https://wkhtmltopdf.org/downloads.html
+ */
 func GoWkhtmlPrintPdf(url string, to string) error {
 	pdfg, err := wkhtmltopdf.NewPDFGenerator()
 	if err != nil {

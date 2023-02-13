@@ -14,6 +14,7 @@ var (
 	ErrBirthFormatInvalid = errors.New("出生日期格式错误")
 	ErrBirthRangeInvalid  = errors.New("出生日期范围错误")
 	ErrSumInvalid         = errors.New("校验和错误")
+	ErrSexInvalid         = errors.New("性别错误")
 
 	reg      = regexp.MustCompile("^(\\d{6})(18|19|20)?(\\d{2})(0\\d|10|11|12)([012]\\d|3[01])(\\d{3})(\\d|X)?$")
 	area     = map[string]string{"11": "北京", "12": "天津", "13": "河北", "14": "山西", "15": "内蒙", "21": "辽宁", "22": "吉林", "23": "黑龙", " 31": "上海", "32": "江苏", "33": "浙江", "34": "安徽", "35": "福建", "36": "江西", "37": "山东", "41": "河南", "42": "湖北", "43": "湖南", "44": "广东", "45": "广西", "46": "海南", "50": "重庆", "51": "四川", "52": "贵州", "53": "云南", "54": "西藏", "61": "陕西", "62": "甘肃", "63": "青海", "64": "宁夏", "65": "新疆", "71": "台湾", "81": "香港", "82": "澳门", "91": "国外"}
@@ -23,7 +24,12 @@ var (
 	code     = []byte{'1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'}
 )
 
-// 整体校验格式
+// ValidateReg
+/**
+ * @description: 整体校验格式
+ * @param {string} id
+ * @return {error}
+ */
 func ValidateReg(id string) error {
 	if reg.MatchString(id) {
 		return nil
@@ -31,7 +37,12 @@ func ValidateReg(id string) error {
 	return ErrFormatInvalid
 }
 
-// 校验地区码
+// ValidateArea
+/**
+ * @description: 校验地区码
+ * @param {string} id
+ * @return {error}
+ */
 func ValidateArea(id string) error {
 	if _, ok := area[id[0:2]]; ok {
 		return nil
@@ -39,7 +50,12 @@ func ValidateArea(id string) error {
 	return ErrAddressInvalid
 }
 
-// 获取地区
+// Area
+/**
+ * @description: 获取地区
+ * @param {string} id
+ * @return {*}
+ */
 func Area(id string) (string, string, error) {
 	if val, ok := area[id[0:2]]; ok {
 		return id[0:2], val, nil
@@ -47,7 +63,12 @@ func Area(id string) (string, string, error) {
 	return "", "", ErrAddressInvalid
 }
 
-// 校验生日,包括格式和范围
+// ValidateBirth
+/**
+ * @description: 校验生日,包括格式和范围
+ * @param {string} id
+ * @return {error}
+ */
 func ValidateBirth(id string) error {
 	birth := id[6:14]
 	if date, err := time.Parse("20060102", birth); err != nil {
@@ -58,7 +79,12 @@ func ValidateBirth(id string) error {
 	return nil
 }
 
-// 获取生日
+// Birth
+/**
+ * @description: 获取生日
+ * @param {string} id
+ * @return {*}
+ */
 func Birth(id string) (string, error) {
 	birth := id[6:14]
 	if date, err := time.Parse("20060102", birth); err != nil {
@@ -69,22 +95,32 @@ func Birth(id string) (string, error) {
 	return birth, nil
 }
 
-// 获取性别
-func Sex(id string) (string, error) {
+// Sex
+/**
+ * @description: 获取性别
+ * @param {string} id
+ * @return {string, string, error}
+ */
+func Sex(id string) (string, string, error) {
 	idLen := len(id)
 	fmt.Println("----------?", idLen)
 	idSex := id[idLen-2 : idLen-1]
 	sex, err := strconv.Atoi(idSex)
 	if err != nil {
-		return "", err
+		return "", "", ErrSexInvalid
 	}
 	if sex%2 == 0 {
-		return "女", nil
+		return "2", "女", nil
 	}
-	return "男", nil
+	return "1", "男", nil
 }
 
-// 校验 校验和
+// ValidateSum
+/**
+ * @description: 校验 校验和
+ * @param {string} id
+ * @return {error}
+ */
 func ValidateSum(id string) error {
 	sum := 0
 	for i, char := range id[:len(id)-1] {
@@ -97,9 +133,14 @@ func ValidateSum(id string) error {
 	return ErrSumInvalid
 }
 
-// 校验
+// Validate
+/**
+ * @description: 校验
+ * @param {string} id
+ * @return {bool, error}
+ */
 func Validate(id string) (flag bool, err error) {
-	fmt.Println(id)
+	// fmt.Println(id)
 	if err = ValidateReg(id); err != nil {
 		return false, err
 	}

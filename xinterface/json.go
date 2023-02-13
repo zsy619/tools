@@ -2,11 +2,23 @@ package xinterface
 
 import "haedu.gov.cn/tools/xjson"
 
+// ObjectToJson
+/**
+ * @description: interface{}转json
+ * @param {interface{}} value
+ * @return {string error}
+ */
 func ObjectToJson(value interface{}) (string, error) {
 	meta, err := xjson.Marshal(value)
 	return string(meta), err
 }
 
+// ObjectsToJson
+/**
+ * @description: interface{}转json
+ * @param {[]interface{}} values
+ * @return {*}
+ */
 func ObjectsToJson(values []interface{}) ([]interface{}, error) {
 	result := [](interface{}){}
 

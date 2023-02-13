@@ -11,10 +11,14 @@ import (
 	"time"
 )
 
-// 写入文件,保存
-// @path 存储路径，如 uploads/icon
-// @base64_image_content base64编码的图片内容
-// @datePath 是否按日期创建目录，如 2018-01-01，则最终存储路径 uploads/icon/2018-01-01
+// Base64ToFile
+/**
+ * @description: 写入文件,保存
+ * @param {string} path 存储路径，如 uploads/icon
+ * @param {string} base64_image_content base64编码的图片内容
+ * @param {bool} datePath 是否按日期创建目录，如 2018-01-01，则最终存储路径 uploads/icon/2018-01-01
+ * @return string error
+ */
 func Base64ToFile(path string, base64_image_content string, datePath bool) (string, error) {
 	b, _ := regexp.MatchString(`^data:\s*image\/(\w+);base64,`, base64_image_content)
 	if !b {
@@ -52,7 +56,12 @@ func Base64ToFile(path string, base64_image_content string, datePath bool) (stri
 	return file, nil
 }
 
-// 判断文件是否存在
+// IsFileExist
+/**
+ * @description: 判断文件是否存在
+ * @param {string} filename 文件名称
+ * @return bool
+ */
 func IsFileExist(filename string) bool {
 	_, err := os.Stat(filename)
 	if os.IsNotExist(err) {
