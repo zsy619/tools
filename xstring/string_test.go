@@ -455,6 +455,7 @@ func TestReverse(t *testing.T) {
 		{"Hello, world", "dlrow ,olleH"},
 		{" ", " "},
 		{"!12345", "54321!"},
+		{"国中a", "a中国"},
 	}
 	for _, tc := range testcases {
 		rev, err := Reverse(tc.in)

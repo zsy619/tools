@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"errors"
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -173,16 +172,16 @@ func ToInt(input string) int {
 }
 
 // ToInt64 字符串转换为int数组
-func ToIntArray(input, sep string) []int {
+func ToIntArray(input, sep string) ([]int, bool) {
 	if len(input) > 0 {
 		var intArr []int
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToInt(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToInt8 字符串转换为int8
@@ -198,16 +197,16 @@ func ToInt8(input string) int8 {
 }
 
 // ToInt8Array 字符串转换为int8数组
-func ToInt8Array(input, sep string) []int8 {
+func ToInt8Array(input, sep string) ([]int8, bool) {
 	if len(input) > 0 {
 		var intArr []int8
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToInt8(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToInt16 字符串转换为int16
@@ -222,16 +221,17 @@ func ToInt16(input string) int16 {
 	return 0
 }
 
-func ToInt16Array(input, sep string) []int16 {
+// ToInt16Array 字符串转换为int16数组
+func ToInt16Array(input, sep string) ([]int16, bool) {
 	if len(input) > 0 {
 		var intArr []int16
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToInt16(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToInt32 字符串转换为int32
@@ -247,23 +247,16 @@ func ToInt32(input string) int32 {
 }
 
 // ToInt32Array 字符串转换为int32数组
-func ToInt32Array(input string, sep string) []int32 {
-	intArray := []int32{}
-	// Split string into array
-	arr := strings.Split(input, sep)
-
-	for _, n := range arr {
-		// Convert each string element to an int
-		intVal, err := strconv.Atoi(n)
-		if err != nil {
-			log.Fatal(err)
+func ToInt32Array(input string, sep string) ([]int32, bool) {
+	if len(input) > 0 {
+		var intArr []int32
+		strArr := strings.Split(input, sep)
+		for _, str := range strArr {
+			intArr = append(intArr, ToInt32(str))
 		}
-		// Add the value to the final int array
-		intArray = append(intArray, int32(intVal))
+		return intArr, true
 	}
-
-	// intArray now contains [1,2,3]
-	return intArray
+	return nil, false
 }
 
 // ToInt64 字符串转换为int64
@@ -279,16 +272,16 @@ func ToInt64(input string) int64 {
 }
 
 // ToInt64Array 字符串转换为int64数组
-func ToInt64Array(input, sep string) []int64 {
+func ToInt64Array(input, sep string) ([]int64, bool) {
 	if len(input) > 0 {
 		var intArr []int64
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToInt64(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToUint 字符串转换为uint
@@ -304,16 +297,16 @@ func ToUnit(input string) uint {
 }
 
 // ToUintArray 字符串转换为uint数组
-func ToUintArray(input, sep string) []uint {
+func ToUintArray(input, sep string) ([]uint, bool) {
 	if len(input) > 0 {
 		var intArr []uint
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToUnit(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToUint8 字符串转换为uint8
@@ -329,16 +322,16 @@ func ToUint8(input string) uint8 {
 }
 
 // ToUint8Array 字符串转换为uint8数组
-func ToUint8Array(input, sep string) []uint8 {
+func ToUint8Array(input, sep string) ([]uint8, bool) {
 	if len(input) > 0 {
 		var intArr []uint8
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToUint8(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToUint16 字符串转换为uint16
@@ -353,16 +346,17 @@ func ToUint16(input string) uint16 {
 	return 0
 }
 
-func ToUint16Array(input, sep string) []uint16 {
+// ToUint16Array 字符串转换为uint16数组
+func ToUint16Array(input, sep string) ([]uint16, bool) {
 	if len(input) > 0 {
 		var intArr []uint16
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToUint16(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToUint32 字符串转换为uint32
@@ -378,16 +372,16 @@ func ToUint32(input string) uint32 {
 }
 
 // ToUint32Array 字符串转换为uint32数组
-func ToUint32Array(input, sep string) []uint32 {
+func ToUint32Array(input, sep string) ([]uint32, bool) {
 	if len(input) > 0 {
 		var intArr []uint32
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToUint32(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // ToUint64 字符串转换为uint64
@@ -403,16 +397,16 @@ func ToUint64(input string) uint64 {
 }
 
 // ToUint64Array 字符串转换为uint64数组
-func ToUint64Array(input, sep string) []uint64 {
+func ToUint64Array(input, sep string) ([]uint64, bool) {
 	if len(input) > 0 {
 		var intArr []uint64
 		strArr := strings.Split(input, sep)
 		for _, str := range strArr {
 			intArr = append(intArr, ToUint64(str))
 		}
-		return intArr
+		return intArr, true
 	}
-	return nil
+	return nil, false
 }
 
 // Without returns a copy of the slice without the remove parameter
@@ -440,7 +434,6 @@ func GenerateSlug(str string) (slug string) {
 		default:
 			return -1
 		}
-		return -1
 	}, strings.ToLower(strings.TrimSpace(str)))
 }
 
@@ -459,6 +452,7 @@ func InChain(needle string, haystack []string) bool {
 	return false
 }
 
+// TrimHtml 去除HTML标签
 func TrimHtml(src string) string {
 	// 将HTML标签全转换成小写
 	re, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
@@ -478,6 +472,7 @@ func TrimHtml(src string) string {
 	return strings.TrimSpace(src)
 }
 
+// CutstrHtml 去除HTML标签
 func CutstrHtml(src string) string {
 	strx := TrimHtml(src)
 	strx = strings.ReplaceAll(strx, "\r\n", "")
@@ -548,6 +543,7 @@ func StrVal(value interface{}) string {
 	return key
 }
 
+// Reverse returns its argument string reversed rune-wise left to right.
 func Reverse(s string) (string, error) {
 	if !utf8.ValidString(s) {
 		return s, errors.New("input is not valid UTF-8")
