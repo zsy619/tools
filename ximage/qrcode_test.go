@@ -58,10 +58,10 @@ func TestQrCode_CreateQrCodeBackground(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			this := &QrCode{
-				Root:       tt.fields.Root,
-				Title:      tt.fields.Title,
-				Background: tt.fields.Background,
-				QrCode:     tt.fields.QrCode,
+				Root:         tt.fields.Root,
+				Title:        tt.fields.Title,
+				Background:   tt.fields.Background,
+				QrCodeConfig: tt.fields.QrCode,
 			}
 			gotFile, err := this.CreateQrCodeBackground()
 			if (err != nil) != tt.wantErr {

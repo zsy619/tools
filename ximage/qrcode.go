@@ -29,6 +29,12 @@ import (
 	"haedu.gov.cn/tools/xphp"
 )
 
+//go:generate goption -p . -c QrCode -w
+//go:generate goption -p . -c BackgroundConfig -w
+//go:generate goption -p . -c QrCodeConfig -w
+//go:generate goption -p . -c TitleConfig -w
+//go:generate gofmt -w .
+
 var (
 	// Black is an opaque black uniform image.
 	Black = image.NewUniform(color.Black)
@@ -41,11 +47,11 @@ var (
 )
 
 type QrCode struct {
-	IsOne      bool             // 生成一次，按月存储，文件名 md5(内容)
-	Root       string           // 最终图片保存路径
-	Title      TitleConfig      // 标题配置
-	Background BackgroundConfig // 背景图片设置
-	QrCode     QrCodeConfig     // 二维码配置
+	IsOne        bool             // 生成一次，按月存储，文件名 md5(内容)
+	Root         string           // 最终图片保存路径
+	Title        TitleConfig      // 标题配置
+	Background   BackgroundConfig // 背景图片设置
+	QrCodeConfig QrCodeConfig     // 二维码配置
 }
 
 type BackgroundConfig struct {
@@ -84,7 +90,12 @@ type Offset struct {
 	Y int
 }
 
-func NewQrCode() *QrCode {
+// NewQrCodeDefault
+/**
+ * @description: 创建默认的二维码配置
+ * @return {*}
+ */
+func NewQrCodeDefault() *QrCode {
 	qrCode := &QrCode{
 		Title: TitleConfig{
 			Dpi:     72,
@@ -100,7 +111,7 @@ func NewQrCode() *QrCode {
 				Height: 0,
 			},
 		},
-		QrCode: QrCodeConfig{
+		QrCodeConfig: QrCodeConfig{
 			Offset: Offset{
 				X: 0,
 				Y: 0,
@@ -120,7 +131,7 @@ func NewQrCode() *QrCode {
 /** CreateQrCodeBackground
  * @description: 生成带带背景图片的二维码
  * @param {*}
- * @return {*}
+ * @return {string} 生成的图片路径
  */
 func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 	err = this.checkAttribute() // 参数校验
@@ -135,7 +146,7 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 	)
 
 	// 二维码
-	qrcode, err = this.createQrCode(this.QrCode.Content)
+	qrcode, err = this.createQrCode(this.QrCodeConfig.Content)
 	if err != nil {
 		return
 	}
@@ -165,7 +176,7 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 		return
 	}
 	// 设置为居中
-	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+this.QrCode.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+this.QrCode.Offset.Y)
+	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+this.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+this.QrCodeConfig.Offset.Y)
 	m := image.NewNRGBA(originalB)
 	draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
 	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Src)
@@ -184,6 +195,12 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 	// return this.CreateQrCodeBackgroundPlacenum(fpath)
 }
 
+// CreateQrCodeBackgroundPlacenum
+/**
+ * @description:
+ * @param {string} file
+ * @return {string , error}
+ */
 func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, err error) {
 	err = this.checkAttribute() // 参数校验
 	if err != nil {
@@ -197,7 +214,7 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 	)
 
 	// 二维码
-	qrcode, err = this.createQrCode(this.QrCode.Content)
+	qrcode, err = this.createQrCode(this.QrCodeConfig.Content)
 	if err != nil {
 		fmt.Println("CreateQrCodeBackgroundPlacenum：", err.Error())
 		return
@@ -228,7 +245,7 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 		return
 	}
 	// 设置为居中
-	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+this.QrCode.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+this.QrCode.Offset.Y)
+	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+this.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+this.QrCodeConfig.Offset.Y)
 	m := image.NewNRGBA(originalB)
 	draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
 	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Over)
@@ -245,6 +262,12 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 	return
 }
 
+// showTitle
+/**
+ * @description: 显示标题
+ * @param {*image.NRGBA} target
+ * @return {*}
+ */
 func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
 	fontFamily, err := xphp.GetFontFamily(this.Title.Path)
 	if err != nil {
@@ -292,7 +315,11 @@ func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
 	return target, nil
 }
 
-// 获取字符集，仅调用一次
+// getFontFamily
+/**
+ * @description: 获取字符集，仅调用一次
+ * @return {*truetype.Font, error}
+ */
 func (this *QrCode) getFontFamily() (*truetype.Font, error) {
 	// 这里需要读取中文字体，否则中文文字会变成方格
 	fontBytes, err := ioutil.ReadFile(this.Title.Path)
@@ -310,12 +337,13 @@ func (this *QrCode) getFontFamily() (*truetype.Font, error) {
 	return f, err
 }
 
-/** CreateQrCode
+// CreateQrCode
+/**
  * @description: 生成二维码
  * @param {string} content 内容
  * @param {int} size 大小
  * @param {qrcode.RecoveryLevel} level 二维码质量
- * @return {*}
+ * @return {string , error}
  */
 func (this *QrCode) CreateQrCode(content string, size int, level qrcode.RecoveryLevel) (file string, err error) {
 	if content == "" {
@@ -331,8 +359,8 @@ func (this *QrCode) CreateQrCode(content string, size int, level qrcode.Recovery
 	if size <= 0 {
 		size = 620
 	}
-	this.QrCode.Size = size
-	this.QrCode.Level = level
+	this.QrCodeConfig.Size = size
+	this.QrCodeConfig.Level = level
 	if xphp.Empty(this.Root) {
 		if this.IsOne {
 			this.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
@@ -360,8 +388,8 @@ func (this *QrCode) CreateQrCode(content string, size int, level qrcode.Recovery
 }
 
 func (this *QrCode) CreateQrCodeImage(content string, size int, level qrcode.RecoveryLevel) (image.Image, error) {
-	this.QrCode.Size = size
-	this.QrCode.Level = level
+	this.QrCodeConfig.Size = size
+	this.QrCodeConfig.Level = level
 	return this.createQrCode(content)
 }
 
@@ -381,22 +409,22 @@ func (this *QrCode) CreateQrCodeFileName(content string, size int, level qrcode.
 		fmt.Println("CreateQrCode：", err.Error())
 		return err
 	}
-	this.QrCode.Size = size
-	this.QrCode.Level = level
+	this.QrCodeConfig.Size = size
+	this.QrCodeConfig.Level = level
 	_, ferr = xphp.ImagePNG(file, img)
 	return
 }
 
 // checkAttribute 属性校验
 func (this *QrCode) checkAttribute() error {
-	if this.QrCode.Content == "" {
+	if this.QrCodeConfig.Content == "" {
 		return errors.New("无二维码内容")
 	}
 	if this.Background.Path == "" {
 		return errors.New("未设置背景图")
 	}
-	if this.QrCode.Size <= 0 {
-		this.QrCode.Size = 620
+	if this.QrCodeConfig.Size <= 0 {
+		this.QrCodeConfig.Size = 620
 	}
 	if xphp.Empty(this.Root) {
 		this.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
@@ -408,7 +436,11 @@ func (this *QrCode) checkAttribute() error {
 	return nil
 }
 
-// randomFileName 获取一个随机的文件名称
+// randomFileName
+/**
+ * @description: 获取一个随机的文件名称
+ * @return {string}
+ */
 func (this *QrCode) randomFileName() string {
 	randNum := fmt.Sprintf("%d", rand.Intn(9999)+1000)
 	hashName := md5.Sum([]byte(time.Now().Format("2006_01_02_15_04_05_") + randNum))
@@ -416,32 +448,41 @@ func (this *QrCode) randomFileName() string {
 	return fileName
 }
 
-// md5FileName 获取一个md5文件名称
+// md5FileName
+/**
+ * @description: 获取一个md5文件名称
+ * @return {string}
+ */
 func (this *QrCode) md5FileName() string {
-	fileName := xcrypto.GetMD5Hash(this.QrCode.Content)
+	fileName := xcrypto.GetMD5Hash(this.QrCodeConfig.Content)
 	return fileName
 }
 
-// createQrCode 创建二维码
+// createQrCode
+/**
+ * @description: 创建二维码
+ * @param {string} content
+ * @return {image.Image, error}
+ */
 func (this *QrCode) createQrCode(content string) (qrcodeImg image.Image, err error) {
 	var qrCode *qrcode.QRCode
-	qrCode, err = qrcode.New(content, this.QrCode.Level)
+	qrCode, err = qrcode.New(content, this.QrCodeConfig.Level)
 	if err != nil {
 		return nil, errors.New("创建二维码失败:" + err.Error())
 	}
 	qrCode.DisableBorder = true
-	qrcodeImg = qrCode.Image(this.QrCode.Size)
+	qrcodeImg = qrCode.Image(this.QrCodeConfig.Size)
 
 	// 二维码logo
-	if this.QrCode.LogoPath != "" {
-		logo, errx := os.Open(this.QrCode.LogoPath)
+	if this.QrCodeConfig.LogoPath != "" {
+		logo, errx := os.Open(this.QrCodeConfig.LogoPath)
 		if errx != nil {
 			fmt.Println("createQrCode-->", errx.Error())
 			goto OK
 		}
 		defer logo.Close()
 		var logoImg image.Image
-		ext := this.getFileExt(this.QrCode.LogoPath)
+		ext := this.getFileExt(this.QrCodeConfig.LogoPath)
 		fmt.Println("ext:", ext)
 		switch ext {
 		default:
@@ -467,8 +508,8 @@ func (this *QrCode) createQrCode(content string) (qrcodeImg image.Image, err err
 			goto OK
 		}
 		// 判断是否缩放
-		if this.QrCode.LogoResize.Width > 0 && this.QrCode.LogoResize.Height > 0 {
-			logoImg = this.ImageResize(logoImg, this.QrCode.LogoResize)
+		if this.QrCodeConfig.LogoResize.Width > 0 && this.QrCodeConfig.LogoResize.Height > 0 {
+			logoImg = this.ImageResize(logoImg, this.QrCodeConfig.LogoResize)
 		}
 
 		qrcodeB := qrcodeImg.Bounds()
@@ -485,10 +526,23 @@ OK:
 	return qrcodeImg, nil
 }
 
+// ImageResize
+/**
+ * @description:
+ * @param {image.Image} src
+ * @param {Resize} rse
+ * @return {image.Image}
+ */
 func (this *QrCode) ImageResize(src image.Image, rse Resize) image.Image {
 	return resize.Resize(uint(rse.Width), uint(rse.Height), src, resize.Lanczos3)
 }
 
+// checkFile
+/**
+ * @description: 检查文件是否存在
+ * @param {string} name
+ * @return {bool, error}
+ */
 func (this *QrCode) checkFile(name string) (bool, error) {
 	_, err := os.Stat(name)
 	if err != nil {
@@ -500,6 +554,12 @@ func (this *QrCode) checkFile(name string) (bool, error) {
 	return true, nil
 }
 
+// getFileExt
+/**
+ * @description: 获取文件后缀
+ * @param {string} filename
+ * @return {string}
+ */
 func (this *QrCode) getFileExt(filename string) string {
 	return strings.ToLower(strings.ReplaceAll(filepath.Ext(filename), ".", ""))
 }

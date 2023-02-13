@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+//go:generate goption -p . -c OpenAI -w
+//go:generate goption -p . -c OpenAIResponse -w
+//go:generate gofmt -w .
+
 const (
 	openAIAPI = "https://api.openai.com/v1/engines/text-davinci/jobs"
 )

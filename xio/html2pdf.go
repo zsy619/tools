@@ -10,6 +10,9 @@ import (
 	"github.com/chromedp/chromedp"
 )
 
+//go:generate goption -p . -c PrintToPDFParams -w
+//go:generate gofmt -w .
+
 // PrintToPDFParams 打印参数
 type PrintToPDFParams struct {
 	Landscape               bool    `json:"landscape,omitempty"`               // 横向打印. 默认false.

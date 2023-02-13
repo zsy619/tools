@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+// Zip
+/**
+ * @description: 压缩文件
+ * @param {string} src_dir 源文件夹
+ * @param {string} zip_file_name 压缩文件名
+ * @param {bool} zip_header_name 是否压缩文件夹
+ * @return {error}
+ */
 func Zip(src_dir string, zip_file_name string, zip_header_name bool) error {
 	dir, err := ioutil.ReadDir(src_dir)
 	if err != nil {
