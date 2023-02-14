@@ -6,6 +6,12 @@ import (
 	"strconv"
 )
 
+// Num2String
+/**
+ * @description: 数字转字符串
+ * @param {int} n
+ * @return {string}
+ */
 func Num2String(n int) string {
 	if n >= 1000 {
 		rt := math.Round(float64(n)/1000*100) / 100
@@ -14,7 +20,12 @@ func Num2String(n int) string {
 	return strconv.Itoa(n)
 }
 
-func Range(begin, end int) (result []int) {
+// Range
+/**
+ * @description: 生成一个范围内的整数切片
+ * @return {*}
+ */
+func Range[T ~int | ~int8 | ~int16 | ~int32 | ~int64 | ~float32 | ~float64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64](begin, end T) (result []T) {
 	step := end - begin
 	if step == 0 {
 		result = append(result, begin)

@@ -27,7 +27,13 @@ type Worker struct {
 	number    int64      // 当前毫秒已经生成的id序列号(从0开始累加) 1毫秒内最多生成4096个ID
 }
 
-func NewWorker(workerId int64) (*Worker, error) {
+// NewWorkerDefault
+/**
+ * @description: 生成一个新的节点
+ * @param {int64} workerId
+ * @return {*}
+ */
+func NewWorkerDefault(workerId int64) (*Worker, error) {
 	// 要先检测workerId是否在上面定义的范围内
 	if workerId < 0 || workerId > workerMax {
 		return nil, errors.New("Worker ID excess of quantity")
@@ -40,6 +46,11 @@ func NewWorker(workerId int64) (*Worker, error) {
 	}, nil
 }
 
+// GetId
+/**
+ * @description: 获取下一个ID
+ * @return {*}
+ */
 func (w *Worker) GetId() int64 {
 	// 获取id最关键的一点 加锁 加锁 加锁
 	w.mu.Lock()

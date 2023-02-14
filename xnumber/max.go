@@ -1,8 +1,18 @@
 package xnumber
 
+func Max[T NumberAll](vs ...T) T {
+	max := vs[0]
+	for i := 1; i < len(vs); i++ {
+		if max < vs[i] {
+			max = vs[i]
+		}
+	}
+	return max
+}
+
 // MaxInt 获取最大整数
 func MaxInt(vs ...int) int {
-	var max = vs[0]
+	max := vs[0]
 	for i := 1; i < len(vs); i++ {
 		if max < vs[i] {
 			max = vs[i]
@@ -13,7 +23,7 @@ func MaxInt(vs ...int) int {
 
 // MinInt 获取最小整数
 func MinInt(vs ...int) int {
-	var min = vs[0]
+	min := vs[0]
 	for i := 1; i < len(vs); i++ {
 		if min > vs[i] {
 			min = vs[i]
@@ -24,6 +34,13 @@ func MinInt(vs ...int) int {
 
 // SumInt 计算整数总和
 func SumInt(args ...int) (v int) {
+	for _, arg := range args {
+		v += arg
+	}
+	return
+}
+
+func Sum[T NumberAll](args ...T) (v T) {
 	for _, arg := range args {
 		v += arg
 	}
@@ -51,9 +68,23 @@ func InSliceInt(v int, is []int) bool {
 	return false
 }
 
+// InSlice
+/**
+ * @description:  判断某值是否在切片中
+ * @return {*}
+ */
+func InSlice[T NumberAll](v T, is []T) bool {
+	for _, i := range is {
+		if i == v {
+			return true
+		}
+	}
+	return false
+}
+
 // MaxInt64 获取最大整数
 func MaxInt64(vs ...int64) int64 {
-	var max = vs[0]
+	max := vs[0]
 	for i := 1; i < len(vs); i++ {
 		if max < vs[i] {
 			max = vs[i]
@@ -64,7 +95,7 @@ func MaxInt64(vs ...int64) int64 {
 
 // MinInt64 获取最小整数
 func MinInt64(vs ...int64) int64 {
-	var min = vs[0]
+	min := vs[0]
 	for i := 1; i < len(vs); i++ {
 		if min > vs[i] {
 			min = vs[i]

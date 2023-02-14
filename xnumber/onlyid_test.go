@@ -7,7 +7,7 @@ import (
 
 func TestWorker_GetId(t *testing.T) {
 	// 生成节点实例
-	worker, err := NewWorker(2)
+	worker, err := NewWorkerDefault(2)
 	if err != nil {
 		fmt.Println(err)
 		return
