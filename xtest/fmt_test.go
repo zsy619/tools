@@ -30,3 +30,7 @@ func Test_ToValidUTF8(t *testing.T) {
 		fmt.Println("", string(letter[i]))
 	}
 }
+
+func Test_Douhao(t *testing.T) {
+	fmt.Println(fmt.Sprintf(`{"job_state":0,"natural_check":%v,"msg":"批量下架"}`, 120))
+}
