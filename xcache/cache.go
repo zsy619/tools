@@ -10,7 +10,7 @@ var cacheAdapter *cache.Cache
 
 func init() {
 	// 创建一个默认过期时间为5分钟的缓存适配器
-	// 每60清除一次过期的项目
+	// 每60秒清除一次过期的项目
 	cacheAdapter = cache.New(5*time.Minute, 60*time.Second)
 }
 

@@ -166,7 +166,7 @@ func TestRandomHex(t *testing.T) {
 	if len(s) != 64 {
 		t.Errorf("Should have been a 64 char hex string: %v", len(s))
 	}
-
+	t.Log(s)
 	s, err = RandomHexStr(10)
 	if err != nil {
 		t.Errorf("Should not have failed on call to random hex str: err: %v", err)
