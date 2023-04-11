@@ -1,4 +1,4 @@
-package xnumber
+package xmath
 
 type decimal struct {
 	d     [800]byte // digits, big-endian representation

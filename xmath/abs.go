@@ -1,4 +1,4 @@
-package xnumber
+package xmath
 
 // AbsInt8 gets absolute value of int8.
 //

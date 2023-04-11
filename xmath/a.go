@@ -1,4 +1,4 @@
-package xnumber
+package xmath
 
 //go:generate goption -p . -c Worker -w
 //go:generate gofmt -w .

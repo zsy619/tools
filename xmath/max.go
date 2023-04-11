@@ -1,4 +1,4 @@
-package xnumber
+package xmath
 
 func Max[T NumberAll](vs ...T) T {
 	max := vs[0]

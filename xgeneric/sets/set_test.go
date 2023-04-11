@@ -17,7 +17,7 @@ func Test_set_should_empty_after_init(t *testing.T) {
 func Test_set_should_contains_elem_after_added(t *testing.T) {
 	s := NewSet[string]()
 
-	s.Add("elem1", "elem2")
+	s.AddSlice("elem1", "elem2")
 
 	if !s.Contains("elem1") {
 		t.Errorf("%t should equal true", s.Contains("elem1"))

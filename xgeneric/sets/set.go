@@ -1,5 +1,7 @@
 package sets
 
+import "haedu.gov.cn/tools"
+
 // Set is a set of elements
 type Set[T comparable] map[T]struct{}
 
@@ -22,9 +24,20 @@ func (s *Set[T]) IsEmpty() bool {
 	return s.Len() == 0
 }
 
-// Add add elements to set s
+// Add add key into set if target exist return false and nothing changes
+func (s *Set[T]) Add(target T) bool {
+	_, ok := (*s)[target]
+	if ok {
+		return false
+	}
+
+	(*s)[target] = tools.Empty
+	return true
+}
+
+// AddSlice add elements to set s
 // if element is already in s this has no effect
-func (s *Set[T]) Add(es ...T) {
+func (s *Set[T]) AddSlice(es ...T) {
 	for _, e := range es {
 		(*s)[e] = struct{}{}
 	}
@@ -40,14 +53,14 @@ func (s *Set[T]) Remove(es ...T) {
 
 // Contains report wether v is in s
 func (s *Set[T]) Contains(v T) bool {
-	_, ok := (*s)[v] 
+	_, ok := (*s)[v]
 	return ok
 }
 
 // Clone create a new set with the same elements as s
 func (s *Set[T]) Clone() Set[T] {
 	r := Set[T]{}
-	r.Add(s.ToSlice()...)
+	r.AddSlice(s.ToSlice()...)
 	return r
 }
 

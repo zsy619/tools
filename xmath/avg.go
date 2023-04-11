@@ -1,4 +1,4 @@
-package xnumber
+package xmath
 
 // Avg
 /**
