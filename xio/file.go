@@ -4,12 +4,38 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
 )
+
+const (
+	COMMON_FILE_MODE = 0o644 // common file mode , value as '-rw-r--r--' by unix os
+)
+
+// file info watch call back function process during in #ListFiles
+type callbackFn func(filename, path string, data []byte)
+
+func ListFiles(dir string, callback callbackFn) (reterr error) {
+	fileSystem := os.DirFS(dir)
+	return fs.WalkDir(fileSystem, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		data, err := ioutil.ReadFile(filepath.Join(dir, path))
+		if err != nil {
+			return err
+		}
+		callback(path, dir, data)
+		return nil
+	})
+}
 
 // IsDir 存在且为目录
 func IsDir(dir string) bool {
@@ -195,7 +221,7 @@ func CopyFile3(src, des string, bufSize int) (written int64, err error) {
 // 创建文件夹（如果文件夹不存在则创建）
 func MakeDir(dir string) error {
 	if !FileIsExisted(dir) {
-		if err := os.MkdirAll(dir, 0777); err != nil { // os.ModePerm
+		if err := os.MkdirAll(dir, 0o777); err != nil { // os.ModePerm
 			fmt.Println("MakeDir failed:", err)
 			return err
 		}
