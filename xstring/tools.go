@@ -364,3 +364,29 @@ func findPlaceholderEndIndex(buf string, startIndex int, prefix, suffix string) 
 
 	return -1
 }
+
+// HasSuffix to check if s has suffix
+func HasSuffix(s string, suffix ...string) bool {
+	if IsEmpty(s) || len(suffix) == 0 {
+		return false
+	}
+	for _, v := range suffix {
+		if strings.HasSuffix(s, v) {
+			return true
+		}
+	}
+	return false
+}
+
+// HasPrefix to check if s has prefix
+func HasPrefix(s string, prefix ...string) bool {
+	if IsEmpty(s) || len(prefix) == 0 {
+		return false
+	}
+	for _, v := range prefix {
+		if strings.HasPrefix(s, v) {
+			return true
+		}
+	}
+	return false
+}
