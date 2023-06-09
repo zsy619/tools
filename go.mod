@@ -25,6 +25,7 @@ require (
 	github.com/smartystreets/goconvey v1.8.0
 	github.com/stretchr/testify v1.8.1
 	github.com/t-tomalak/logrus-easy-formatter v0.0.0-20190827215021-c074f06c5816
+	github.com/tjfoc/gmsm v1.4.1
 	golang.org/x/image v0.3.0
 	golang.org/x/net v0.6.0
 	gopkg.in/yaml.v2 v2.4.0

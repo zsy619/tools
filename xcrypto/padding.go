@@ -30,7 +30,7 @@ func PKCS5UnPadding(origData []byte) []byte {
 	return origData[:(length - unpadding)] // 只截取返回有效数字内的byte数组
 }
 
-// 加密填充模式（添加补全码） PKCS5Padding
+// 加密填充模式（添加补全码） PKCS7Padding
 // 加密时，如果加密bytes的length不是blockSize的整数倍，需要在最后面添加填充byte
 func PKCS7Padding(ciphertext []byte, blockSize int) []byte {
 	paddingCount := blockSize - len(ciphertext)%blockSize // 需要padding的数目
