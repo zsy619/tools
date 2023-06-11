@@ -6,6 +6,13 @@ type Queryer interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
 
+/**
+ * @description: 查询多条数据
+ * @param {Queryer} db 数据库连接
+ * @param {string} query 查询语句
+ * @param {...interface{}} args 查询参数
+ * @return {*}
+ */
 func Select(db Queryer, query string, args ...interface{}) ([]map[string]interface{}, error) {
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -14,6 +21,11 @@ func Select(db Queryer, query string, args ...interface{}) ([]map[string]interfa
 	return SelectScan(rows)
 }
 
+/**
+ * @description: 查询多条数据
+ * @param {*sql.Rows} rows 查询结果
+ * @return {*}
+ */
 func SelectScan(rows *sql.Rows) ([]map[string]interface{}, error) {
 	defer rows.Close()
 

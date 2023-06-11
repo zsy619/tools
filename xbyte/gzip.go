@@ -25,8 +25,8 @@ func EncodeGzipBytes(meta []byte) []byte {
 	w := gzip.NewWriter(&b)
 	defer w.Close()
 
-	w.Write(meta)
-	w.Flush()
+	_, _ = w.Write(meta)
+	_ = w.Flush()
 
 	return b.Bytes()
 }

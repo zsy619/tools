@@ -24,7 +24,7 @@ func Values(objects ...interface{}) string {
 // Modulo returns the modulo of sha value into num
 func Modulo(sha string, num int) int {
 	hasher := fnv.New32a()
-	hasher.Write([]byte(sha))
+	_, _ = hasher.Write([]byte(sha))
 	partition := int(hasher.Sum32()) % num
 	if partition < 0 {
 		partition = -partition
@@ -36,26 +36,26 @@ func hashValues(objects ...interface{}) string {
 	h := xxhash.New()
 
 	// This is a type switch, pointers have to be handled differently unfortunately
-	// Note: It appears fmt.Fprintf is second fastest to io.WriteString.
+	// Note: It appears fmt.Fprintf is second fastest to _, _ = io.WriteString.
 	for _, o := range objects {
 		if o == nil {
-			io.WriteString(h, "")
+			_, _ = io.WriteString(h, "")
 			continue
 		}
 		switch s := o.(type) {
 		case string:
-			io.WriteString(h, s)
+			_, _ = io.WriteString(h, s)
 		case []byte:
-			h.Write(s)
+			_, _ = h.Write(s)
 		case []string:
 			for _, v := range s {
-				io.WriteString(h, v)
+				_, _ = io.WriteString(h, v)
 			}
 		case bool:
 			if s {
-				io.WriteString(h, "true")
+				_, _ = io.WriteString(h, "true")
 			} else {
-				io.WriteString(h, "false")
+				_, _ = io.WriteString(h, "false")
 			}
 		case int, int8, int16, int32, int64:
 			fmt.Fprintf(h, "%d", s)
@@ -75,43 +75,43 @@ func hashValues(objects ...interface{}) string {
 			}
 		case *string:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
-				io.WriteString(h, *s)
+				_, _ = io.WriteString(h, *s)
 			}
 		case *int:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				fmt.Fprintf(h, "%d", *s)
 			}
 		case *int8:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				fmt.Fprintf(h, "%d", *s)
 			}
 		case *int16:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				fmt.Fprintf(h, "%d", *s)
 			}
 		case *int32:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				fmt.Fprintf(h, "%d", *s)
 			}
 		case *int64:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				fmt.Fprintf(h, "%d", *s)
 			}
 		case *float32:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				// truncate without decimals if a float like 123.00
 				if *s == float32(int32(*s)) {
@@ -122,7 +122,7 @@ func hashValues(objects ...interface{}) string {
 			}
 		case *float64:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				// truncate without decimals if a float like 123.00
 				if *s == float64(int64(*s)) {
@@ -133,7 +133,7 @@ func hashValues(objects ...interface{}) string {
 			}
 		case *bool:
 			if s == nil {
-				io.WriteString(h, "")
+				_, _ = io.WriteString(h, "")
 			} else {
 				fmt.Fprintf(h, "%v", *s)
 			}
@@ -147,7 +147,7 @@ func hashValues(objects ...interface{}) string {
 			switch k {
 			case reflect.Struct, reflect.Slice, reflect.Interface:
 				buf, _ := xjson.Marshal(s)
-				h.Write(buf)
+				_, _ = h.Write(buf)
 			default:
 				// fmt.Println(reflect.TypeOf(s), reflect.TypeOf(s).Kind(), fmt.Sprintf("%v", s))
 				fmt.Fprintf(h, "%v", s)

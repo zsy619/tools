@@ -22,7 +22,7 @@ func init() {
 }
 
 func SetDisCahce(k string, x []byte) {
-	diskKeyValue.Write(k, x)
+	_ = diskKeyValue.Write(k, x)
 }
 
 func GetDisCahce(k string) (string, error) {
@@ -63,11 +63,11 @@ func GetDiskvInt(key string) int {
 
 func SetDiskvInt(key string, value int) {
 	x := strconv.Itoa(value)
-	diskKeyValue.Write(key, []byte(x))
+	_ = diskKeyValue.Write(key, []byte(x))
 }
 
 func SetDiskvString(key string, value string) {
-	diskKeyValue.Write(key, []byte(value))
+	_ = diskKeyValue.Write(key, []byte(value))
 }
 
 func GetDiskvString(key string) string {

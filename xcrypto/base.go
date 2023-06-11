@@ -28,7 +28,7 @@ func Base64StdDecode(s string) string {
 // Md5String return the md5 value of string.
 func Md5String(s string) string {
 	h := md5.New()
-	h.Write([]byte(s))
+	_, _ = h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
 }
 

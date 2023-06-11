@@ -34,7 +34,7 @@ func DeleteCache(k string) {
 
 // Add() 加入缓存
 func AddCache(k string, x interface{}, d time.Duration) {
-	cacheAdapter.Add(k, x, d)
+	_ = cacheAdapter.Add(k, x, d)
 }
 
 // IncrementInt() 对已存在的key 值自增n
