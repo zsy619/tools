@@ -154,3 +154,13 @@ func ZeroUnPadding(data []byte) []byte {
 	}
 	return data[0 : i+1]
 }
+
+// ReverseString 字符串反转
+func ReverseString(s string) string {
+	b := []byte(s)
+	n := len(b)
+	for i := 0; i < n/2; i++ {
+		b[i], b[n-i-1] = b[n-i-1], b[i]
+	}
+	return string(b)
+}
