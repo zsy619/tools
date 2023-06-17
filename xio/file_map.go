@@ -3,7 +3,7 @@ package xio
 import (
 	"bytes"
 	"encoding/hex"
-	"io/ioutil"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -17,6 +17,7 @@ var fileTypeMap sync.Map
  * @return {*}
  */
 func init() {
+	fmt.Println("begin init file_map.go")
 	fileTypeMap.Store("ffd8ffe000104a464946", "jpg")  // JPEG (jpg)
 	fileTypeMap.Store("89504e470d0a1a0a0000", "png")  // PNG (png)
 	fileTypeMap.Store("47494638396126026f01", "gif")  // GIF (gif)
@@ -73,6 +74,7 @@ func init() {
 	fileTypeMap.Store("AC9EBD8F", "qdf")         // Quicken (qdf)
 	fileTypeMap.Store("E3828596", "pwl")         // Windows Password (pwl)
 	fileTypeMap.Store("2E7261FD", "ram")         // Real Audio (ram)
+	fmt.Println("end init file_map.go")
 }
 
 // BytesToHexString
@@ -98,7 +100,6 @@ func BytesToHexString(src []byte) string {
 	return res.String()
 }
 
-// GetFileType
 /**
  * @description: 用文件前面几个字节来判断
  * @param {[]byte} fSrc 文件字节流（就用前面几个字节）
@@ -121,21 +122,22 @@ func GetFileType(fSrc []byte) string {
 	return fileType
 }
 
-// GetFileTypeByFileName
 /**
  * @description: 根据文件名获取扩展
  * @return string
  */
-func GetFileTypeByFileName(fn string) string {
+func GetFileTypeByFileName(fn string) (string, error) {
 	f, err := os.Open(fn)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	defer f.Close()
-
-	fSrc, err := ioutil.ReadAll(f)
+	buffer := make([]byte, 512)
+	_, err = f.Read(buffer)
+	// fSrc, err := ioutil.ReadAll(f)
 	if err != nil {
-		return ""
+		return "", err
 	}
-	return GetFileType(fSrc[:10])
+	// fmt.Println("buffer:", string(buffer[:10]))
+	return GetFileType(buffer[:10]), nil
 }
