@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"haedu.gov.cn/tools/xinterface"
 )
 
 const (
@@ -41,6 +43,7 @@ func (e *GormWhere) Unset(key string) error {
 	return nil
 }
 
+// Length 获取长度
 func (e *GormWhere) Length() int {
 	if e == nil || e.where == nil {
 		return 0
@@ -48,54 +51,94 @@ func (e *GormWhere) Length() int {
 	return len(e.where)
 }
 
+// Add 添加
 func (e *GormWhere) Add(key string, value interface{}) *GormWhere {
 	e.where[key] = value
 	return e
 }
 
+// AddInt 添加整数
 func (e *GormWhere) AddInt(key string, value int) *GormWhere {
 	e.where[key] = strconv.Itoa(value)
 	return e
 }
 
+// AddInt32 添加整数
+func (e *GormWhere) AddInt32(key string, value int32) *GormWhere {
+	e.where[key] = strconv.Itoa(int(value))
+	return e
+}
+
+// AddInt64 添加整数
+func (e *GormWhere) AddInt64(key string, value int64) *GormWhere {
+	e.where[key] = strconv.FormatInt(value, 10)
+	return e
+}
+
+// AddInt64s 添加整数
+func (e *GormWhere) AddInt64s(key string, value []int64) *GormWhere {
+	var str []string
+	for _, v := range value {
+		str = append(str, strconv.FormatInt(v, 10))
+	}
+	e.where[key] = strings.Join(str, ",")
+	return e
+}
+
+// AddInts 添加整数
+func (e *GormWhere) AddInts(key string, value []int) *GormWhere {
+	var str []string
+	for _, v := range value {
+		str = append(str, strconv.Itoa(v))
+	}
+	e.where[key] = strings.Join(str, ",")
+	return e
+}
+
+// AddString 添加字符串
 func (e *GormWhere) AddString(key string, value string) *GormWhere {
 	e.where[key] = e.ForamtString(value)
 	return e
 }
 
+// AddExp 添加表达式
 func (e *GormWhere) AddExp(expKey string, value string) *GormWhere {
 	e.where[GormWhere_ExpPrefix+expKey] = e.ForamtString(value)
 	return e
 }
 
+// ForamtString 格式化字符串
 func (e *GormWhere) ForamtString(value string) string {
-	return "'" + value + "'"
+	return "'" + SafeString(value) + "'"
 }
 
+// AddDatetime 添加日期时间
 func (e *GormWhere) AddDatetime(key string, value string) *GormWhere {
 	e.where[key] = e.ForamtString(value)
 	return e
 }
 
+// ForamtDatetime 格式化日期时间
 func (e *GormWhere) ForamtDatetime(value string) string {
 	return ""
 }
 
+// String 转换为字符串sql
 func (e *GormWhere) String() string {
 	where := ""
-	for f, v := range e.where {
+	for exp, v := range e.where {
 		switch v.(type) {
 		case string:
 			if len(where) > 0 {
-				switch f {
+				switch exp {
 				default:
-					if strings.HasPrefix(f, GormWhere_ExpPrefix) {
+					if strings.HasPrefix(exp, GormWhere_ExpPrefix) {
 						exp := v.(string)
 						if len(exp) > 0 {
 							where += " AND " + exp[1:len(exp)-1]
 						}
 					} else {
-						where += " AND " + f + " = " + v.(string)
+						where += " AND " + exp + " = " + v.(string)
 					}
 				case GormWhere_String:
 					where += " AND " + v.(string)
@@ -106,15 +149,15 @@ func (e *GormWhere) String() string {
 					}
 				}
 			} else {
-				switch f {
+				switch exp {
 				default:
-					if strings.HasPrefix(f, GormWhere_ExpPrefix) {
+					if strings.HasPrefix(exp, GormWhere_ExpPrefix) {
 						exp := v.(string)
 						if len(exp) > 0 {
 							where += exp[1 : len(exp)-1]
 						}
 					} else {
-						where = f + " = " + v.(string)
+						where = exp + " = " + v.(string)
 					}
 				case GormWhere_String:
 					where += v.(string)
@@ -125,25 +168,26 @@ func (e *GormWhere) String() string {
 					}
 				}
 			}
-		case int:
+		case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64, float32, float64:
+			val := xinterface.ToString(v)
 			if len(where) > 0 {
-				switch f {
+				switch exp {
 				default:
-					where += " AND " + f + " = " + strconv.Itoa(v.(int))
+					where += " AND " + exp + " = " + val
 				case GormWhere_String:
-					where += strconv.Itoa(v.(int))
+					where += val
 				}
 			} else {
-				switch f {
+				switch exp {
 				default:
-					where = f + " = " + strconv.Itoa(v.(int))
+					where = exp + " = " + val
 				case GormWhere_String:
-					where += strconv.Itoa(v.(int))
+					where += val
 				}
 			}
 		case []string:
 			wheres := v.([]string)
-			str := e.toString(f, wheres)
+			str := e.toString(exp, wheres)
 			if len(str) > 0 {
 				where += " AND " + str
 			} else {
@@ -151,9 +195,33 @@ func (e *GormWhere) String() string {
 			}
 		case [][]string:
 			wheres := v.([][]string)
-			str := e.toStringMore(f, wheres)
+			str := e.toStringMore(exp, wheres)
 			if len(str) > 0 {
 				where += " AND " + str
+			} else {
+				where = str
+			}
+		case *GormWhere:
+			wheres := v.(*GormWhere)
+			str := wheres.String()
+			if len(str) > 0 {
+				if len(where) > 0 {
+					where += " AND (" + str + ")"
+				} else {
+					where = str
+				}
+			} else {
+				where = str
+			}
+		case GormWhere:
+			wheres := v.(GormWhere)
+			str := wheres.String()
+			if len(str) > 0 {
+				if len(where) > 0 {
+					where += " AND (" + str + ")"
+				} else {
+					where = str
+				}
 			} else {
 				where = str
 			}
@@ -165,6 +233,7 @@ func (e *GormWhere) String() string {
 	return where
 }
 
+// toString 转换为字符串s
 func (e *GormWhere) toString(field string, wheres []string) string {
 	if field == GormWhere_String {
 		return wheres[0]
@@ -192,6 +261,7 @@ func (e *GormWhere) toString(field string, wheres []string) string {
 	}
 }
 
+// toStringMore 转换为字符串
 func (e *GormWhere) toStringMore(field string, wheres [][]string) string {
 	length := len(wheres)
 	rt := ""
