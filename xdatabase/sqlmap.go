@@ -1,6 +1,9 @@
 package xdatabase
 
-import "database/sql"
+import (
+	"database/sql"
+	"time"
+)
 
 type Queryer interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
@@ -140,6 +143,8 @@ func Rows2StringInterfaceMapSlice(rows *sql.Rows, cols ...string) ([]map[string]
 				row[cols[i]] = float64(v)
 			case bool:
 				row[cols[i]] = bool(v)
+			case time.Time:
+				row[cols[i]] = v.Format("2006-01-02 15:04:05")
 			case nil:
 				row[cols[i]] = ""
 			default:

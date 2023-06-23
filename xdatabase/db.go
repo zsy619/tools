@@ -28,7 +28,6 @@ func DoQuery2(rows *sql.Rows) (result []map[string]string, columns []string) {
 	columns, err := rows.Columns()
 	if err != nil {
 		return
-		panic(err.Error()) // proper error handling instead of panic in your app
 	}
 	// Make a slice for the values
 	values := make([]sql.RawBytes, len(columns))
