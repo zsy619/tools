@@ -109,7 +109,8 @@ func (e *GormWhere) AddExp(expKey string, value string) *GormWhere {
 
 // ForamtString 格式化字符串
 func (e *GormWhere) ForamtString(value string) string {
-	return "'" + SafeString(value) + "'"
+	return value
+	// return SafeString(value)
 }
 
 // AddDatetime 添加日期时间
