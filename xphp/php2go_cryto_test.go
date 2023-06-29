@@ -6,6 +6,6 @@ import (
 )
 
 func TestMd5(t *testing.T) {
-	out, _ := Md5("12aAAAA3")
+	out, _ := Md5("Bys@123123")
 	fmt.Println("", out)
 }
