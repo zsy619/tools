@@ -75,3 +75,25 @@ func TestSm4Decrypt(t *testing.T) {
 		t.Log(pwd)
 	}
 }
+
+func TestSm4EncryptReverse(t *testing.T) {
+	data := "admin@1245"
+	key := "admin@2023"
+	pwd, err := Sm4EncryptReverse(data, key)
+	if err != nil {
+		t.Fatal(err)
+	} else {
+		fmt.Println(pwd)
+	}
+}
+
+func TestSm4DecryptReverse(t *testing.T) {
+	data := "cc7f5c0865c24adb044b7cdc0b95a6bd"
+	key := "admin@2023"
+	pwd, err := Sm4DecryptReverse(data, key)
+	if err != nil {
+		t.Fatal(err)
+	} else {
+		fmt.Println(pwd)
+	}
+}

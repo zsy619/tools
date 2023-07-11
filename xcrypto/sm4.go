@@ -5,8 +5,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"github.com/tjfoc/gmsm/sm4"
+	"haedu.gov.cn/tools/xstring"
 )
 
 /*
@@ -163,4 +165,34 @@ func ReverseString(s string) string {
 		b[i], b[n-i-1] = b[n-i-1], b[i]
 	}
 	return string(b)
+}
+
+/**
+ * @description: SM4 加密
+ * @param {string} data 明文
+ * @param {string} key 密钥(字符串反转并转换为小写字母)
+ * @return {*}
+ */
+func Sm4EncryptReverse(data string, key string) (string, error) {
+	str, err := xstring.Reverse(key)
+	if err != nil {
+		return "", err
+	}
+	str = strings.ToLower(str)
+	return Sm4Encrypt(data, str)
+}
+
+/**
+ * @description: SM4 解密
+ * @param {string} data 密文
+ * @param {string} key 密钥(字符串反转并转换为小写字母)
+ * @return {*}
+ */
+func Sm4DecryptReverse(data string, key string) (string, error) {
+	str, err := xstring.Reverse(key)
+	if err != nil {
+		return "", err
+	}
+	str = strings.ToLower(str)
+	return Sm4Decrypt(data, str)
 }
