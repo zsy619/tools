@@ -44,6 +44,19 @@ func IsAllowFile(filename string) bool {
 	return isImage
 }
 
+// IsAllowExcel 判断文件是否为允许的excel文件
+// ".xls", ".xlsx"
+func IsAllowExcel(filename string) bool {
+	isImage := false
+	ext := path.Ext(filename)
+	ext = strings.ToLower(ext)
+	switch ext {
+	case ".xls", ".xlsx":
+		isImage = true
+	}
+	return isImage
+}
+
 // IsCompress 判断文件是否为压缩文件
 func IsCompress(filename string) bool {
 	isImage := false
