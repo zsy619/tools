@@ -4,6 +4,8 @@ github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/SebastiaanKlippert/go-wkhtmltopdf v1.8.2 h1:n66+ofm9qVFC1qygyOJ1DgzSv2hSAO66XRbbMQ4JMNI=
 github.com/SebastiaanKlippert/go-wkhtmltopdf v1.8.2/go.mod h1:SQq4xfIdvf6WYKSDxAJc+xOJdolt+/bc1jnQKMtPMvQ=
+github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394 h1:OYA+5W64v3OgClL+IrOD63t4i/RW7RqrAVl9LTZ9UqQ=
+github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394/go.mod h1:Q8n74mJTIgjX4RBBcHnJ05h//6/k6foqmgE45jTQtxg=
 github.com/beeker1121/mailchimp-go v0.0.0-20160721165115-7c5f827423b2 h1:kOmg8hrS+kiad7K9cKEcOWpsdT4mt9eno8cFLs37weA=
 github.com/beeker1121/mailchimp-go v0.0.0-20160721165115-7c5f827423b2/go.mod h1:Bfdd1+ahgqlSj/2T/HoPipgZYQU4rh2bhgUgFlCsN6Q=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=

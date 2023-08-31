@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.8.2
+	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/beeker1121/mailchimp-go v0.0.0-20160721165115-7c5f827423b2
 	github.com/cespare/xxhash v1.1.0
 	github.com/chromedp/cdproto v0.0.0-20230208104036-c3c870aa4771
