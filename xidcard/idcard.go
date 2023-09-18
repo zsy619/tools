@@ -52,6 +52,19 @@ func (id IdCard) Birth() (string, error) {
 	return Birth(id.ToString())
 }
 
+// BirthYm
+/**
+ * @description: 获取出生年月
+ * @return {*}
+ */
+func (id IdCard) BirthYm() (string, error) {
+	ymd, err := Birth(id.ToString())
+	if err != nil {
+		return "", err
+	}
+	return ymd[:6], nil
+}
+
 // Sex
 /**
  * @description: 获取性别

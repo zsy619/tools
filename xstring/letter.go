@@ -26,6 +26,7 @@ func FirstLetterLower(str string) string {
 	return str
 }
 
+// ToLetterArray convert string to letter array
 func ToLetterArray(str string) (result []string) {
 	letter := []rune(str)
 	for i := 0; i < len(letter); i++ {
