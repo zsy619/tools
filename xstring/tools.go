@@ -2,6 +2,7 @@ package xstring
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"unsafe"
 
@@ -389,4 +390,35 @@ func HasPrefix(s string, prefix ...string) bool {
 		}
 	}
 	return false
+}
+
+var (
+	sensitiveStrings []string
+	REGEX            *regexp.Regexp
+)
+
+func init() {
+	// 定义敏感字符串列表
+	sensitiveStrings = []string{
+		"<script>", "</script>", "<style>", "</style>", "<iframe>", "</iframe>", "<img>", "</img>",
+		"<video>", "</video>", "<audio>", "</audio>", "<source>", "</source>", "<track>", "</track>",
+		"<object>", "</object>", "<embed>", "</embed>", "<form>", "</form>", "<button>", "</button>",
+		"<input>", "</input>", "<textarea>", "</textarea>", "<select>", "</select>", "<option>", "</option>",
+		"<frame>", "</frame>", "<frameset>", "</frameset>", "<noframes>", "</noframes>", "<marquee>", "</marquee>",
+		"<blink>", "</blink>", "<link>", "</link>", "<meta>", "</meta>", "<base>", "</base>", "<basefont>", "</basefont>",
+		"<applet>", "</applet>", "<param>", "</param>", "<object>", "</object>", "<embed>", "</embed>",
+		"select", "delete", "update", "where", "drop", "truncate", "exec", "execute", "declare", "master", "create",
+	}
+
+	// 构建正则表达式，忽略大小写，并对敏感字符串进行转义处理
+	pattern := "(?i)" + strings.Join(sensitiveStrings, "|")
+	REGEX = regexp.MustCompile(pattern)
+}
+
+// GetSafeString 过滤敏感字符串
+func GetSafeString(data string) string {
+	if data == "" {
+		return ""
+	}
+	return REGEX.ReplaceAllString(data, "")
 }
