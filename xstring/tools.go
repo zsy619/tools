@@ -394,7 +394,7 @@ func HasPrefix(s string, prefix ...string) bool {
 
 var (
 	sensitiveStrings []string
-	REGEX            *regexp.Regexp
+	sensitiveRegex   *regexp.Regexp
 )
 
 func init() {
@@ -412,7 +412,7 @@ func init() {
 
 	// 构建正则表达式，忽略大小写，并对敏感字符串进行转义处理
 	pattern := "(?i)" + strings.Join(sensitiveStrings, "|")
-	REGEX = regexp.MustCompile(pattern)
+	sensitiveRegex = regexp.MustCompile(pattern)
 }
 
 // GetSafeString 过滤敏感字符串
@@ -420,5 +420,5 @@ func GetSafeString(data string) string {
 	if data == "" {
 		return ""
 	}
-	return REGEX.ReplaceAllString(data, "")
+	return sensitiveRegex.ReplaceAllString(data, "")
 }
