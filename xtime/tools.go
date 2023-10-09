@@ -109,3 +109,37 @@ func SetSeconds(t time.Time, seconds int) time.Time {
 func SetMilliSeconds(t time.Time, milliseconds int) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), milliseconds*1000, t.Location())
 }
+
+// ToWeekday convert string to time.Weekday
+func ToWeekday(week string) time.Weekday {
+	switch week {
+	case "周一", "星期一", "Monday", "Mon", "Mon.", "1", "一":
+		return time.Monday
+	case "周二", "星期二", "Tuesday", "Tue", "Tue.", "2", "二":
+		return time.Tuesday
+	case "周三", "星期三", "Wednesday", "Wed", "Wed.", "3", "三":
+		return time.Wednesday
+	case "周四", "星期四", "Thursday", "Thu", "Thu.", "4", "四":
+		return time.Thursday
+	case "周五", "星期五", "Friday", "Fri", "Fri.", "5", "五":
+		return time.Friday
+	case "周六", "星期六", "Saturday", "Sat", "Sat.", "6", "六":
+		return time.Saturday
+	default:
+		return time.Sunday
+	}
+}
+
+// MonthOfDayCount 获取某年某月的天数
+func MonthOfDayCount(year, month int) int {
+	if month != 2 {
+		if month == 4 || month == 6 || month == 9 || month == 11 {
+			return 30
+		}
+		return 31
+	}
+	if ((year%4) == 0 && (year%100) != 0) || (year%400) == 0 {
+		return 29
+	}
+	return 28
+}
