@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -28,7 +27,7 @@ func ListFiles(dir string, callback callbackFn) (reterr error) {
 		if d.IsDir() {
 			return nil
 		}
-		data, err := ioutil.ReadFile(filepath.Join(dir, path))
+		data, err := os.ReadFile(filepath.Join(dir, path))
 		if err != nil {
 			return err
 		}
@@ -50,7 +49,7 @@ func IsDir(dir string) bool {
 func IsFile(file string) bool {
 	fi, err := os.Stat(file)
 	if err == nil {
-		return fi.IsDir() == false
+		return !fi.IsDir()
 	}
 	return false
 }
@@ -76,7 +75,7 @@ func WalkDir(dir, suffix string) (files []string, err error) {
 /* 获取指定路径下的所有文件，只搜索当前路径，不进入下一级目录，可匹配后缀过滤（suffix为空则不过滤）*/
 func ListDir(dir, suffix string) (files []string, err error) {
 	files = []string{}
-	_dir, err := ioutil.ReadDir(dir)
+	_dir, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +157,7 @@ func CopyFile(src, des string) (written int64, err error) {
 	return io.Copy(desFile, srcFile)
 }
 
-// 使用ioutil.WriteFile()和ioutil.ReadFile()
+// 使用os.WriteFile()和os.ReadFile()
 func CopyFile2(src, des string) (written int64, err error) {
 	// 获取源文件的权限
 	srcFile, err := os.Open(src)
@@ -169,11 +168,11 @@ func CopyFile2(src, des string) (written int64, err error) {
 	perm := fi.Mode()
 	srcFile.Close()
 
-	input, err := ioutil.ReadFile(src)
+	input, err := os.ReadFile(src)
 	if err != nil {
 		return 0, err
 	}
-	err = ioutil.WriteFile(des, input, perm)
+	err = os.WriteFile(des, input, perm)
 	if err != nil {
 		return 0, err
 	}

@@ -3,7 +3,7 @@ package xcas
 import (
 	"encoding/xml"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -25,7 +25,7 @@ func CasVersion2ServiceValidateAction(url string) (serviceResponse *XmlServiceRe
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -56,7 +56,7 @@ func CASLogoutAction(logoutPath string) error {
 	}
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("CASLogoutAction-->", err)
 		return err

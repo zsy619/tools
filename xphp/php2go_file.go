@@ -3,7 +3,6 @@ package xphp
 import (
 	"encoding/csv"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -95,12 +94,12 @@ func FileSize(filename string) (int64, error) {
 
 // FilePutContents file_put_contents()
 func FilePutContents(filename string, data string, mode os.FileMode) error {
-	return ioutil.WriteFile(filename, []byte(data), mode)
+	return os.WriteFile(filename, []byte(data), mode)
 }
 
 // FileGetContents file_get_contents()
 func FileGetContents(filename string) (string, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	return string(data), err
 }
 
@@ -121,7 +120,7 @@ func Copy(source, dest string) (bool, error) {
 		return false, err
 	}
 	defer fd1.Close()
-	fd2, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0644)
+	fd2, err := os.OpenFile(dest, os.O_WRONLY|os.O_CREATE, 0o644)
 	if err != nil {
 		return false, err
 	}
@@ -158,7 +157,7 @@ func Rename(oldname, newname string) error {
 
 // Touch touch()
 func Touch(filename string) (bool, error) {
-	fd, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0666)
+	fd, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0o666)
 	if err != nil {
 		return false, err
 	}

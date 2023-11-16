@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"net"
 	"net/http"
 
 	"github.com/axgle/mahonia"
 	"golang.org/x/net/html/charset"
+
 	"haedu.gov.cn/tools/xjson"
 )
 
@@ -31,7 +32,12 @@ func GetAreaByIp(ip string) AreaInfo {
 	if ip == "" {
 		return info
 	}
-	if ip == "::1" || ip == "127.0.0.1" {
+	if ip == "::1" {
+		info.Err = "内网IP"
+		return info
+	}
+	netIp := net.ParseIP(ip)
+	if isPrivateSubnet(netIp) {
 		info.Err = "内网IP"
 		return info
 	}
@@ -50,26 +56,13 @@ func GetAreaByIp(ip string) AreaInfo {
 		return info
 	}
 
-	body, err := ioutil.ReadAll(utf8Reader)
+	body, err := io.ReadAll(utf8Reader)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
 		return info
 	}
 	xjson.Unmarshal(body, &info)
 
-	// client := &http.Client{}
-	// request, _ := http.NewRequest("GET", url, nil)
-	// request.Header.Set("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3")
-	// response, _ := client.Do(request)
-	// if response.StatusCode == 200 {
-	// 	body, err := io.ReadAll(response.Body)
-	// 	fmt.Println(string(body))
-	// 	if err != nil {
-	// 		info.Err = err.Error()
-	// 		return info
-	// 	}
-	// 	xjson.Unmarshal(body, &info)
-	// }
 	return info
 }
 
@@ -78,7 +71,11 @@ func GetCityByIp(ip string) string {
 	if ip == "" {
 		return ""
 	}
-	if ip == "::1" || ip == "127.0.0.1" {
+	if ip == "::1" {
+		return "内网IP"
+	}
+	netIp := net.ParseIP(ip)
+	if isPrivateSubnet(netIp) {
 		return "内网IP"
 	}
 	url := "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip
@@ -108,4 +105,29 @@ func ConvertToString(src string, srcCode string, tagCode string) string {
 	_, cdata, _ := tagCoder.Translate([]byte(srcResult), true)
 	result := string(cdata)
 	return result
+}
+
+func isPrivateSubnet(ip net.IP) bool {
+	if ip.To4() == nil {
+		return false
+	}
+
+	privateIPBlocks := []*net.IPNet{}
+	for _, cidr := range []string{
+		"127.0.0.0/8",    // IPv4 loopback
+		"10.0.0.0/8",     // RFC1918
+		"172.16.0.0/12",  // RFC1918
+		"192.168.0.0/16", // RFC1918
+	} {
+		if _, block, err := net.ParseCIDR(cidr); err == nil {
+			privateIPBlocks = append(privateIPBlocks, block)
+		}
+	}
+
+	for _, block := range privateIPBlocks {
+		if block.Contains(ip) {
+			return true
+		}
+	}
+	return false
 }

@@ -3,7 +3,6 @@ package xio
 import (
 	"archive/zip"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,7 +17,7 @@ import (
  * @return {error}
  */
 func Zip(src_dir string, zip_file_name string, zip_header_name bool) error {
-	dir, err := ioutil.ReadDir(src_dir)
+	dir, err := os.ReadDir(src_dir)
 	if err != nil {
 		return err
 	}

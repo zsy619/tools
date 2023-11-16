@@ -10,7 +10,6 @@ import (
 	"image/gif"
 	"image/jpeg"
 	"image/png"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -24,6 +23,7 @@ import (
 	qrcode "github.com/skip2/go-qrcode"
 	"golang.org/x/image/bmp"
 	"golang.org/x/image/font"
+
 	"haedu.gov.cn/tools/xcrypto"
 	"haedu.gov.cn/tools/xio"
 	"haedu.gov.cn/tools/xphp"
@@ -322,7 +322,7 @@ func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
  */
 func (this *QrCode) getFontFamily() (*truetype.Font, error) {
 	// 这里需要读取中文字体，否则中文文字会变成方格
-	fontBytes, err := ioutil.ReadFile(this.Title.Path)
+	fontBytes, err := os.ReadFile(this.Title.Path)
 	if err != nil {
 		fmt.Println("getFontFamily--》", "read file error:", err)
 		return &truetype.Font{}, err

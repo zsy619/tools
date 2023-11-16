@@ -2,7 +2,7 @@ package xcas
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -139,7 +139,7 @@ func (c *RestClient) RequestServiceTicket(tgt TicketGrantingTicket) (ServiceTick
 
 	defer resp.Body.Close()
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

@@ -38,7 +38,8 @@ func ToLetterArray(str string) (result []string) {
 // GetStringWidth get the string width
 func GetStringWidth(str string) int {
 	w := 0
-	for _, c := range []rune(str) {
+	rstr := []rune(str)
+	for _, c := range rstr {
 		if IsHalfwidth(c) {
 			w = w + 1
 		} else {

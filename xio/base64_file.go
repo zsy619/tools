@@ -3,7 +3,6 @@ package xio
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"regexp"
@@ -47,7 +46,7 @@ func Base64ToFile(path string, base64_image_content string, datePath bool) (stri
 	var file string = path + "/" + curFileStr + strconv.Itoa(n) + "." + fileType
 	byte, _ := base64.StdEncoding.DecodeString(base64Str)
 
-	err := ioutil.WriteFile(file, byte, 0o666)
+	err := os.WriteFile(file, byte, 0o666)
 	if err != nil {
 		fmt.Println(err)
 		return "", err

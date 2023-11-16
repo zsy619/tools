@@ -3,7 +3,6 @@ package xcrypto
 import (
 	"bytes"
 	"encoding/hex"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -192,6 +191,6 @@ func TestChecksumCopyToFile(t *testing.T) {
 	// shasum -a 256 hashChecksum
 	assert.Equal("eb201af5aaf0d60629d3d2a61e466cfc0fedb517add831ecac5235e1daa963d6", sum)
 	of.Close()
-	buf, _ = ioutil.ReadFile(fn)
+	buf, _ = os.ReadFile(fn)
 	assert.Equal("hash me", string(buf))
 }

@@ -2,7 +2,7 @@ package xio
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -17,7 +17,7 @@ func TestGetFileType(t *testing.T) {
 
 	defer f.Close()
 
-	fSrc, err := ioutil.ReadAll(f)
+	fSrc, err := io.ReadAll(f)
 	if err != nil {
 		t.Logf("read error: %v", err)
 	} else {

@@ -134,7 +134,7 @@ func GetFileTypeByFileName(fn string) (string, error) {
 	defer f.Close()
 	buffer := make([]byte, 512)
 	_, err = f.Read(buffer)
-	// fSrc, err := ioutil.ReadAll(f)
+	// fSrc, err := io.ReadAll(f)
 	if err != nil {
 		return "", err
 	}

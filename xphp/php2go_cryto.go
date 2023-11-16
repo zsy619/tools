@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"hash/crc32"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -25,14 +25,13 @@ func Md5_file(filepath string) (string, error) {
 		return "", err
 	}
 	defer f.Close()
-	contentbyte, err := ioutil.ReadAll(f)
+	contentbyte, err := io.ReadAll(f)
 	if err != nil {
 		return "", err
 	}
 	h := md5.New()
 	h.Write(contentbyte)
 	return hex.EncodeToString(h.Sum(nil)), nil
-
 }
 
 func Base64_decode(str string) (string, error) {
@@ -49,7 +48,7 @@ func Base64_encode(str string) string {
 
 // Md5File md5_file()
 func Md5File(path string) (string, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -67,7 +66,7 @@ func Sha1(str string) string {
 
 // Sha1File sha1_file()
 func Sha1File(path string) (string, error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}

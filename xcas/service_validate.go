@@ -2,7 +2,7 @@ package xcas
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -63,7 +63,7 @@ func (validator *ServiceTicketValidator) ValidateTicket(serviceURL *url.URL, tic
 		return validator.validateTicketCas1(serviceURL, ticket)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	if err != nil {
@@ -134,7 +134,7 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 			resp.Status)
 	}
 
-	data, err := ioutil.ReadAll(resp.Body)
+	data, err := io.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	if err != nil {

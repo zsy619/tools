@@ -3,7 +3,7 @@ package xbyte
 import (
 	"bytes"
 	"compress/gzip"
-	"io/ioutil"
+	"io"
 )
 
 func DecodeGzipBytes(meta []byte) ([]byte, error) {
@@ -11,7 +11,7 @@ func DecodeGzipBytes(meta []byte) ([]byte, error) {
 	b.Write(meta)
 	r, _ := gzip.NewReader(&b)
 	defer r.Close()
-	datas, readErr := ioutil.ReadAll(r)
+	datas, readErr := io.ReadAll(r)
 
 	if readErr != nil {
 		return nil, readErr

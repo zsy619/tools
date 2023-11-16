@@ -10,7 +10,6 @@ import (
 	_ "image/jpeg" // jpeg format
 	"image/png"
 	_ "image/png" // png format
-	"io/ioutil"
 	"mime"
 	"os"
 	"strings"
@@ -20,6 +19,7 @@ import (
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/bmp"
 	"golang.org/x/image/font"
+
 	"haedu.gov.cn/tools/xstring"
 )
 
@@ -109,7 +109,7 @@ func ImageTtfbBox(size, angle float64, fontPath string, text string) (with int, 
 // 获取字符集，仅调用一次
 func GetFontFamily(fontPath string) (*truetype.Font, error) {
 	// 这里需要读取中文字体，否则中文文字会变成方格
-	fontBytes, err := ioutil.ReadFile(fontPath)
+	fontBytes, err := os.ReadFile(fontPath)
 	if err != nil {
 		fmt.Println("GetFontFamily--》", "read file error:", err)
 		return &truetype.Font{}, err
@@ -157,7 +157,7 @@ func AutoWrap(size, angle float64, fontPath string, text string, width float64, 
 }
 
 func LoadFontFace(path string, points float64) (font.Face, error) {
-	fontBytes, err := ioutil.ReadFile(path)
+	fontBytes, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

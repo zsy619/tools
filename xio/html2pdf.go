@@ -3,7 +3,7 @@ package xio
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	wkhtmltopdf "github.com/SebastiaanKlippert/go-wkhtmltopdf"
 	"github.com/chromedp/cdproto/page"
@@ -63,7 +63,7 @@ func ChromedpPrintPdf(url string, to string) error {
 	if err != nil {
 		return fmt.Errorf("chromedp Run failed,err:%+v", err)
 	}
-	if err := ioutil.WriteFile(to, buf, 0o644); err != nil {
+	if err := os.WriteFile(to, buf, 0o644); err != nil {
 		return fmt.Errorf("write to file failed,err:%+v", err)
 	}
 	return nil
