@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/axgle/mahonia"
+	"golang.org/x/net/html/charset"
 	"haedu.gov.cn/tools/xjson"
 )
 
@@ -34,19 +36,40 @@ func GetAreaByIp(ip string) AreaInfo {
 		return info
 	}
 	url := "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip
-	client := &http.Client{}
-	request, _ := http.NewRequest("GET", url, nil)
-	request.Header.Set("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3")
-	response, _ := client.Do(request)
-	if response.StatusCode == 200 {
-		body, err := io.ReadAll(response.Body)
-		fmt.Println(string(body))
-		if err != nil {
-			info.Err = err.Error()
-			return info
-		}
-		xjson.Unmarshal(body, &info)
+	resp, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error fetching URL:", err)
+		info.Err = err.Error()
+		return info
 	}
+	defer resp.Body.Close()
+	// 创建一个带自动转换编码的Reader
+	utf8Reader, err := charset.NewReader(resp.Body, resp.Header.Get("Content-Type"))
+	if err != nil {
+		fmt.Println("Error creating charset reader:", err)
+		return info
+	}
+
+	body, err := ioutil.ReadAll(utf8Reader)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return info
+	}
+	xjson.Unmarshal(body, &info)
+
+	// client := &http.Client{}
+	// request, _ := http.NewRequest("GET", url, nil)
+	// request.Header.Set("Accept-Charset", "GBK,utf-8;q=0.7,*;q=0.3")
+	// response, _ := client.Do(request)
+	// if response.StatusCode == 200 {
+	// 	body, err := io.ReadAll(response.Body)
+	// 	fmt.Println(string(body))
+	// 	if err != nil {
+	// 		info.Err = err.Error()
+	// 		return info
+	// 	}
+	// 	xjson.Unmarshal(body, &info)
+	// }
 	return info
 }
 
