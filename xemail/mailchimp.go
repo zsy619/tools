@@ -11,6 +11,7 @@ import (
 
 	mailchimp "github.com/beeker1121/mailchimp-go"
 	"github.com/beeker1121/mailchimp-go/lists/members"
+
 	"haedu.gov.cn/tools/xjson"
 )
 
@@ -66,13 +67,14 @@ func (m *MailchimpAPI) GetListMember(listID string, email string) (*ListMember, 
 
 	var status Status
 
-	if mcMember.Status == members.StatusSubscribed {
+	switch mcMember.Status {
+	case members.StatusSubscribed:
 		status = StatusSubscribed
-	} else if mcMember.Status == members.StatusUnsubscribed {
+	case members.StatusUnsubscribed:
 		status = StatusUnsubscribed
-	} else if mcMember.Status == members.StatusCleaned {
+	case members.StatusCleaned:
 		status = StatusInvalid
-	} else {
+	default:
 		status = StatusPending
 	}
 

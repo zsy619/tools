@@ -33,12 +33,12 @@ func GetAreaByIp(ip string) AreaInfo {
 		return info
 	}
 	if ip == "::1" {
-		info.Err = "内网IP"
+		info.Err = "内网"
 		return info
 	}
 	netIp := net.ParseIP(ip)
 	if isPrivateSubnet(netIp) {
-		info.Err = "内网IP"
+		info.Err = "内网"
 		return info
 	}
 	url := "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip
@@ -72,11 +72,11 @@ func GetCityByIp(ip string) string {
 		return ""
 	}
 	if ip == "::1" {
-		return "内网IP"
+		return "内网"
 	}
 	netIp := net.ParseIP(ip)
 	if isPrivateSubnet(netIp) {
-		return "内网IP"
+		return "内网"
 	}
 	url := "http://whois.pconline.com.cn/ipJson.jsp?json=true&ip=" + ip
 	client := &http.Client{}
