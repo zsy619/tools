@@ -133,8 +133,8 @@ func NewQrCodeDefault() *QrCode {
  * @param {*}
  * @return {string} 生成的图片路径
  */
-func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
-	err = this.checkAttribute() // 参数校验
+func (code *QrCode) CreateQrCodeBackground() (file string, err error) {
+	err = code.checkAttribute() // 参数校验
 	if err != nil {
 		return "", err
 	}
@@ -146,13 +146,13 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 	)
 
 	// 二维码
-	qrcode, err = this.createQrCode(this.QrCodeConfig.Content)
+	qrcode, err = code.createQrCode(code.QrCodeConfig.Content)
 	if err != nil {
 		return
 	}
 
 	// 背景图片
-	original, err = os.Open(this.Background.Path)
+	original, err = os.Open(code.Background.Path)
 	if err != nil {
 		fmt.Println("", err.Error())
 		return
@@ -165,8 +165,8 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 		return
 	}
 	// 判断是否缩放
-	if this.Background.Resize.Width > 0 && this.Background.Resize.Height > 0 {
-		originalImg = this.ImageResize(originalImg, this.Background.Resize)
+	if code.Background.Resize.Width > 0 && code.Background.Resize.Height > 0 {
+		originalImg = code.ImageResize(originalImg, code.Background.Resize)
 	}
 
 	qrcodeB := qrcode.Bounds()
@@ -176,23 +176,22 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
 		return
 	}
 	// 设置为居中
-	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+this.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+this.QrCodeConfig.Offset.Y)
+	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+code.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+code.QrCodeConfig.Offset.Y)
 	m := image.NewNRGBA(originalB)
 	draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
 	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Src)
 
 	// 字体设置
-	if this.Title.Title != "" {
-		dst, errx := this.showTitle(m)
+	if code.Title.Title != "" {
+		dst, errx := code.showTitle(m)
 		if errx == nil {
 			m = dst
 		}
 	}
 
-	fpath := this.Root + this.randomFileName() + ".png"
+	fpath := code.Root + code.randomFileName() + ".png"
 	file, err = xphp.ImagePNG(fpath, m)
 	return
-	// return this.CreateQrCodeBackgroundPlacenum(fpath)
 }
 
 // CreateQrCodeBackgroundPlacenum
@@ -201,8 +200,8 @@ func (this *QrCode) CreateQrCodeBackground() (file string, err error) {
  * @param {string} file
  * @return {string , error}
  */
-func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, err error) {
-	err = this.checkAttribute() // 参数校验
+func (code *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, err error) {
+	err = code.checkAttribute() // 参数校验
 	if err != nil {
 		return "", err
 	}
@@ -214,14 +213,14 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 	)
 
 	// 二维码
-	qrcode, err = this.createQrCode(this.QrCodeConfig.Content)
+	qrcode, err = code.createQrCode(code.QrCodeConfig.Content)
 	if err != nil {
 		fmt.Println("CreateQrCodeBackgroundPlacenum：", err.Error())
 		return
 	}
 
 	// 背景图片
-	original, err = os.Open(this.Background.Path)
+	original, err = os.Open(code.Background.Path)
 	if err != nil {
 		fmt.Println("CreateQrCodeBackgroundPlacenum：", err.Error())
 		return
@@ -234,8 +233,8 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 		return
 	}
 	// 判断是否缩放
-	if this.Background.Resize.Width > 0 && this.Background.Resize.Height > 0 {
-		originalImg = this.ImageResize(originalImg, this.Background.Resize)
+	if code.Background.Resize.Width > 0 && code.Background.Resize.Height > 0 {
+		originalImg = code.ImageResize(originalImg, code.Background.Resize)
 	}
 
 	qrcodeB := qrcode.Bounds()
@@ -245,14 +244,14 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 		return
 	}
 	// 设置为居中
-	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+this.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+this.QrCodeConfig.Offset.Y)
+	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+code.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+code.QrCodeConfig.Offset.Y)
 	m := image.NewNRGBA(originalB)
 	draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
 	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Over)
 
 	// 字体设置
-	if this.Title.Title != "" {
-		dst, errx := this.showTitle(m)
+	if code.Title.Title != "" {
+		dst, errx := code.showTitle(m)
 		if errx == nil {
 			m = dst
 		}
@@ -268,8 +267,8 @@ func (this *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
  * @param {*image.NRGBA} target
  * @return {*}
  */
-func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
-	fontFamily, err := xphp.GetFontFamily(this.Title.Path)
+func (code *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
+	fontFamily, err := xphp.GetFontFamily(code.Title.Path)
 	if err != nil {
 		fmt.Println("showTitle：", "get font family error")
 		return nil, err
@@ -278,12 +277,12 @@ func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
 	// 设置用于绘制文本的字体
 	f.SetFont(fontFamily)
 	// 设置屏幕每英寸的分辨率
-	f.SetDPI(this.Title.Dpi)
+	f.SetDPI(code.Title.Dpi)
 	// 设置剪裁矩形以进行绘制
 	f.SetClip(target.Bounds())
 	// 设置目标图像
 	f.SetDst(target)
-	switch this.Title.Hinting {
+	switch code.Title.Hinting {
 	default:
 		f.SetHinting(font.HintingNone)
 	case "full":
@@ -293,18 +292,18 @@ func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
 	// f.SetSrc(image.NewUniform(color.RGBA{R: 220, G: 220, B: 220, A: 220}))
 	f.SetSrc(Black)
 	// 以磅为单位设置字体大小
-	f.SetFontSize(this.Title.Size)
+	f.SetFontSize(code.Title.Size)
 
-	drawStr := this.Title.Title
+	drawStr := code.Title.Title
 	if drawStr == "" {
 		drawStr = "嘿，世界！"
 	}
 	// 获取字体的尺寸大小
-	fixed := f.PointToFixed(this.Title.Size)
+	fixed := f.PointToFixed(code.Title.Size)
 	// fixed.Ceil() 字体大小
 	// utf8.RuneCountInString(drawStr) 获取字符串的实际大小，而不是以byte算
-	pt := freetype.Pt(target.Rect.Max.X/2-(utf8.RuneCountInString(drawStr)/2)*fixed.Ceil()+this.Title.Offset.X, this.Title.Offset.Y)
-	// pt := freetype.Pt(0, this.Title.Offset.Y)
+	pt := freetype.Pt(target.Rect.Max.X/2-(utf8.RuneCountInString(drawStr)/2)*fixed.Ceil()+code.Title.Offset.X, code.Title.Offset.Y)
+	// pt := freetype.Pt(0, code.Title.Offset.Y)
 	// 根据 Pt 的坐标值绘制给定的文本内容
 	fix, err := f.DrawString(drawStr, pt)
 	if err != nil {
@@ -320,9 +319,9 @@ func (this *QrCode) showTitle(target *image.NRGBA) (*image.NRGBA, error) {
  * @description: 获取字符集，仅调用一次
  * @return {*truetype.Font, error}
  */
-func (this *QrCode) getFontFamily() (*truetype.Font, error) {
+func (code *QrCode) getFontFamily() (*truetype.Font, error) {
 	// 这里需要读取中文字体，否则中文文字会变成方格
-	fontBytes, err := os.ReadFile(this.Title.Path)
+	fontBytes, err := os.ReadFile(code.Title.Path)
 	if err != nil {
 		fmt.Println("getFontFamily--》", "read file error:", err)
 		return &truetype.Font{}, err
@@ -345,13 +344,17 @@ func (this *QrCode) getFontFamily() (*truetype.Font, error) {
  * @param {qrcode.RecoveryLevel} level 二维码质量
  * @return {string , error}
  */
-func (this *QrCode) CreateQrCode(content string, size int, level qrcode.RecoveryLevel) (file string, err error) {
+func (code *QrCode) CreateQrCode(content string, size int, level qrcode.RecoveryLevel) (file string, err error) {
 	if content == "" {
 		return "", errors.New("无二维码内容")
 	}
-	if this.IsOne {
-		this.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
-		fpath := this.Root + this.md5FileName() + ".png"
+	if code.IsOne {
+		code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
+		if err := os.MkdirAll(code.Root, os.ModePerm); err != nil {
+			fmt.Println("CreateQrCode：", err.Error())
+			return "", err
+		}
+		fpath := code.Root + code.md5FileName() + ".png"
 		if xio.FileIsExisted(fpath) {
 			return fpath, nil
 		}
@@ -359,77 +362,77 @@ func (this *QrCode) CreateQrCode(content string, size int, level qrcode.Recovery
 	if size <= 0 {
 		size = 620
 	}
-	this.QrCodeConfig.Size = size
-	this.QrCodeConfig.Level = level
-	if xphp.Empty(this.Root) {
-		if this.IsOne {
-			this.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
+	code.QrCodeConfig.Size = size
+	code.QrCodeConfig.Level = level
+	if xphp.Empty(code.Root) {
+		if code.IsOne {
+			code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
 		} else {
-			this.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
+			code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
 		}
 	}
-	if err := os.MkdirAll(this.Root, os.ModePerm); err != nil {
+	if err := os.MkdirAll(code.Root, os.ModePerm); err != nil {
 		fmt.Println("CreateQrCode：", err.Error())
 		return "", err
 	}
-	img, err := this.createQrCode(content)
+	img, err := code.createQrCode(content)
 	if err != nil {
 		fmt.Println("CreateQrCode：", err.Error())
 		return "", err
 	}
 
-	fpath := this.randomFileName()
-	if this.IsOne {
-		fpath = this.md5FileName()
+	fpath := code.randomFileName()
+	if code.IsOne {
+		fpath = code.md5FileName()
 	}
-	fpath = this.Root + fpath + ".png"
+	fpath = code.Root + fpath + ".png"
 	file, err = xphp.ImagePNG(fpath, img)
 	return
 }
 
-func (this *QrCode) CreateQrCodeImage(content string, size int, level qrcode.RecoveryLevel) (image.Image, error) {
-	this.QrCodeConfig.Size = size
-	this.QrCodeConfig.Level = level
-	return this.createQrCode(content)
+func (code *QrCode) CreateQrCodeImage(content string, size int, level qrcode.RecoveryLevel) (image.Image, error) {
+	code.QrCodeConfig.Size = size
+	code.QrCodeConfig.Level = level
+	return code.createQrCode(content)
 }
 
-func (this *QrCode) CreateQrCodeImageByHighest(content string, size int) (image.Image, error) {
-	return this.CreateQrCodeImage(content, size, qrcode.Highest)
+func (code *QrCode) CreateQrCodeImageByHighest(content string, size int) (image.Image, error) {
+	return code.CreateQrCodeImage(content, size, qrcode.Highest)
 }
 
-func (this *QrCode) CreateQrCodeFileName(content string, size int, level qrcode.RecoveryLevel, file string) (ferr error) {
+func (code *QrCode) CreateQrCodeFileName(content string, size int, level qrcode.RecoveryLevel, file string) (ferr error) {
 	if content == "" {
 		return errors.New("无二维码内容")
 	}
 	if size <= 0 {
 		size = 620
 	}
-	img, err := this.createQrCode(content)
+	img, err := code.createQrCode(content)
 	if err != nil {
 		fmt.Println("CreateQrCode：", err.Error())
 		return err
 	}
-	this.QrCodeConfig.Size = size
-	this.QrCodeConfig.Level = level
+	code.QrCodeConfig.Size = size
+	code.QrCodeConfig.Level = level
 	_, ferr = xphp.ImagePNG(file, img)
 	return
 }
 
 // checkAttribute 属性校验
-func (this *QrCode) checkAttribute() error {
-	if this.QrCodeConfig.Content == "" {
+func (code *QrCode) checkAttribute() error {
+	if code.QrCodeConfig.Content == "" {
 		return errors.New("无二维码内容")
 	}
-	if this.Background.Path == "" {
+	if code.Background.Path == "" {
 		return errors.New("未设置背景图")
 	}
-	if this.QrCodeConfig.Size <= 0 {
-		this.QrCodeConfig.Size = 620
+	if code.QrCodeConfig.Size <= 0 {
+		code.QrCodeConfig.Size = 620
 	}
-	if xphp.Empty(this.Root) {
-		this.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
+	if xphp.Empty(code.Root) {
+		code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
 	}
-	if err := os.MkdirAll(this.Root, os.ModePerm); err != nil {
+	if err := os.MkdirAll(code.Root, os.ModePerm); err != nil {
 		fmt.Println("CreateQrCode：", err.Error())
 		return err
 	}
@@ -441,7 +444,7 @@ func (this *QrCode) checkAttribute() error {
  * @description: 获取一个随机的文件名称
  * @return {string}
  */
-func (this *QrCode) randomFileName() string {
+func (code *QrCode) randomFileName() string {
 	randNum := fmt.Sprintf("%d", rand.Intn(9999)+1000)
 	hashName := md5.Sum([]byte(time.Now().Format("2006_01_02_15_04_05_") + randNum))
 	fileName := fmt.Sprintf("%x", hashName)
@@ -453,8 +456,8 @@ func (this *QrCode) randomFileName() string {
  * @description: 获取一个md5文件名称
  * @return {string}
  */
-func (this *QrCode) md5FileName() string {
-	fileName := xcrypto.GetMD5Hash(this.QrCodeConfig.Content)
+func (code *QrCode) md5FileName() string {
+	fileName := xcrypto.GetMD5Hash(code.QrCodeConfig.Content)
 	return fileName
 }
 
@@ -464,25 +467,25 @@ func (this *QrCode) md5FileName() string {
  * @param {string} content
  * @return {image.Image, error}
  */
-func (this *QrCode) createQrCode(content string) (qrcodeImg image.Image, err error) {
+func (code *QrCode) createQrCode(content string) (qrcodeImg image.Image, err error) {
 	var qrCode *qrcode.QRCode
-	qrCode, err = qrcode.New(content, this.QrCodeConfig.Level)
+	qrCode, err = qrcode.New(content, code.QrCodeConfig.Level)
 	if err != nil {
 		return nil, errors.New("创建二维码失败:" + err.Error())
 	}
 	qrCode.DisableBorder = true
-	qrcodeImg = qrCode.Image(this.QrCodeConfig.Size)
+	qrcodeImg = qrCode.Image(code.QrCodeConfig.Size)
 
 	// 二维码logo
-	if this.QrCodeConfig.LogoPath != "" {
-		logo, errx := os.Open(this.QrCodeConfig.LogoPath)
+	if code.QrCodeConfig.LogoPath != "" {
+		logo, errx := os.Open(code.QrCodeConfig.LogoPath)
 		if errx != nil {
 			fmt.Println("createQrCode-->", errx.Error())
 			goto OK
 		}
 		defer logo.Close()
 		var logoImg image.Image
-		ext := this.getFileExt(this.QrCodeConfig.LogoPath)
+		ext := code.getFileExt(code.QrCodeConfig.LogoPath)
 		fmt.Println("ext:", ext)
 		switch ext {
 		default:
@@ -508,8 +511,8 @@ func (this *QrCode) createQrCode(content string) (qrcodeImg image.Image, err err
 			goto OK
 		}
 		// 判断是否缩放
-		if this.QrCodeConfig.LogoResize.Width > 0 && this.QrCodeConfig.LogoResize.Height > 0 {
-			logoImg = this.ImageResize(logoImg, this.QrCodeConfig.LogoResize)
+		if code.QrCodeConfig.LogoResize.Width > 0 && code.QrCodeConfig.LogoResize.Height > 0 {
+			logoImg = code.ImageResize(logoImg, code.QrCodeConfig.LogoResize)
 		}
 
 		qrcodeB := qrcodeImg.Bounds()
@@ -533,7 +536,7 @@ OK:
  * @param {Resize} rse
  * @return {image.Image}
  */
-func (this *QrCode) ImageResize(src image.Image, rse Resize) image.Image {
+func (code *QrCode) ImageResize(src image.Image, rse Resize) image.Image {
 	return resize.Resize(uint(rse.Width), uint(rse.Height), src, resize.Lanczos3)
 }
 
@@ -543,7 +546,7 @@ func (this *QrCode) ImageResize(src image.Image, rse Resize) image.Image {
  * @param {string} name
  * @return {bool, error}
  */
-func (this *QrCode) checkFile(name string) (bool, error) {
+func (code *QrCode) checkFile(name string) (bool, error) {
 	_, err := os.Stat(name)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -560,6 +563,6 @@ func (this *QrCode) checkFile(name string) (bool, error) {
  * @param {string} filename
  * @return {string}
  */
-func (this *QrCode) getFileExt(filename string) string {
+func (code *QrCode) getFileExt(filename string) string {
 	return strings.ToLower(strings.ReplaceAll(filepath.Ext(filename), ".", ""))
 }
