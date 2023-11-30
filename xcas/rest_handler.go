@@ -41,7 +41,6 @@ func (ch *restClientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	setAuthenticationResponse(r, success)
 	ch.h.ServeHTTP(w, r)
-	return
 }
 
 func (ch *restClientHandler) authenticate(username string, password string) (*AuthenticationResponse, error) {

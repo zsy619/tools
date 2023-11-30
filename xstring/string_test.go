@@ -59,7 +59,7 @@ func TestSplitInts(t *testing.T) {
 }
 
 func BenchmarkJoinInts(b *testing.B) {
-	is := make([]int64, 10000, 10000)
+	is := make([]int64, 10000)
 	for i := int64(0); i < 10000; i++ {
 		is[i] = i
 	}
@@ -398,6 +398,7 @@ func TestTrimHtml(t *testing.T) {
 		want string
 	}{
 		// TODO: Add test cases.
+		{"test1", args{src: "<script>aaa</script>"}, "aaa"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -10,7 +10,7 @@ import (
 // GetHostByAddr gets the Internet host name corresponding to a given IP address
 func GetHostByAddr(ipAddress string) (string, error) {
 	names, err := net.LookupAddr(ipAddress)
-	if names != nil && len(names) > 0 {
+	if len(names) > 0 {
 		return strings.TrimRight(names[0], "."), nil
 	}
 	return "", err
@@ -19,7 +19,7 @@ func GetHostByAddr(ipAddress string) (string, error) {
 // GetHostByName gets the IPv4 address corresponding to a given Internet host name
 func GetHostByName(hostname string) (string, error) {
 	ips, err := net.LookupIP(hostname)
-	if ips != nil {
+	if len(ips) != 0 {
 		for _, v := range ips {
 			if v.To4() != nil {
 				return v.String(), nil

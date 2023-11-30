@@ -178,8 +178,10 @@ func (code *QrCode) CreateQrCodeBackground() (file string, err error) {
 	// 设置为居中
 	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+code.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+code.QrCodeConfig.Offset.Y)
 	m := image.NewNRGBA(originalB)
-	draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
-	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Src)
+	// draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
+	draw.Draw(m, originalB, originalImg, image.Point{}, draw.Src)
+	// draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Src)
+	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.Point{}, draw.Src)
 
 	// 字体设置
 	if code.Title.Title != "" {
@@ -240,14 +242,16 @@ func (code *QrCode) CreateQrCodeBackgroundPlacenum(file string) (dest string, er
 	qrcodeB := qrcode.Bounds()
 	originalB := originalImg.Bounds()
 	if qrcodeB.Dx() >= originalB.Dx() || qrcodeB.Dy() >= originalB.Dy() {
-		err = errors.New(fmt.Sprintf("背景图尺寸过小，至少为（宽*高）：%d*%d", qrcodeB.Dx(), qrcodeB.Dy()))
+		err = fmt.Errorf("背景图尺寸过小，至少为（宽*高）：%d*%d", qrcodeB.Dx(), qrcodeB.Dy())
 		return
 	}
 	// 设置为居中
 	offset = image.Pt((originalB.Max.X-qrcodeB.Max.X)/2+code.QrCodeConfig.Offset.X, (originalB.Max.Y-qrcodeB.Max.Y)/2+code.QrCodeConfig.Offset.Y)
 	m := image.NewNRGBA(originalB)
-	draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
-	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Over)
+	// draw.Draw(m, originalB, originalImg, image.ZP, draw.Src)
+	// draw.Draw(m, qrcodeB.Add(offset), qrcode, image.ZP, draw.Over)
+	draw.Draw(m, originalB, originalImg, image.Point{}, draw.Src)
+	draw.Draw(m, qrcodeB.Add(offset), qrcode, image.Point{}, draw.Over)
 
 	// 字体设置
 	if code.Title.Title != "" {
@@ -490,21 +494,16 @@ func (code *QrCode) createQrCode(content string) (qrcodeImg image.Image, err err
 		switch ext {
 		default:
 			logoImg, errx = jpeg.Decode(logo)
-			break
 		case "bmp":
 			logoImg, errx = bmp.Decode(logo)
-			break
 		case "png":
 			logoImg, errx = png.Decode(logo)
-			break
 		case "jpg":
 			fallthrough
 		case "jpeg":
 			logoImg, errx = jpeg.Decode(logo)
-			break
 		case "gif":
 			logoImg, errx = gif.Decode(logo)
-			break
 		}
 		if errx != nil {
 			fmt.Println("createQrCode-->", errx.Error())
@@ -520,8 +519,10 @@ func (code *QrCode) createQrCode(content string) (qrcodeImg image.Image, err err
 		// 设置为居中
 		offset := image.Pt((qrcodeB.Dx()-logoB.Dx())/2, (qrcodeB.Dy()-logoB.Dy())/2)
 		m := image.NewNRGBA(qrcodeB)
-		draw.Draw(m, qrcodeB, qrcodeImg, image.ZP, draw.Src)
-		draw.Draw(m, logoB.Add(offset), logoImg, image.ZP, draw.Src)
+		// draw.Draw(m, qrcodeB, qrcodeImg, image.ZP, draw.Src)
+		// draw.Draw(m, logoB.Add(offset), logoImg, image.ZP, draw.Src)
+		draw.Draw(m, qrcodeB, qrcodeImg, image.Point{}, draw.Src)
+		draw.Draw(m, logoB.Add(offset), logoImg, image.Point{}, draw.Src)
 
 		qrcodeImg = m
 	}

@@ -455,19 +455,19 @@ func InChain(needle string, haystack []string) bool {
 // TrimHtml 去除HTML标签
 func TrimHtml(src string) string {
 	// 将HTML标签全转换成小写
-	re, _ := regexp.Compile("\\<[\\S\\s]+?\\>")
+	re, _ := regexp.Compile(`\\<[\\S\\s]+?\\>`)
 	src = re.ReplaceAllStringFunc(src, strings.ToLower)
 	// 去除STYLE
-	re, _ = regexp.Compile("\\<style[\\S\\s]+?\\</style\\>")
+	re, _ = regexp.Compile(`\\<style[\\S\\s]+?\\</style\\>`)
 	src = re.ReplaceAllString(src, "")
 	// 去除SCRIPT
-	re, _ = regexp.Compile("\\<script[\\S\\s]+?\\</script\\>")
+	re, _ = regexp.Compile(`\\<script[\\S\\s]+?\\</script\\>`)
 	src = re.ReplaceAllString(src, "")
 	// 去除所有尖括号内的HTML代码，并换成换行符
-	re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
+	re, _ = regexp.Compile(`\\<[\\S\\s]+?\\>`)
 	src = re.ReplaceAllString(src, "\n")
 	// 去除连续的换行符
-	re, _ = regexp.Compile("\\s{2,}")
+	re, _ = regexp.Compile(`\\s{2,}`)
 	src = re.ReplaceAllString(src, "\n")
 	return strings.TrimSpace(src)
 }
@@ -494,47 +494,47 @@ func StrVal(value interface{}) string {
 		return key
 	}
 
-	switch value.(type) {
+	switch value := value.(type) {
 	case float64:
-		ft := value.(float64)
+		ft := value
 		key = strconv.FormatFloat(ft, 'f', -1, 64)
 	case float32:
-		ft := value.(float32)
+		ft := value
 		key = strconv.FormatFloat(float64(ft), 'f', -1, 64)
 	case int:
-		it := value.(int)
+		it := value
 		key = strconv.Itoa(it)
 	case uint:
-		it := value.(uint)
+		it := value
 		key = strconv.Itoa(int(it))
 	case int8:
-		it := value.(int8)
+		it := value
 		key = strconv.Itoa(int(it))
 	case uint8:
-		it := value.(uint8)
+		it := value
 		key = strconv.Itoa(int(it))
 	case int16:
-		it := value.(int16)
+		it := value
 		key = strconv.Itoa(int(it))
 	case uint16:
-		it := value.(uint16)
+		it := value
 		key = strconv.Itoa(int(it))
 	case int32:
-		it := value.(int32)
+		it := value
 		key = strconv.Itoa(int(it))
 	case uint32:
-		it := value.(uint32)
+		it := value
 		key = strconv.Itoa(int(it))
 	case int64:
-		it := value.(int64)
+		it := value
 		key = strconv.FormatInt(it, 10)
 	case uint64:
-		it := value.(uint64)
+		it := value
 		key = strconv.FormatUint(it, 10)
 	case string:
-		key = value.(string)
+		key = value
 	case []byte:
-		key = string(value.([]byte))
+		key = string(value)
 	default:
 		newValue, _ := xjson.Marshal(value)
 		key = string(newValue)

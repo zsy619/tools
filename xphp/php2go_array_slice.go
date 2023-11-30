@@ -8,7 +8,7 @@ func ArrayUnique(arr []string) []string {
 	result := make([]string, 0, size)
 	temp := map[string]struct{}{}
 	for i := 0; i < size; i++ {
-		if _, ok := temp[arr[i]]; ok != true {
+		if _, ok := temp[arr[i]]; !ok {
 			temp[arr[i]] = struct{}{}
 			result = append(result, arr[i])
 		}
@@ -105,7 +105,7 @@ func ArraySearch(needle interface{}, hystack interface{}) (index int) {
 		s := reflect.ValueOf(hystack)
 
 		for i := 0; i < s.Len(); i++ {
-			if reflect.DeepEqual(needle, s.Index(i).Interface()) == true {
+			if reflect.DeepEqual(needle, s.Index(i).Interface()) {
 				index = i
 				return
 			}

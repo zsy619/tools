@@ -7,6 +7,9 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // 字段小写json
@@ -128,7 +131,8 @@ func Camel2Case(name string) string {
 // 下划线写法转为驼峰写法
 func Case2Camel(name string) string {
 	name = strings.Replace(name, "_", " ", -1)
-	name = strings.Title(name)
+	caser := cases.Title(language.English)
+	name = caser.String(name)
 	return strings.Replace(name, " ", "", -1)
 }
 

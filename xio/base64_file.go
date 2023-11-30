@@ -63,8 +63,5 @@ func Base64ToFile(path string, base64_image_content string, datePath bool) (stri
  */
 func IsFileExist(filename string) bool {
 	_, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return true
+	return !os.IsNotExist(err)
 }

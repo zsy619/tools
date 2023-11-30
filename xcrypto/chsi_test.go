@@ -50,6 +50,9 @@ func Test_AES(t *testing.T) {
 
 	// using the function
 	decodedString, err := base64.RawURLEncoding.DecodeString(givenString)
+	if err != nil {
+		t.Fatal(err)
+	}
 	buf := new(bytes.Buffer)
 
 	err = binary.Write(buf, binary.BigEndian, decodedString)
@@ -86,6 +89,9 @@ func Test_AES(t *testing.T) {
 	aesKey := "3PywuK7B4stmJT1Q5APOlg=="
 	fmt.Println(aesKey, len(aesKey))
 	rsax, err := NewChsiRSA(pubKey, prvKey)
+	if err != nil {
+		t.Fatal(err)
+	}
 	rsaEncrypt, err := rsax.PublicEncrypt(aesKey)
 	if err != nil {
 		return
@@ -119,6 +125,9 @@ func Test_AES(t *testing.T) {
 		return
 	}
 	aesEncrypt, err := aesx.Encrypt(content)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fmt.Println("AES 加密:\r\n", aesEncrypt)
 	// aesEncrypt = "D+L8LDiZ05nOD1i7AmVl8ytEbQ++urjehGP5JIiqNmkzYV46m3CyQZ9VvHO8xxvhb28xnYktIboOEUbvj6B1OYjuMW1McZ3DkhbKiObxJDlTo4i58wwvLSQkc71+OJN2YjCvl7LUzFvyXP+SOIc+B6R8xsZ2PkqvXKWfDMW+psf/K+tm37nE0URLGeL14tlNroJTLYFrmNc4F6p2n7P5NlgvLwMjQkpqc2fbMJYxkHNYBSRrPvaELtUlTLA41D27hOVHQmWShfPwyX2Jhqvlgamteu4Z5JGsP8ZOtaeGO/mZwdeoIXTmMKgLzizhSWw/mIy1gvnxxOkLwbdty5OxZ1/Z8l5aZ5zPC7xskWrjlwRwkgla2xfMNnf9x83cFRIRQkU60MQiO2FNiEu+lQspwQXHxR0gxP8ohlef5Jls2JUBxMW/OQjKCpqvaHdr+EDbY7Nou03uFPzcfREb6581JA=="
 	aesDecrypt, err := aesx.Decrypt(aesEncrypt)

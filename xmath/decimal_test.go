@@ -259,11 +259,11 @@ func TestNewFromFormattedString(t *testing.T) {
 		ReplRegex *regexp.Regexp
 	}{
 		{"$10.99", "10.99", regexp.MustCompile("[$]")},
-		{"$ 12.1", "12.1", regexp.MustCompile("[$\\s]")},
+		{"$ 12.1", "12.1", regexp.MustCompile(`[$\\s]`)},
 		{"$61,690.99", "61690.99", regexp.MustCompile("[$,]")},
 		{"1_000_000.00", "1000000.00", regexp.MustCompile("[_]")},
 		{"41,410.00", "41410.00", regexp.MustCompile("[,]")},
-		{"5200 USD", "5200", regexp.MustCompile("[USD\\s]")},
+		{"5200 USD", "5200", regexp.MustCompile(`[USD\\s]`)},
 	} {
 		dFormatted, err := NewFromFormattedString(testCase.Formatted, testCase.ReplRegex)
 		if err != nil {

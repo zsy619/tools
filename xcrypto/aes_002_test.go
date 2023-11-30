@@ -17,8 +17,7 @@ func Test_Aes_002(t *testing.T) {
 	log.Println(txt)
 	// txt = "D+L8LDiZ05nOD1i7AmVl8ytEbQ++urjehGP5JIiqNmkzYV46m3CyQZ9VvHO8xxvhb28xnYktIboOEUbvj6B1OYjuMW1McZ3DkhbKiObxJDlTo4i58wwvLSQkc71+OJN2YjCvl7LUzFvyXP+SOIc+B6R8xsZ2PkqvXKWfDMW+psf/K+tm37nE0URLGeL14tlNroJTLYFrmNc4F6p2n7P5NlgvLwMjQkpqc2fbMJYxkHNYBSRrPvaELtUlTLA41D27hOVHQmWShfPwyX2Jhqvlgamteu4Z5JGsP8ZOtaeGO/mZwdeoIXTmMKgLzizhSWw/mIy1gvnxxOkLwbdty5OxZ1/Z8l5aZ5zPC7xskWrjlwRwkgla2xfMNnf9x83cFRIRQkU60MQiO2FNiEu+lQspwQXHxR0gxP8ohlef5Jls2JUBxMW/OQjKCpqvaHdr+EDbY7Nou03uFPzcfREb6581JA=="
 	// rt, _ := base64.RawStdEncoding.DecodeString(txt)
-	var source string
-	source = UnEn(txt, aesKey)
+	var source string = UnEn(txt, aesKey)
 	log.Println(source)
 }
 

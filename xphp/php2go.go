@@ -21,13 +21,13 @@ import (
 // Thus +0123.45e6 is a valid numeric value.
 // In PHP hexadecimal (e.g. 0xf4c3b00c) is not supported, but IsNumeric is supported.
 func IsNumeric(val interface{}) bool {
-	switch val.(type) {
+	switch val := val.(type) {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
 		return true
 	case float32, float64, complex64, complex128:
 		return true
 	case string:
-		str := val.(string)
+		str := val
 		if str == "" {
 			return false
 		}
@@ -72,9 +72,10 @@ func IsNumeric(val interface{}) bool {
 }
 
 // Empty Determine whether a variable is empty
-//  Determine whether a variable is considered to be empty.
-//  A variable is considered empty if it does not exist or if its value equals FALSE.
-//  empty() does not generate a warning if the variable does not exist.
+//
+//	Determine whether a variable is considered to be empty.
+//	A variable is considered empty if it does not exist or if its value equals FALSE.
+//	empty() does not generate a warning if the variable does not exist.
 func Empty(val interface{}) bool {
 	v := reflect.ValueOf(val)
 	switch v.Kind() {
@@ -101,8 +102,9 @@ func Empty(val interface{}) bool {
 // returnVar, 0: succ; 1: fail
 // Return the last line from the result of the command.
 // command format eg:
-//   "ls -a"
-//   "/bin/bash -c \"ls -a\""
+//
+//	"ls -a"
+//	"/bin/bash -c \"ls -a\""
 func Exec(command string, output *[]string, returnVar *int) string {
 	q := rune(0)
 	parts := strings.FieldsFunc(command, func(r rune) bool {

@@ -20,7 +20,8 @@ func WhereBuild(where map[string]interface{}) (whereSQL string, vals []interface
 	for k, v := range where {
 		ks := strings.Split(k, " ")
 		if len(ks) > 2 {
-			return "", nil, fmt.Errorf("Error in query condition: %s. ", k)
+			outerr := fmt.Errorf("error in query condition: %s. ", k)
+			return "", nil, outerr
 		}
 
 		if whereSQL != "" {
@@ -41,47 +42,37 @@ func WhereBuild(where map[string]interface{}) (whereSQL string, vals []interface
 				whereSQL += fmt.Sprint(k, "=?")
 				vals = append(vals, v)
 			}
-			break
 		case 2:
 			k = ks[0]
 			switch ks[1] {
 			case "=":
 				whereSQL += fmt.Sprint(k, "=?")
 				vals = append(vals, v)
-				break
 			case ">":
 				whereSQL += fmt.Sprint(k, ">?")
 				vals = append(vals, v)
-				break
 			case ">=":
 				whereSQL += fmt.Sprint(k, ">=?")
 				vals = append(vals, v)
-				break
 			case "<":
 				whereSQL += fmt.Sprint(k, "<?")
 				vals = append(vals, v)
-				break
 			case "<=":
 				whereSQL += fmt.Sprint(k, "<=?")
 				vals = append(vals, v)
-				break
 			case "!=":
 				whereSQL += fmt.Sprint(k, "!=?")
 				vals = append(vals, v)
-				break
 			case "<>":
 				whereSQL += fmt.Sprint(k, "!=?")
 				vals = append(vals, v)
-				break
 			case "in":
 				whereSQL += fmt.Sprint(k, " in (?)")
 				vals = append(vals, v)
-				break
 			case "like":
 				whereSQL += fmt.Sprint(k, " like ?")
 				vals = append(vals, v)
 			}
-			break
 		}
 	}
 	return
@@ -89,9 +80,9 @@ func WhereBuild(where map[string]interface{}) (whereSQL string, vals []interface
 
 func WhereBuildExtension(where map[string]interface{}) (result string) {
 	for k, v := range where {
-		switch v.(type) {
+		switch v := v.(type) {
 		case string:
-			value := v.(string)
+			value := v
 			if value != "" {
 				if k == "or" || k == "and" {
 					if result == "" {

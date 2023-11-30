@@ -9,6 +9,7 @@ import (
 	"reflect"
 
 	"github.com/cespare/xxhash"
+
 	"haedu.gov.cn/tools/xjson"
 )
 
@@ -180,6 +181,7 @@ func ChecksumFrom(r io.Reader, hasher hash.Hash) (int64, []byte, error) {
 		if err != nil {
 			return 0, nil, err
 		}
+		fmt.Println("ChecksumFrom--->", n)
 	}
 	return int64(written), hasher.Sum(nil), nil
 }

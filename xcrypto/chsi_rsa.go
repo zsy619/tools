@@ -31,7 +31,7 @@ func NewChsiRSA(publicKey []byte, privateKey []byte) (*ChsiRsa, error) {
 
 	block, _ = pem.Decode(privateKey)
 	if block == nil {
-		return nil, errors.New("private key error!")
+		return nil, errors.New("private key error")
 	}
 	priv, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {
@@ -49,7 +49,7 @@ func NewChsiRSA(publicKey []byte, privateKey []byte) (*ChsiRsa, error) {
 	}
 }
 
-func (this *ChsiRsa) SetPrvKey(pkey []byte) {
+func (chsirsa *ChsiRsa) SetPrvKey(pkey []byte) {
 	block, _ := pem.Decode(pkey)
 	if block == nil {
 		fmt.Println("pem.Decode err")
@@ -62,12 +62,10 @@ func (this *ChsiRsa) SetPrvKey(pkey []byte) {
 		return
 	}
 
-	this.privateKey = private.(*rsa.PrivateKey)
-
-	return
+	chsirsa.privateKey = private.(*rsa.PrivateKey)
 }
 
-func (this *ChsiRsa) SetPubKey(pkey []byte) {
+func (chsirsa *ChsiRsa) SetPubKey(pkey []byte) {
 	block, _ := pem.Decode(pkey)
 	if block == nil {
 		return
@@ -78,17 +76,15 @@ func (this *ChsiRsa) SetPubKey(pkey []byte) {
 		return
 	}
 
-	this.publicKey = pubInterface.(*rsa.PublicKey)
-
-	return
+	chsirsa.publicKey = pubInterface.(*rsa.PublicKey)
 }
 
-func (this *ChsiRsa) Sign(data string) (string, error) {
+func (chsirsa *ChsiRsa) Sign(data string) (string, error) {
 	h := sha1.New()
 	h.Write([]byte(data))
 	digest := h.Sum(nil)
 
-	s, err := rsa.SignPKCS1v15(nil, this.privateKey, crypto.SHA1, digest)
+	s, err := rsa.SignPKCS1v15(nil, chsirsa.privateKey, crypto.SHA1, digest)
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +93,7 @@ func (this *ChsiRsa) Sign(data string) (string, error) {
 }
 
 // 通过公钥验证签名通过与否
-func (this *ChsiRsa) Verify(content, sign string) (bool, error) {
+func (chsirsa *ChsiRsa) Verify(content, sign string) (bool, error) {
 	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(content))
 	hashed := h.Sum(nil)
@@ -107,7 +103,7 @@ func (this *ChsiRsa) Verify(content, sign string) (bool, error) {
 		return false, err
 	}
 
-	return false, rsa.VerifyPKCS1v15(this.publicKey, RSA_ALGORITHM_SIGN, hashed, decodedSign)
+	return false, rsa.VerifyPKCS1v15(chsirsa.publicKey, RSA_ALGORITHM_SIGN, hashed, decodedSign)
 }
 
 // 公钥加密

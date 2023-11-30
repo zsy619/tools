@@ -13,15 +13,16 @@ func Checkdate(month, day, year int) bool {
 	if day < 1 {
 		return false
 	}
-	if month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12 { // 31 days
+	switch month {
+	case 1, 3, 5, 7, 8, 10, 12: // 31 days
 		if day > 31 {
 			return false
 		}
-	} else if month == 4 || month == 6 || month == 9 || month == 11 { // 30 days
+	case 4, 6, 9, 11: // 30 days
 		if day > 30 {
 			return false
 		}
-	} else { // february
+	default: // february
 		if CheckIfLeapYear(year) {
 			if day > 29 {
 				return false
@@ -41,10 +42,7 @@ func Checkdate(month, day, year int) bool {
 
 func CheckIfLeapYear(year int) bool {
 	if year%100 == 0 {
-		if year%400 == 0 {
-			return true
-		}
-		return false
+		return year%400 == 0
 	}
 	if year%4 == 0 {
 		return true

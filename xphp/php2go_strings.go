@@ -14,6 +14,9 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"haedu.gov.cn/tools/xjson"
 )
 
@@ -62,7 +65,7 @@ func Strrev(s string) string {
 
 func Chr(ascii int) (string, error) {
 	if ascii > 127 || ascii < 32 {
-		return "", errors.New("invalid ascii code.")
+		return "", errors.New("invalid ascii code")
 	}
 	var buf bytes.Buffer
 	buf.Write([]byte{byte(ascii)})
@@ -89,6 +92,9 @@ func Chunk_split(body string, chunklen int, end string) (str string, err error) 
 		}
 	}
 	_, err = buf.Write([]byte(body)[chunklen*(count-1):])
+	if err != nil {
+		return "", err
+	}
 	_, err = buf.WriteString(end)
 	if err != nil {
 		return "", err
@@ -216,12 +222,13 @@ func Lcfirst(str string) string {
 
 // Ucwords ucwords()
 func Ucwords(str string) string {
-	return strings.Title(str)
+	caser := cases.Title(language.English)
+	return caser.String(str)
 }
 
 // Substr substr()
 func Substr(str string, start uint, length int) string {
-	if start < 0 || length < -1 {
+	if length < -1 {
 		return str
 	}
 	switch {

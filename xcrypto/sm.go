@@ -4,7 +4,6 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -71,7 +70,7 @@ func GetSm2P256V1() P256V1Curve {
 
 func RawBytesToPubKey(bytes []byte) (*sm2.PublicKey, error) {
 	if len(bytes) != KeyBytes*2 {
-		return nil, errors.New(fmt.Sprintf("Public key raw bytes length must be %d", KeyBytes*2))
+		return nil, fmt.Errorf("public key raw bytes length must be %d", KeyBytes*2)
 	}
 	publicKey := new(sm2.PublicKey)
 	publicKey.Curve = sm2P256V1
@@ -82,7 +81,7 @@ func RawBytesToPubKey(bytes []byte) (*sm2.PublicKey, error) {
 
 func RawBytesToPriKey(bytes []byte) (*sm2.PrivateKey, error) {
 	if len(bytes) != KeyBytes {
-		return nil, errors.New(fmt.Sprintf("Private key raw bytes length must be %d", KeyBytes))
+		return nil, fmt.Errorf("private key raw bytes length must be %d", KeyBytes)
 	}
 	privateKey := new(sm2.PrivateKey)
 	privateKey.Curve = sm2P256V1

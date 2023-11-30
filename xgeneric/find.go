@@ -214,9 +214,7 @@ func Samples[T any](collection []T, count int) []T {
 
 	// put values into a map, for faster deletion
 	cOpy := make([]T, 0, size)
-	for _, v := range collection {
-		cOpy = append(cOpy, v)
-	}
+	cOpy = append(cOpy, collection...)
 
 	results := []T{}
 

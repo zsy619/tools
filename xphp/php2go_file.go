@@ -2,6 +2,7 @@ package xphp
 
 import (
 	"encoding/csv"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -32,7 +33,11 @@ func Pathinfo(path string, options int) map[string]string {
 	if ((options & 4) == 4) || ((options & 8) == 8) {
 		basename := ""
 		if (options & 2) == 2 {
-			basename, _ = info["basename"]
+			var ok bool
+			basename, ok = info["basename"]
+			if !ok {
+				fmt.Println("basename not found")
+			}
 		} else {
 			basename = filepath.Base(path)
 		}
@@ -135,19 +140,13 @@ func Copy(source, dest string) (bool, error) {
 // IsReadable is_readable()
 func IsReadable(filename string) bool {
 	_, err := syscall.Open(filename, syscall.O_RDONLY, 0)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // IsWriteable is_writeable()
 func IsWriteable(filename string) bool {
 	_, err := syscall.Open(filename, syscall.O_WRONLY, 0)
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 // Rename rename()

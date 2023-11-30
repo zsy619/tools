@@ -7,15 +7,14 @@ type TimeSpan struct {
 	endNS   int64
 }
 
-func (this *TimeSpan) Start() {
-	this.startNS = time.Now().UnixNano()
+func (ts *TimeSpan) Start() {
+	ts.startNS = time.Now().UnixNano()
 }
 
-func (this *TimeSpan) End() {
-	this.endNS = time.Now().UnixNano()
+func (ts *TimeSpan) End() {
+	ts.endNS = time.Now().UnixNano()
 }
 
-func (this *TimeSpan) GetTimeSpanMS() float64 {
-
-	return float64(this.endNS-this.startNS) / 1000000
+func (ts *TimeSpan) GetTimeSpanMS() float64 {
+	return float64(ts.endNS-ts.startNS) / 1000000
 }

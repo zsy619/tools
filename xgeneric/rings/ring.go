@@ -117,7 +117,7 @@ func NewRing[E any](n int) *Ring[E] {
 
 // New creates a ring of n elements.
 func NewRingOf[E any](e ...E) *Ring[E] {
-	if e == nil || len(e) == 0 {
+	if len(e) == 0 {
 		return nil
 	}
 	r := &Ring[E]{Value: e[0]}

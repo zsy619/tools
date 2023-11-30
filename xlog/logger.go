@@ -13,9 +13,7 @@ import (
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 )
 
-var (
-	LoggerPath string
-)
+var LoggerPath string
 
 func init() {
 	LoggerPath = "./logs"
@@ -109,7 +107,8 @@ func newLogLevel(logPath, logFileName string, maxAge time.Duration, rotationTime
 		rotatelogs.WithRotationTime(rotationTime), // 日志切割时间间隔
 	)
 	if err != nil {
-		fmt.Errorf("config local file system logger error. %+v", errors.WithStack(err))
+		errx := fmt.Errorf("config local file system logger error. %+v", errors.WithStack(err))
+		fmt.Println(errx)
 	}
 	return writer
 }

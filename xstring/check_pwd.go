@@ -46,7 +46,7 @@ func PasswordCheck(minLength, maxLength, minLevel int, pwd string) error {
 	}
 	fmt.Println("", level)
 	if level < minLevel {
-		return fmt.Errorf("The password does not satisfy the current policy requirements. ")
+		return fmt.Errorf("the password does not satisfy the current policy requirements. ")
 	}
 	return nil
 }
@@ -74,9 +74,5 @@ func VerifyPassword(minLength, maxLength int, pwd string) bool {
 			level++
 		}
 	}
-	if level < 3 {
-		return false
-	}
-
-	return true
+	return level >= 3
 }

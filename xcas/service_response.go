@@ -172,6 +172,4 @@ func addRubycasAttribute(attributes UserAttributes, key, value string) {
 			glog.Warningf("cas: service response: unable to parse %v value: %#v (kind: %v)", key, decoded, kind)
 		}
 	}
-
-	return
 }

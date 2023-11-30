@@ -39,6 +39,7 @@ func MergeImageNew(base image.Image, mask image.Image, paddingX int, paddingY in
 	// 首先将一个图片信息存入jpg
 	draw.Draw(des, des.Bounds(), base, base.Bounds().Min, draw.Over)
 	// 将另外一张图片信息存入jpg
-	draw.Draw(des, image.Rect(paddingX, newHeight-paddingY-maskHeight, (paddingX+maskWidth), (newHeight-paddingY)), mask, image.ZP, draw.Over)
+	// draw.Draw(des, image.Rect(paddingX, newHeight-paddingY-maskHeight, (paddingX+maskWidth), (newHeight-paddingY)), mask, image.ZP, draw.Over)
+	draw.Draw(des, image.Rect(paddingX, newHeight-paddingY-maskHeight, (paddingX+maskWidth), (newHeight-paddingY)), mask, image.Point{}, draw.Over)
 	return des, nil
 }

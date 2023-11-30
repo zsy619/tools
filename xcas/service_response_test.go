@@ -410,7 +410,7 @@ func TestSuccessfulServiceResponseWithProxies(t *testing.T) {
 func TestSuccessfulServiceResponseWithBasicAttributes(t *testing.T) {
 	sr := SuccessServiceResponse("username", "")
 	sr.Success.Attributes = &XmlAttributes{
-		AuthenticationDate:                     time.Date(2015, 02, 10, 14, 28, 42, 0, time.UTC),
+		AuthenticationDate:                     time.Date(2015, 0o2, 10, 14, 28, 42, 0, time.UTC),
 		LongTermAuthenticationRequestTokenUsed: false,
 		IsFromNewLogin:                         true,
 	}
@@ -439,7 +439,7 @@ func TestSuccessfulServiceResponseWithBasicAttributes(t *testing.T) {
 func TestSuccessfulServiceResponseWithMemberOfAttributes(t *testing.T) {
 	sr := SuccessServiceResponse("username", "")
 	sr.Success.Attributes = &XmlAttributes{
-		AuthenticationDate:                     time.Date(2015, 02, 10, 14, 28, 42, 0, time.UTC),
+		AuthenticationDate:                     time.Date(2015, 0o2, 10, 14, 28, 42, 0, time.UTC),
 		LongTermAuthenticationRequestTokenUsed: false,
 		IsFromNewLogin:                         true,
 		MemberOf:                               []string{"staff", "faculty", "testing"},
@@ -472,14 +472,14 @@ func TestSuccessfulServiceResponseWithMemberOfAttributes(t *testing.T) {
 func TestSuccessfulServiceResponseWithNamedUserAttributes(t *testing.T) {
 	sr := SuccessServiceResponse("username", "")
 	sr.Success.Attributes = &XmlAttributes{
-		AuthenticationDate:                     time.Date(2015, 02, 10, 14, 28, 42, 0, time.UTC),
+		AuthenticationDate:                     time.Date(2015, 0o2, 10, 14, 28, 42, 0, time.UTC),
 		LongTermAuthenticationRequestTokenUsed: false,
 		IsFromNewLogin:                         true,
 		MemberOf:                               []string{"staff", "faculty", "testing"},
 		UserAttributes: &XmlUserAttributes{
 			Attributes: []*XmlNamedAttribute{
-				&XmlNamedAttribute{Name: "firstname", Value: "Enoch"},
-				&XmlNamedAttribute{Name: "lastname", Value: "Root"},
+				{Name: "firstname", Value: "Enoch"},
+				{Name: "lastname", Value: "Root"},
 			},
 		},
 	}
@@ -515,17 +515,17 @@ func TestSuccessfulServiceResponseWithNamedUserAttributes(t *testing.T) {
 func TestSuccessfulServiceResponseWithAnyUserAttributes(t *testing.T) {
 	sr := SuccessServiceResponse("username", "")
 	sr.Success.Attributes = &XmlAttributes{
-		AuthenticationDate:                     time.Date(2015, 02, 10, 14, 28, 42, 0, time.UTC),
+		AuthenticationDate:                     time.Date(2015, 0o2, 10, 14, 28, 42, 0, time.UTC),
 		LongTermAuthenticationRequestTokenUsed: false,
 		IsFromNewLogin:                         true,
 		MemberOf:                               []string{"staff", "faculty", "testing"},
 		UserAttributes: &XmlUserAttributes{
 			AnyAttributes: []*XmlAnyAttribute{
-				&XmlAnyAttribute{
+				{
 					XMLName: xml.Name{Local: "firstname"},
 					Value:   "Enoch",
 				},
-				&XmlAnyAttribute{
+				{
 					XMLName: xml.Name{Local: "lastname"},
 					Value:   "Root",
 				},
@@ -564,15 +564,15 @@ func TestSuccessfulServiceResponseWithAnyUserAttributes(t *testing.T) {
 func TestSuccessfulServiceResponseWithRubyCasAttributes(t *testing.T) {
 	sr := SuccessServiceResponse("username", "")
 	sr.Success.ExtraAttributes = []*XmlAnyAttribute{
-		&XmlAnyAttribute{
+		{
 			XMLName: xml.Name{Local: "firstname"},
 			Value:   "Enoch",
 		},
-		&XmlAnyAttribute{
+		{
 			XMLName: xml.Name{Local: "lastname"},
 			Value:   "Root",
 		},
-		&XmlAnyAttribute{
+		{
 			XMLName: xml.Name{Local: "groups"},
 			Value: `---
 - staff

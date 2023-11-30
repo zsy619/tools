@@ -101,6 +101,9 @@ func Test_Rsa(t *testing.T) {
 	data := "卧了个槽，这么神奇的吗？？！！！  ԅ(¯﹃¯ԅ) ！！！！！！）"
 	fmt.Println("对消息进行签名操作...")
 	signData, err := xrsa.Sign(data)
+	if err != nil {
+		t.Fatal(err)
+	}
 	fmt.Println("消息的签名信息： ", hex.EncodeToString([]byte(signData)))
 	fmt.Println("\n对签名信息进行验证...")
 	if err := xrsa.Verify(data, signData); err == nil {

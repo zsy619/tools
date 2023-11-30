@@ -33,7 +33,6 @@ func (ch *clientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	ch.c.getSession(w, r)
 	ch.h.ServeHTTP(w, r)
-	return
 }
 
 // isSingleLogoutRequest determines if the http.Request is a CAS Single Logout Request.

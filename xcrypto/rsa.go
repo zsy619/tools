@@ -86,7 +86,7 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 
 	block, _ = pem.Decode(privateKey)
 	if block == nil {
-		return nil, errors.New("private key error!")
+		return nil, errors.New("private key error")
 	}
 	priv, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 	if err != nil {

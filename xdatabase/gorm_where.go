@@ -128,23 +128,23 @@ func (e *GormWhere) ForamtDatetime(value string) string {
 func (e *GormWhere) String() string {
 	where := ""
 	for exp, v := range e.where {
-		switch v.(type) {
+		switch v := v.(type) {
 		case string:
 			if len(where) > 0 {
 				switch exp {
 				default:
 					if strings.HasPrefix(exp, GormWhere_ExpPrefix) {
-						exp := v.(string)
+						exp := v
 						if len(exp) > 0 {
 							where += " AND " + exp[1:len(exp)-1]
 						}
 					} else {
-						where += " AND " + exp + " = " + v.(string)
+						where += " AND " + exp + " = " + v
 					}
 				case GormWhere_String:
-					where += " AND " + v.(string)
+					where += " AND " + v
 				case GormWhere_Exp:
-					exp := v.(string)
+					exp := v
 					if len(exp) > 0 {
 						where += " AND " + exp[1:len(exp)-1]
 					}
@@ -153,17 +153,17 @@ func (e *GormWhere) String() string {
 				switch exp {
 				default:
 					if strings.HasPrefix(exp, GormWhere_ExpPrefix) {
-						exp := v.(string)
+						exp := v
 						if len(exp) > 0 {
 							where += exp[1 : len(exp)-1]
 						}
 					} else {
-						where = exp + " = " + v.(string)
+						where = exp + " = " + v
 					}
 				case GormWhere_String:
-					where += v.(string)
+					where += v
 				case GormWhere_Exp:
-					exp := v.(string)
+					exp := v
 					if len(exp) > 0 {
 						where += exp[1 : len(exp)-1]
 					}
@@ -187,7 +187,7 @@ func (e *GormWhere) String() string {
 				}
 			}
 		case []string:
-			wheres := v.([]string)
+			wheres := v
 			str := e.toString(exp, wheres)
 			if len(str) > 0 {
 				where += " AND " + str
@@ -195,7 +195,7 @@ func (e *GormWhere) String() string {
 				where = str
 			}
 		case [][]string:
-			wheres := v.([][]string)
+			wheres := v
 			str := e.toStringMore(exp, wheres)
 			if len(str) > 0 {
 				where += " AND " + str
@@ -203,7 +203,7 @@ func (e *GormWhere) String() string {
 				where = str
 			}
 		case *GormWhere:
-			wheres := v.(*GormWhere)
+			wheres := v
 			str := wheres.String()
 			if len(str) > 0 {
 				if len(where) > 0 {
@@ -215,7 +215,7 @@ func (e *GormWhere) String() string {
 				where = str
 			}
 		case GormWhere:
-			wheres := v.(GormWhere)
+			wheres := v
 			str := wheres.String()
 			if len(str) > 0 {
 				if len(where) > 0 {

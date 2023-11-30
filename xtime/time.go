@@ -119,7 +119,7 @@ func TimestampToString(timestamp int64) string {
 func StringToTimestamp(timestamp string) (int64, error) {
 	i, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		return i, fmt.Errorf("Could not convert timestamp from string to int64: %v", err)
+		return i, fmt.Errorf("could not convert timestamp from string to int64: %v", err)
 	}
 	return i, nil
 }

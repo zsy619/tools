@@ -77,10 +77,8 @@ func NewList[E any]() *List[E] { return new(List[E]).Init() }
 // NewFromArray returns an initialized list and set elements from target array.
 func NewListFromArray[E any](arr []E) *List[E] {
 	l := new(List[E]).Init()
-	if arr != nil {
-		for _, v := range arr {
-			l.PushBack(v)
-		}
+	for _, v := range arr {
+		l.PushBack(v)
 	}
 
 	return l
@@ -89,10 +87,8 @@ func NewListFromArray[E any](arr []E) *List[E] {
 // NewOf returns an initialized list and set elements from target variable parameter.
 func NewListOf[E any](e ...E) *List[E] {
 	l := new(List[E]).Init()
-	if e != nil {
-		for _, v := range e {
-			l.PushBack(v)
-		}
+	for _, v := range e {
+		l.PushBack(v)
 	}
 	return l
 }

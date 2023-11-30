@@ -263,7 +263,7 @@ func BoolComparator(a, b bool) int {
 	if a == b {
 		return 0
 	}
-	if a == false && b == true {
+	if !a && b {
 		return -1
 	}
 	return 1
