@@ -101,6 +101,14 @@ func RandomHexStr(n int) (string, error) {
 	return hex.EncodeToString(bys), nil
 }
 
+func RandomFileName(n int) string {
+	fn, err := RandomHexStr(n)
+	if err != nil {
+		return ""
+	}
+	return fn
+}
+
 // ListCommonAddressToListString converts a list of common.address to list of string
 func ListCommonAddressToListString(addresses []common.Address) []string {
 	addressesString := make([]string, len(addresses))
