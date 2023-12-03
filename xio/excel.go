@@ -1,5 +1,7 @@
 package xio
 
+import "fmt"
+
 // 用来匹配的字符A-Z
 var Slice = []string{
 	"", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
@@ -12,6 +14,8 @@ var Slice = []string{
  * @param {int} num 需要转化的数字，如excel第几列
  * @return string
  */
+// Deprecated: Div is no longer recommended,
+// use ExcelColumnNumberToName instead.
 func Div(num int) string {
 	var (
 		Str  string = ""
@@ -41,4 +45,25 @@ func Div(num int) string {
 		Str = Slice[value] + Str // 因为数据切分后存储顺序是反的，所以Str要放在后面
 	}
 	return Str
+}
+
+func ExcelColumnNumberToName(columnNumber int) string {
+	var columnName string
+	for columnNumber > 0 {
+		columnNumber--
+		columnName = fmt.Sprint('A'+columnNumber%26) + columnName
+		columnNumber = columnNumber / 26
+	}
+	return columnName
+}
+
+func ExcelColumnNumberToNextName(prevColumnNumber int) (int, string) {
+	columnNumber := prevColumnNumber + 1
+	var columnName string
+	for columnNumber > 0 {
+		columnNumber--
+		columnName = fmt.Sprint('A'+columnNumber%26) + columnName
+		columnNumber = columnNumber / 26
+	}
+	return columnNumber, columnName
 }
