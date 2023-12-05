@@ -10,6 +10,19 @@ type val struct {
 	expiredTime int64
 }
 
+func (v *val) Data() interface{} {
+	return v.data
+}
+
+func (v *val) ExpiredTime() int64 {
+	return v.expiredTime
+}
+
+// 过期时间
+const (
+	expiredTime = 10 * time.Minute
+)
+
 const delChannelCap = 100
 
 type ExpiredMap struct {
@@ -33,6 +46,10 @@ func NewExpiredMap() *ExpiredMap {
 type delMsg struct {
 	keys []interface{}
 	t    int64
+}
+
+func (e *ExpiredMap) List() map[interface{}]*val {
+	return e.m
 }
 
 // background goroutine 主动删除过期的key
