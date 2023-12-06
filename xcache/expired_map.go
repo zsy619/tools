@@ -81,6 +81,19 @@ func (e *ExpiredMap) run(now int64) {
 	}
 }
 
+func (e *ExpiredMap) GetFirst() (found bool, value interface{}) {
+	e.lck.Lock()
+	defer e.lck.Unlock()
+	for _, v := range e.m {
+		if v.expiredTime > time.Now().Unix() {
+			found = true
+			value = v.data
+			break
+		}
+	}
+	return
+}
+
 func (e *ExpiredMap) Set(key, value interface{}, expireSeconds int64) bool {
 	if expireSeconds <= 0 {
 		return false
