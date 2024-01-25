@@ -168,10 +168,13 @@ func SubString(source string, start int, end int) string {
 }
 
 // ToInt 字符串转换为int
-func ToInt(input string) int {
+func ToInt(input string, def ...int) int {
 	if len(input) > 0 {
 		i, err := strconv.Atoi(input)
 		if err != nil {
+			if len(def) > 0 {
+				return def[0]
+			}
 			return 0
 		}
 		return i
@@ -193,10 +196,13 @@ func ToIntArray(input, sep string) ([]int, bool) {
 }
 
 // ToInt8 字符串转换为int8
-func ToInt8(input string) int8 {
+func ToInt8(input string, def ...int8) int8 {
 	if len(input) > 0 {
 		i, err := strconv.Atoi(input)
 		if err != nil {
+			if len(def) > 0 {
+				return def[0]
+			}
 			return 0
 		}
 		return int8(i)
@@ -218,10 +224,13 @@ func ToInt8Array(input, sep string) ([]int8, bool) {
 }
 
 // ToInt16 字符串转换为int16
-func ToInt16(input string) int16 {
+func ToInt16(input string, def ...int16) int16 {
 	if len(input) > 0 {
 		i, err := strconv.Atoi(input)
 		if err != nil {
+			if len(def) > 0 {
+				return def[0]
+			}
 			return 0
 		}
 		return int16(i)
@@ -243,10 +252,13 @@ func ToInt16Array(input, sep string) ([]int16, bool) {
 }
 
 // ToInt32 字符串转换为int32
-func ToInt32(input string) int32 {
+func ToInt32(input string, def ...int32) int32 {
 	if len(input) > 0 {
 		i, err := strconv.Atoi(input)
 		if err != nil {
+			if len(def) > 0 {
+				return def[0]
+			}
 			return 0
 		}
 		return int32(i)
@@ -268,13 +280,16 @@ func ToInt32Array(input string, sep string) ([]int32, bool) {
 }
 
 // ToInt64 字符串转换为int64
-func ToInt64(input string) int64 {
+func ToInt64(input string, def ...int64) int64 {
 	if len(input) > 0 {
-		i, err := strconv.Atoi(input)
+		value, err := strconv.ParseInt(input, 10, 64)
 		if err != nil {
+			if len(def) > 0 {
+				return def[0]
+			}
 			return 0
 		}
-		return int64(i)
+		return value
 	}
 	return 0
 }
@@ -293,10 +308,13 @@ func ToInt64Array(input, sep string) ([]int64, bool) {
 }
 
 // ToUint 字符串转换为uint
-func ToUnit(input string) uint {
+func ToUnit(input string, def ...uint) uint {
 	if len(input) > 0 {
 		i, err := strconv.Atoi(input)
 		if err != nil {
+			if len(def) > 0 {
+				return def[0]
+			}
 			return 0
 		}
 		return uint(i)
