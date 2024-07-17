@@ -111,9 +111,9 @@ func Test_Rsa(t *testing.T) {
 	}
 
 	fmt.Println("-------------------------------进行加密解密操作-----------------------------------------")
-	ciphertext, _ := xrsa.PublicEncrypt(data)
+	ciphertext, _ := xrsa.EncryptWithPublicKey(data)
 	fmt.Println("公钥加密后的数据：", hex.EncodeToString([]byte(ciphertext)))
-	sourceData, _ := xrsa.PrivateDecrypt(ciphertext)
+	sourceData, _ := xrsa.DecryptWithPrivateKey(ciphertext)
 	fmt.Println("私钥解密后的数据：", sourceData)
 }
 
@@ -128,7 +128,7 @@ func Test_Rsax(t *testing.T) {
 	}
 
 	fmt.Println("-------------------------------Key加密-----------------------------------------")
-	keyEn, _ := xrsa.PublicEncrypt(string(key))
+	keyEn, _ := xrsa.EncryptWithPublicKey(string(key))
 	fmt.Println("Key加密：", base64.StdEncoding.EncodeToString([]byte(keyEn)))
 
 	fmt.Println("------------------ CBC模式 --------------------")

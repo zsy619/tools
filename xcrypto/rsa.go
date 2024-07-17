@@ -27,6 +27,12 @@ type XRsa struct {
 	privateKey *rsa.PrivateKey
 }
 
+// GenRsaKey 函数生成RSA密钥对并返回
+//
+// 返回值：
+//   - []byte: 私钥的字节切片
+//   - []byte: 公钥的字节切片
+//   - error: 若有错误则返回错误信息，否则为nil
 func GenRsaKey() ([]byte, []byte, error) {
 	publicKey := bytes.NewBufferString("")
 	privateKey := bytes.NewBufferString("")
@@ -39,6 +45,10 @@ func GenRsaKey() ([]byte, []byte, error) {
 }
 
 // 生成密钥对
+// CreateKeys 函数生成RSA密钥对，并将私钥和公钥分别写入指定的io.Writer中。
+// publicKeyWriter是公钥写入的目标io.Writer，privateKeyWriter是私钥写入的目标io.Writer。
+// keyLength是密钥的长度（以位为单位）。
+// 如果在生成密钥对或写入文件的过程中发生错误，将返回非零错误码。
 func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) error {
 	// 生成私钥文件
 	privateKey, err := rsa.GenerateKey(rand.Reader, keyLength)
@@ -73,6 +83,14 @@ func CreateKeys(publicKeyWriter, privateKeyWriter io.Writer, keyLength int) erro
 	return nil
 }
 
+// NewXRsa 是一个构造函数，用于根据给定的公钥和私钥字节数组创建XRsa实例
+//
+// publicKey: 公钥的字节数组
+// privateKey: 私钥的字节数组
+//
+// 返回值：
+// *XRsa：包含公钥和私钥的XRsa实例指针
+// error：如果发生错误，则返回非零的错误码
 func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 	block, _ := pem.Decode(publicKey)
 	if block == nil {
@@ -104,8 +122,18 @@ func NewXRsa(publicKey []byte, privateKey []byte) (*XRsa, error) {
 	}
 }
 
-// 公钥加密
-func (r *XRsa) PublicEncrypt(data string) (string, error) {
+// EncryptWithPublicKey 使用RSA公钥对数据进行加密
+//
+// 参数：
+//
+//	r *XRsa - 包含RSA公钥的XRsa对象指针
+//	data string - 待加密的字符串数据
+//
+// 返回值：
+//
+//	string - 加密后的Base64编码字符串
+//	error - 如果加密过程中发生错误，则返回非nil的错误信息
+func (r *XRsa) EncryptWithPublicKey(data string) (string, error) {
 	partLen := r.publicKey.N.BitLen()/8 - 11
 	chunks := split([]byte(data), partLen)
 
@@ -121,10 +149,45 @@ func (r *XRsa) PublicEncrypt(data string) (string, error) {
 	return base64.StdEncoding.EncodeToString(buffer.Bytes()), nil
 }
 
+// EncryptWithPrivateKey 使用私钥对给定的字符串进行加密（实际上是签名），并返回加密后的Base64字符串和可能发生的错误。
+// 参数：
+//
+//	data string - 待加密的字符串
+//
+// 返回值：
+//
+//	string - 加密后的Base64字符串
+//	error - 如果加密过程中发生错误，则返回非零的错误码；否则返回nil
+func (r *XRsa) EncryptWithPrivateKey(data string) (string, error) {
+	output := bytes.NewBuffer(nil)
+	err := priKeyIO(r.privateKey, bytes.NewReader([]byte(data)), output, true)
+	if err != nil {
+		return "", err
+	}
+	out, err := io.ReadAll(output)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(out), nil
+}
+
 // 私钥解密
-func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
-	partLen := r.publicKey.N.BitLen() / 8
+// DecryptWithPrivateKey 使用私钥对加密后的字符串进行解密
+//
+// 参数：
+//
+//	encrypted string - 待解密的加密字符串（应为base64编码）
+//
+// 返回值：
+//
+//	string - 解密后的明文字符串
+//	error - 解密过程中可能遇到的错误，若解密成功则为nil
+func (r *XRsa) DecryptWithPrivateKey(encrypted string) (string, error) {
 	raw, err := base64.StdEncoding.DecodeString(encrypted)
+	if err != nil {
+		return "", err
+	}
+	partLen := r.publicKey.N.BitLen() / 8
 	chunks := split([]byte(raw), partLen)
 
 	buffer := bytes.NewBufferString("")
@@ -137,6 +200,32 @@ func (r *XRsa) PrivateDecrypt(encrypted string) (string, error) {
 	}
 
 	return buffer.String(), err
+}
+
+// DecryptWithPublicKey 使用RSA公钥解密方法解密字符串
+// 参数：
+//
+//	encrypted: 待解密的字符串（Base64编码）
+//
+// 返回值：
+//
+//	string: 解密后的字符串
+//	error: 如果解密过程中发生错误，则返回非零的错误码
+func (r *XRsa) DecryptWithPublicKey(encrypted string) (string, error) {
+	raw, err := base64.StdEncoding.DecodeString(encrypted)
+	if err != nil {
+		return "", err
+	}
+	output := bytes.NewBuffer(nil)
+	err = pubKeyIO(r.publicKey, bytes.NewReader(raw), output, false)
+	if err != nil {
+		return "", err
+	}
+	outStr, err := io.ReadAll(output)
+	if err != nil {
+		return "", err
+	}
+	return string(outStr), nil
 }
 
 // 数据加签
