@@ -9,7 +9,7 @@ require (
 	github.com/cespare/xxhash v1.1.0
 	github.com/chromedp/cdproto v0.0.0-20240519224452-66462be74baa
 	github.com/chromedp/chromedp v0.9.5
-	github.com/ethereum/go-ethereum v1.14.3
+	github.com/ethereum/go-ethereum v1.14.7
 	github.com/g3n/engine v0.2.0
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/golang/glog v1.2.1
@@ -44,7 +44,7 @@ require (
 	github.com/gobwas/ws v1.4.0 // indirect
 	github.com/google/btree v1.1.2 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
-	github.com/holiman/uint256 v1.2.4 // indirect
+	github.com/holiman/uint256 v1.3.0 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
