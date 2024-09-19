@@ -20,7 +20,7 @@ func BenchmarkString(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for _, tt := range tests {
-			if got := String(tt.args.s); got != tt.want {
+			if got := ToHashcode(tt.args.s); got != tt.want {
 				b.Errorf("String() = %v, want %v", got, tt.want)
 			}
 		}
@@ -41,7 +41,7 @@ func TestString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := String(tt.args.s); got != tt.want {
+			if got := ToHashcode(tt.args.s); got != tt.want {
 				t.Errorf("String() = %v, want %v", got, tt.want)
 			}
 		})

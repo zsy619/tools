@@ -22,12 +22,16 @@ const (
 	PasswordLevelS
 )
 
-/*
- *  minLength: 指定密码的最小长度
- *  maxLength：指定密码的最大长度
- *  minLevel：指定密码最低要求的强度等级
- *  pwd：明文密码
- */
+// PasswordCheck 检查密码是否符合要求
+//
+// 参数：
+// minLength int - 密码最小长度
+// maxLength int - 密码最大长度
+// minLevel int - 密码最低安全等级
+// pwd string - 待检查的密码
+//
+// 返回值：
+// error - 如果密码不符合要求，返回错误信息；否则返回nil
 func PasswordCheck(minLength, maxLength, minLevel int, pwd string) error {
 	if len(pwd) < minLength {
 		return fmt.Errorf("BAD PASSWORD: The password is shorter than %d characters", minLength)
@@ -51,7 +55,11 @@ func PasswordCheck(minLength, maxLength, minLevel int, pwd string) error {
 	return nil
 }
 
-// VerifyPassword 密码校验规则: 必须包含数字、大写字母、小写字母、特殊字符(如.@$!%*#_~?&^)至少3种的组合且长度在8-16之间
+// VerifyPassword 函数用于验证密码是否合法: 必须包含数字、大写字母、小写字母、特殊字符(如.@$!%*#_~?&^)至少3种的组合且长度在8-16之间
+// minLength：密码最小长度
+// maxLength：密码最大长度
+// pwd：待验证的密码
+// 返回值：如果密码合法返回true，否则返回false
 func VerifyPassword(minLength, maxLength int, pwd string) bool {
 	if len(pwd) < minLength || len(pwd) > maxLength {
 		return false

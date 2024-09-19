@@ -2,12 +2,10 @@ package xstring
 
 import "hash/crc32"
 
-// String hashes a string to a unique hashcode.
-//
-// crc32 returns a uint32, but for our use we need
-// and non negative integer. Here we cast to an integer
-// and invert it if the result is negative.
-func String(s string) int {
+// ToHashcode 函数将一个字符串s转换为一个哈希码（整数）
+// 参数s是需要转换的字符串
+// 返回值是一个整数，表示字符串s的哈希码
+func ToHashcode(s string) int {
 	v := int(crc32.ChecksumIEEE([]byte(s)))
 	if v >= 0 {
 		return v

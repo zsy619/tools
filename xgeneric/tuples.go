@@ -269,9 +269,23 @@ func Zip8[A any, B any, C any, D any, E any, F any, G any, H any](a []A, b []B, 
 	return result
 }
 
-// Zip9 creates a slice of grouped elements, the first of which contains the first elements
-// of the given arrays, the second of which contains the second elements of the given arrays, and so on.
-// When collections have different size, the Tuple attributes are filled with zero value.
+// Zip9 是一个泛型函数，它接受九个切片作为参数，并将这些切片压缩成一个元组切片
+//
+// 参数：
+//
+//	a []A：第一个切片，元素类型为A
+//	b []B：第二个切片，元素类型为B
+//	c []C：第三个切片，元素类型为C
+//	d []D：第四个切片，元素类型为D
+//	e []E：第五个切片，元素类型为E
+//	f []F：第六个切片，元素类型为F
+//	g []G：第七个切片，元素类型为G
+//	h []H：第八个切片，元素类型为H
+//	i []I：第九个切片，元素类型为I
+//
+// 返回值：
+//
+//	[]Tuple9[A, B, C, D, E, F, G, H, I]：一个元组切片，其中每个元组包含了九个切片的对应位置的元素
 func Zip9[A any, B any, C any, D any, E any, F any, G any, H any, I any](a []A, b []B, c []C, d []D, e []E, f []F, g []G, h []H, i []I) []Tuple9[A, B, C, D, E, F, G, H, I] {
 	size := Max([]int{len(a), len(b), len(c), len(d), len(e), len(f), len(g), len(h), len(i)})
 
@@ -298,6 +312,57 @@ func Zip9[A any, B any, C any, D any, E any, F any, G any, H any, I any](a []A, 
 			G: _g,
 			H: _h,
 			I: _i,
+		})
+	}
+
+	return result
+}
+
+// Zip10 将十个切片a, b, c, d, e, f, g, h, i, j进行zip操作，返回一个新的切片，其中每个元素是一个Tuple10类型的元组
+// 参数：
+//
+//	a []A：类型为A的切片
+//	b []B：类型为B的切片
+//	c []C：类型为C的切片
+//	d []D：类型为D的切片
+//	e []E：类型为E的切片
+//	f []F：类型为F的切片
+//	g []G：类型为G的切片
+//	h []H：类型为H的切片
+//	i []I：类型为I的切片
+//	j []J：类型为J的切片
+//
+// 返回值：
+//
+//	[]Tuple10[A, B, C, D, E, F, G, H, I, J]：一个元素类型为Tuple10[A, B, C, D, E, F, G, H, I, J]的切片
+func Zip10[A any, B any, C any, D any, E any, F any, G any, H any, I any, J any](a []A, b []B, c []C, d []D, e []E, f []F, g []G, h []H, i []I, j []J) []Tuple10[A, B, C, D, E, F, G, H, I, J] {
+	size := Max([]int{len(a), len(b), len(c), len(d), len(e), len(f), len(g), len(h), len(i), len(j)})
+
+	result := make([]Tuple10[A, B, C, D, E, F, G, H, I, J], 0, size)
+
+	for index := 0; index < size; index++ {
+		_a, _ := Nth(a, index)
+		_b, _ := Nth(b, index)
+		_c, _ := Nth(c, index)
+		_d, _ := Nth(d, index)
+		_e, _ := Nth(e, index)
+		_f, _ := Nth(f, index)
+		_g, _ := Nth(g, index)
+		_h, _ := Nth(h, index)
+		_i, _ := Nth(i, index)
+		_j, _ := Nth(j, index)
+
+		result = append(result, Tuple10[A, B, C, D, E, F, G, H, I, J]{
+			A: _a,
+			B: _b,
+			C: _c,
+			D: _d,
+			E: _e,
+			F: _f,
+			G: _g,
+			H: _h,
+			I: _i,
+			J: _j,
 		})
 	}
 
@@ -478,4 +543,37 @@ func Unzip9[A any, B any, C any, D any, E any, F any, G any, H any, I any](tuple
 	}
 
 	return r1, r2, r3, r4, r5, r6, r7, r8, r9
+}
+
+// Unzip10 将一个包含Tuple10的切片解压为十个切片，分别对应Tuple10中的十个元素类型
+// A, B, C, D, E, F, G, H, I, J 是Tuple10中元素的类型参数
+// tuples 是包含Tuple10的切片
+// 返回值为十个切片，分别对应Tuple10中的十个元素类型
+func Unzip10[A any, B any, C any, D any, E any, F any, G any, H any, I any, J any](tuples []Tuple10[A, B, C, D, E, F, G, H, I, J]) ([]A, []B, []C, []D, []E, []F, []G, []H, []I, []J) {
+	size := len(tuples)
+	r1 := make([]A, 0, size)
+	r2 := make([]B, 0, size)
+	r3 := make([]C, 0, size)
+	r4 := make([]D, 0, size)
+	r5 := make([]E, 0, size)
+	r6 := make([]F, 0, size)
+	r7 := make([]G, 0, size)
+	r8 := make([]H, 0, size)
+	r9 := make([]I, 0, size)
+	r10 := make([]J, 0, size)
+
+	for _, tuple := range tuples {
+		r1 = append(r1, tuple.A)
+		r2 = append(r2, tuple.B)
+		r3 = append(r3, tuple.C)
+		r4 = append(r4, tuple.D)
+		r5 = append(r5, tuple.E)
+		r6 = append(r6, tuple.F)
+		r7 = append(r7, tuple.G)
+		r8 = append(r8, tuple.H)
+		r9 = append(r9, tuple.I)
+		r10 = append(r10, tuple.J)
+	}
+
+	return r1, r2, r3, r4, r5, r6, r7, r8, r9, r10
 }

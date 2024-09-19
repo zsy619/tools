@@ -419,7 +419,15 @@ var EastAsianNeutral = _EastAsianNeutral
 // EastAsianWide is the unicode.RangeTable for East Asian wide characters
 var EastAsianWide = _EastAsianWide
 
-// Fullwidth returns the map of unicode.RangeTable of full width East Asian characters
+// Fullwidth 函数返回一个包含全角字符范围表的映射表
+// 映射表的键是字符串类型，表示字符范围的名称
+// 映射表的值是*unicode.RangeTable类型，表示对应的字符范围表
+// 返回值中的映射表包含以下键值对：
+//   - "EastAsianFullwidth": 表示东亚全角字符的范围表
+//   - "EastAsianWide": 表示东亚宽字符的范围表
+//
+// 如果全局变量EastAsian为真，则映射表中还会包含以下键值对：
+//   - "EastAsianAmbiguous": 表示东亚模糊字符的范围表
 func Fullwidth() map[string]*unicode.RangeTable {
 	rangeTable := map[string]*unicode.RangeTable{
 		"EastAsianFullwidth": EastAsianFullwidth,
@@ -433,7 +441,7 @@ func Fullwidth() map[string]*unicode.RangeTable {
 	return rangeTable
 }
 
-// Halfwidth returns the map of unicode.RangeTable of half width East Asian characters
+// Halfwidth 函数返回一个包含unicode.RangeTable类型指针的map，用于表示半角字符范围
 func Halfwidth() map[string]*unicode.RangeTable {
 	rangeTable := map[string]*unicode.RangeTable{
 		"EastAsianHalfwidth": EastAsianHalfwidth,
@@ -448,7 +456,13 @@ func Halfwidth() map[string]*unicode.RangeTable {
 	return rangeTable
 }
 
-// IsFullwidth reports whether the rune is in range of full width character of East Asian.
+// IsFullwidth 判断给定的字符是否为全角字符
+//
+// 参数：
+// char rune - 待判断的字符
+//
+// 返回值：
+// bool - 如果是全角字符返回true，否则返回false
 func IsFullwidth(char rune) bool {
 	for _, fullwidthRangeTable := range Fullwidth() {
 		if unicode.Is(fullwidthRangeTable, char) {
@@ -458,7 +472,14 @@ func IsFullwidth(char rune) bool {
 	return false
 }
 
-// IsHalfwidth reports whether the rune is in range of half width character of East Asian.
+// IsHalfwidth 判断给定的字符是否为半角字符
+// 参数：
+//
+//	char rune - 待判断的字符
+//
+// 返回值：
+//
+//	bool - 如果字符为半角字符，则返回true；否则返回false
 func IsHalfwidth(char rune) bool {
 	for _, halfwidthRangeTable := range Halfwidth() {
 		if unicode.Is(halfwidthRangeTable, char) {
