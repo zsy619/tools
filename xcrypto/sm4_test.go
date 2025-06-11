@@ -88,8 +88,8 @@ func TestSm4EncryptReverse(t *testing.T) {
 }
 
 func TestSm4DecryptReverse(t *testing.T) {
-	data := "cc7f5c0865c24adb044b7cdc0b95a6bd"
-	key := "admin@2023"
+	data := "bdd73cf3ba3d31fe"
+	key := "c9431549e347910a35fcf4e4a04bcb75"
 	pwd, err := Sm4DecryptReverse(data, key)
 	if err != nil {
 		t.Fatal(err)
