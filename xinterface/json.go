@@ -4,32 +4,31 @@ import "haedu.gov.cn/tools/xjson"
 
 // ObjectToJson
 /**
- * @description: interface{}转json
- * @param {interface{}} value
+ * @description: any转json
+ * @param {any} value
  * @return {string error}
  */
-func ObjectToJson(value interface{}) (string, error) {
+func ObjectToJson(value any) (string, error) {
 	meta, err := xjson.Marshal(value)
 	return string(meta), err
 }
 
 // ObjectsToJson
 /**
- * @description: interface{}转json
- * @param {[]interface{}} values
+ * @description: any转json
+ * @param {[]any} values
  * @return {*}
  */
-func ObjectsToJson(values []interface{}) ([]interface{}, error) {
-	result := [](interface{}){}
+func ObjectsToJson(values []any) ([]any, error) {
+	result := [](any){}
 
 	for _, currValue := range values {
 		meta, err := ObjectToJson(currValue)
 
 		if err != nil {
 			return nil, err
-		} else {
-			result = append(result, meta)
 		}
+		result = append(result, meta)
 	}
 
 	return result, nil
