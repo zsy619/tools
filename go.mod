@@ -1,6 +1,6 @@
-module haedu.gov.cn/tools
+module github.com/zsy619/tools
 
-go 1.24
+go 1.25
 
 require (
 	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.9.3
