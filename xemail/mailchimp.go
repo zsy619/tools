@@ -12,7 +12,7 @@ import (
 	mailchimp "github.com/beeker1121/mailchimp-go"
 	"github.com/beeker1121/mailchimp-go/lists/members"
 
-	"haedu.gov.cn/tools/xjson"
+	"github.com/zsy619/tools/xjson"
 )
 
 // NOTE(PN): Mainly use this Mailchimp library to add addresses to mailing lists for.

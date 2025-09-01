@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/tjfoc/gmsm/sm4"
-	"haedu.gov.cn/tools/xstring"
+	"github.com/zsy619/tools/xstring"
 )
 
 /*

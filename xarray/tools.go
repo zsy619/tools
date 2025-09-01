@@ -5,10 +5,10 @@ import (
 	"math/rand"
 	"sort"
 
-	"haedu.gov.cn/tools"
-	"haedu.gov.cn/tools/xgeneric"
-	"haedu.gov.cn/tools/xgeneric/maths"
-	"haedu.gov.cn/tools/xmap"
+	"github.com/zsy619/tools"
+	"github.com/zsy619/tools/xgeneric"
+	"github.com/zsy619/tools/xgeneric/maths"
+	"github.com/zsy619/tools/xmap"
 )
 
 const (

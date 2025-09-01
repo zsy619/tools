@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"unicode/utf8"
 
-	"haedu.gov.cn/tools/xgeneric"
+	"github.com/zsy619/tools/xgeneric"
 )
 
 var (

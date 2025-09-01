@@ -3,7 +3,7 @@ package queues
 import (
 	"sync"
 
-	"haedu.gov.cn/tools/xgeneric/lists"
+	"github.com/zsy619/tools/xgeneric/lists"
 )
 
 // Queue provides a container as the rule of FIFO(first in first out) manner

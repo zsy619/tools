@@ -1,6 +1,6 @@
 package sets
 
-import "haedu.gov.cn/tools"
+import "github.com/zsy619/tools"
 
 // Set is a set of elements
 type Set[T comparable] map[T]struct{}

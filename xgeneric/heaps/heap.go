@@ -4,7 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	"haedu.gov.cn/tools"
+	"github.com/zsy619/tools"
 )
 
 // heapST to implments the interface of "heap.Interface"

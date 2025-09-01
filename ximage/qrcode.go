@@ -24,9 +24,9 @@ import (
 	"golang.org/x/image/bmp"
 	"golang.org/x/image/font"
 
-	"haedu.gov.cn/tools/xcrypto"
-	"haedu.gov.cn/tools/xio"
-	"haedu.gov.cn/tools/xphp"
+	"github.com/zsy619/tools/xcrypto"
+	"github.com/zsy619/tools/xio"
+	"github.com/zsy619/tools/xphp"
 )
 
 //go:generate goption -p . -c QrCode -w

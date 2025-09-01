@@ -9,7 +9,7 @@ import (
 	"net/url"
 
 	"github.com/go-chi/chi"
-	"haedu.gov.cn/tools/xcas"
+	"github.com/zsy619/tools/xcas"
 )
 
 var casURL = "http://[Your CAS SERVER URL]"

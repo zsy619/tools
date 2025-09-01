@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"unsafe"
 
-	"haedu.gov.cn/tools/xjson"
+	"github.com/zsy619/tools/xjson"
 )
 
 // JsonToObject 将JSON字符串转换为Go对象

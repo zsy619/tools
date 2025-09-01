@@ -1,6 +1,6 @@
 package arrays
 
-import "haedu.gov.cn/tools/xgeneric"
+import "github.com/zsy619/tools/xgeneric"
 
 func Equal[T xgeneric.Ordered](a, b []T) bool {
 	if len(a) != len(b) {

@@ -1,6 +1,6 @@
 package arrays
 
-import "haedu.gov.cn/tools/xgeneric/utils"
+import "github.com/zsy619/tools/xgeneric/utils"
 
 type T any
 

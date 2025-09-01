@@ -1,8 +1,8 @@
 package xdatabase
 
 import (
+	"github.com/zsy619/tools"
 	"gorm.io/gorm"
-	"haedu.gov.cn/tools"
 )
 
 type CrudRepository[T Entity[ID], ID comparable] struct {

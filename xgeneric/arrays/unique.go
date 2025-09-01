@@ -1,6 +1,6 @@
 package arrays
 
-import "haedu.gov.cn/tools/xgeneric"
+import "github.com/zsy619/tools/xgeneric"
 
 // Unique 数组或slice边去重
 func Unique[T xgeneric.Ordered](arr []T) []T {

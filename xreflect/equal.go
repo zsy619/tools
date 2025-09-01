@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"reflect"
 
-	"haedu.gov.cn/tools/xjson"
+	"github.com/zsy619/tools/xjson"
 )
 
 // 增强型 DeepEqual 函数

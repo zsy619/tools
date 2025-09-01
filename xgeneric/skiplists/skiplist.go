@@ -6,7 +6,7 @@ import (
 	gosync "sync"
 	"time"
 
-	"haedu.gov.cn/tools/xgeneric/utils"
+	"github.com/zsy619/tools/xgeneric/utils"
 )
 
 var (

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"haedu.gov.cn/tools/xstring"
+	"github.com/zsy619/tools/xstring"
 )
 
 // TestByte32Utils tests encoding, then decoding from byte[32] to string

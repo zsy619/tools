@@ -17,7 +17,7 @@ import (
 	"golang.org/x/image/bmp"
 	"golang.org/x/image/font"
 
-	"haedu.gov.cn/tools/xstring"
+	"github.com/zsy619/tools/xstring"
 )
 
 // ImageInfo stores the info of an image

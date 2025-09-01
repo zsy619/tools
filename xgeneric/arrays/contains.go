@@ -5,7 +5,7 @@ import (
 	"math"
 	"math/rand"
 
-	"haedu.gov.cn/tools/xgeneric"
+	"github.com/zsy619/tools/xgeneric"
 )
 
 func Contains[T comparable](collection []T, val T) int {

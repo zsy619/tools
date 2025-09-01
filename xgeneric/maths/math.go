@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/bits"
 
-	"haedu.gov.cn/tools/xgeneric"
+	"github.com/zsy619/tools/xgeneric"
 )
 
 // 把数n分成m份

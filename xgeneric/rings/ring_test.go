@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-	"haedu.gov.cn/tools/xarray"
+	"github.com/zsy619/tools/xarray"
 )
 
 type RingPojo struct {

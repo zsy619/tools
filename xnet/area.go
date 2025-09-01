@@ -10,7 +10,7 @@ import (
 	"github.com/axgle/mahonia"
 	"golang.org/x/net/html/charset"
 
-	"haedu.gov.cn/tools/xjson"
+	"github.com/zsy619/tools/xjson"
 )
 
 type AreaInfo struct {

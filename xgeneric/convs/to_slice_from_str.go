@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"haedu.gov.cn/tools/xstring"
+	"github.com/zsy619/tools/xstring"
 )
 
 // SplitStrToSlice splits a string to a slice by the specified separator.

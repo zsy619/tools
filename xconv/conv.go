@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"haedu.gov.cn/tools/xarray"
-	"haedu.gov.cn/tools/xgeneric"
-	"haedu.gov.cn/tools/xgeneric/lists"
-	"haedu.gov.cn/tools/xstring"
+	"github.com/zsy619/tools/xarray"
+	"github.com/zsy619/tools/xgeneric"
+	"github.com/zsy619/tools/xgeneric/lists"
+	"github.com/zsy619/tools/xstring"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"haedu.gov.cn/tools/xinterface"
+	"github.com/zsy619/tools/xinterface"
 )
 
 const (

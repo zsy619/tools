@@ -5,7 +5,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 
-	"haedu.gov.cn/tools/xgeneric"
+	"github.com/zsy619/tools/xgeneric"
 )
 
 // Map used to apply a function to each element in slice

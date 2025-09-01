@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	"haedu.gov.cn/tools/xuuid"
+	"github.com/zsy619/tools/xuuid"
 )
 
 func Test_LIBS(t *testing.T) {

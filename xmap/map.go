@@ -3,8 +3,8 @@ package xmap
 import (
 	"sync"
 
-	"haedu.gov.cn/tools"
-	"haedu.gov.cn/tools/xreflect"
+	"github.com/zsy619/tools"
+	"github.com/zsy619/tools/xreflect"
 )
 
 // Map is like a Go map[interface{}]interface{} but is provide more useful methods

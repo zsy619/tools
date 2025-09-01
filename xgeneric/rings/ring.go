@@ -3,7 +3,7 @@ package rings
 import (
 	"sort"
 
-	"haedu.gov.cn/tools"
+	"github.com/zsy619/tools"
 )
 
 type sortableRing[E any] struct {

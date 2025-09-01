@@ -1,6 +1,6 @@
 package convs
 
-import "haedu.gov.cn/tools/xstring"
+import "github.com/zsy619/tools/xstring"
 
 // SplitStrToSet convert a string to map set after split
 func SplitStrToSet(v string, sep string) map[string]struct{} {

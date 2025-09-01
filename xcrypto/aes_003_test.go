@@ -11,7 +11,7 @@ import (
 	"io"
 	"testing"
 
-	"haedu.gov.cn/tools/xuuid"
+	"github.com/zsy619/tools/xuuid"
 )
 
 // 填充

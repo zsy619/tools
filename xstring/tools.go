@@ -6,10 +6,10 @@ import (
 	"strings"
 	"unsafe"
 
-	"haedu.gov.cn/tools"
-	"haedu.gov.cn/tools/xarray"
-	"haedu.gov.cn/tools/xgeneric/sets"
-	"haedu.gov.cn/tools/xunsafe"
+	"github.com/zsy619/tools"
+	"github.com/zsy619/tools/xarray"
+	"github.com/zsy619/tools/xgeneric/sets"
+	"github.com/zsy619/tools/xunsafe"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"haedu.gov.cn/tools/xgeneric/utils"
+	"github.com/zsy619/tools/xgeneric/utils"
 )
 
 func TestInsert(t *testing.T) {

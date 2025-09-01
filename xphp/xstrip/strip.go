@@ -16,7 +16,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"haedu.gov.cn/tools/xjson"
+	"github.com/zsy619/tools/xjson"
 )
 
 // htmlNospaceEscaper escapes for inclusion in unquoted attribute values.

@@ -3,7 +3,7 @@ package xinterface
 import (
 	"reflect"
 
-	"haedu.gov.cn/tools/xreflect"
+	"github.com/zsy619/tools/xreflect"
 )
 
 // Similar to "extend" in JS, only updates fields that are specified and not empty in newData

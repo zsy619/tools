@@ -10,7 +10,7 @@ import (
 
 	"github.com/cespare/xxhash"
 
-	"haedu.gov.cn/tools/xjson"
+	"github.com/zsy619/tools/xjson"
 )
 
 // https://github.com/pinpt/go-common/blob/master/hash/hash.go

@@ -3,7 +3,7 @@ package lists
 import (
 	"sort"
 
-	"haedu.gov.cn/tools"
+	"github.com/zsy619/tools"
 )
 
 type sortableList[E any] struct {

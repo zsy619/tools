@@ -1,6 +1,6 @@
 package xinterface
 
-import "haedu.gov.cn/tools/xjson"
+import "github.com/zsy619/tools/xjson"
 
 // ObjectToJson
 /**
