@@ -1,32 +1,22 @@
 package xidcard
 
-// IdCard 身份证号码
+// IdCard 表示一个身份证号码。
 type IdCard string
 
-// NewIdCard
-/**
- * @description: 生成身份证号码
- * @param {string} idCard
- * @return {IdCard}
- */
+// NewIdCard 将字符串 idCard 包装为 IdCard 类型。
+// 当 idCard 为空字符串时仍会返回合法的 IdCard，校验请调用 Validate。
 func NewIdCard(idCard string) IdCard {
 	return IdCard(idCard)
 }
 
-// ToString
-/**
- * @description: 转换为字符串
- * @return {string}
- */
+// ToString 返回身份证号字符串形式。
 func (id IdCard) ToString() string {
 	return string(id)
 }
 
-// Validate
-/**
- * @description: 身份证号码校验
- * @return {bool, error}
- */
+// Validate 校验当前身份证号是否合法。
+// 校验流程：格式 -> 地区码 -> 出生日期 -> 校验和。
+// 返回 (true, nil) 表示通过；任一步失败返回 (false, 错误信息)。
 func (id IdCard) Validate() (bool, error) {
 	if flag, err := Validate(id.ToString()); err != nil {
 		return flag, err
@@ -34,29 +24,20 @@ func (id IdCard) Validate() (bool, error) {
 	return true, nil
 }
 
-// Area
-/**
- * @description: 获取地区
- * @return {string, string, error}
- */
+// Area 获取身份证号对应的地区信息。
+// 返回 (地区码, 地区名, error)；地区码不存在时返回 ErrAddressInvalid。
 func (id IdCard) Area() (string, string, error) {
 	return Area(id.ToString())
 }
 
-// Birth
-/**
- * @description: 获取生日
- * @return {string, error}
- */
+// Birth 获取身份证号中的出生日期，格式为 YYYYMMDD。
+// 解析失败或超出合法范围时返回相应错误。
 func (id IdCard) Birth() (string, error) {
 	return Birth(id.ToString())
 }
 
-// BirthYm
-/**
- * @description: 获取出生年月
- * @return {*}
- */
+// BirthYm 获取身份证号中的出生年月，格式为 YYYYMM。
+// 内部基于 Birth 实现，错误情况与 Birth 一致。
 func (id IdCard) BirthYm() (string, error) {
 	ymd, err := Birth(id.ToString())
 	if err != nil {
@@ -65,11 +46,8 @@ func (id IdCard) BirthYm() (string, error) {
 	return ymd[:6], nil
 }
 
-// Sex
-/**
- * @description: 获取性别
- * @return {string, string, error}
- */
+// Sex 获取身份证号对应的性别信息。
+// 返回 (性别码, "男"/"女", error)；倒数第二位无法解析时返回 ErrSexInvalid。
 func (id IdCard) Sex() (string, string, error) {
 	return Sex(id.ToString())
 }

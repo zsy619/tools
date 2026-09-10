@@ -12,12 +12,13 @@ import (
 )
 
 const (
-	COMMON_FILE_MODE = 0o644 // common file mode , value as '-rw-r--r--' by unix os
+	COMMON_FILE_MODE = 0o644 // 常见的文件权限模式，unix 下对应 '-rw-r--r--'
 )
 
-// file info watch call back function process during in #ListFiles
+// callbackFn ListFiles 遍历文件时的回调函数，参数依次为：文件名、所在目录、文件内容。
 type callbackFn func(filename, path string, data []byte)
 
+// ListFiles 递归遍历指定目录 dir 下的所有文件，并对每个文件调用回调 callback。
 func ListFiles(dir string, callback callbackFn) (reterr error) {
 	fileSystem := os.DirFS(dir)
 	return fs.WalkDir(fileSystem, ".", func(path string, d fs.DirEntry, err error) error {

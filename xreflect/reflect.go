@@ -6,6 +6,9 @@ import (
 	"strings"
 )
 
+// GetMapResult 从 collections 中按 key 取值，并将其断言为 bool 后返回。
+// 若 key 不存在会返回零值（false）并产生 "index out of range" 类的 panic；
+// 若对应值不是 bool 类型，类型断言会以 panic 形式失败。
 func GetMapResult(collections map[string]interface{}, key string) bool {
 	return collections[key].(bool)
 }

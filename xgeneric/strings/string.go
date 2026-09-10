@@ -17,8 +17,10 @@ var (
 	AllCharset              = append(AlphanumericCharset, SpecialCharset...)
 )
 
-// RandomString return a random string.
-// Play: https://go.dev/play/p/rRseOQVVum4
+// RandomString 返回一个由指定字符集随机生成的字符串。
+// 示例：https://go.dev/play/p/rRseOQVVum4
+// 参数：size 为结果长度，charset 为可用字符集。
+// 返回：长度为 size 的随机字符串；当 size <= 0 或 charset 为空时返回空串。
 func RandomString(size int, charset []rune) string {
 	if size <= 0 {
 		return ""
@@ -35,8 +37,10 @@ func RandomString(size int, charset []rune) string {
 	return string(b)
 }
 
-// Substring return part of a string.
-// Play: https://go.dev/play/p/TQlxQi82Lu1
+// Substring 返回字符串的子串。
+// 示例：https://go.dev/play/p/TQlxQi82Lu1
+// 参数：str 为输入字符串，offset 为起始偏移（负数表示从尾部倒数），length 为长度。
+// 返回：以 offset 开始、长度为 length 的子串；当 offset 越界时返回空串，length 超过剩余长度会被截断。
 func Substring[T ~string](str T, offset int, length uint) T {
 	size := len(str)
 
@@ -58,9 +62,12 @@ func Substring[T ~string](str T, offset int, length uint) T {
 	return str[offset : offset+int(length)]
 }
 
-// ChunkString returns an array of strings split into groups the length of size. If array can't be split evenly,
-// the final chunk will be the remaining elements.
-// Play: https://go.dev/play/p/__FLTuJVz54
+// ChunkString 将字符串按 size 长度切分为多个子串切片。
+// 当无法均匀切分时，最后一个块包含剩余字符。
+// 示例：https://go.dev/play/p/__FLTuJVz54
+// 参数：str 为输入字符串，size 为每个块的长度。
+// 返回：包含切分后所有块的 []T。
+// 当 size <= 0 时 panic("lo.ChunkString: Size parameter must be greater than 0")；空串返回 [""]。
 func ChunkString[T ~string](str T, size int) []T {
 	if size <= 0 {
 		panic("lo.ChunkString: Size parameter must be greater than 0")
@@ -89,8 +96,10 @@ func ChunkString[T ~string](str T, size int) []T {
 	return chunks
 }
 
-// RuneLength is an alias to utf8.RuneCountInString which returns the number of runes in string.
-// Play: https://go.dev/play/p/tuhgW_lWY8l
+// RuneLength 是 utf8.RuneCountInString 的别名，返回字符串中 rune 的数量。
+// 示例：https://go.dev/play/p/tuhgW_lWY8l
+// 参数：str 为输入字符串。
+// 返回：str 中的 rune 个数（按 UTF-8 解码）。
 func RuneLength(str string) int {
 	return utf8.RuneCountInString(str)
 }

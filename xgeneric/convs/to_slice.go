@@ -8,17 +8,17 @@ import (
 )
 
 //
-// Desc: convert an any type value to the specified type slice.
+// Desc: 将任意类型的值转换为指定类型的切片。
 //
 
-// ToStrSlice converts an interface to a []string.
-// For example, covert []int{1, 2, 3} to []string{"1", "2", "3"}.
+// ToStrSlice 将任意类型转换为 []string（转换失败时返回 nil）。
+// 例如：[]int{1, 2, 3} 会转换为 []string{"1", "2", "3"}。
 func ToStrSlice(i any) []string {
 	v, _ := ToStrSliceE(i)
 	return v
 }
 
-// ToStrSliceE converts an interface to a []string with error.
+// ToStrSliceE 将任意类型转换为 []string，并在转换失败时返回错误。
 func ToStrSliceE(i any) ([]string, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
@@ -57,14 +57,14 @@ func ToStrSliceE(i any) ([]string, error) {
 	}
 }
 
-// ToIntSlice converts an interface to []int.
-// E.g. covert []string{"1", "2", "3"} to []int{1, 2, 3}.
+// ToIntSlice 将任意类型转换为 []int（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []int{1, 2, 3}。
 func ToIntSlice(i any) []int {
 	v, _ := ToIntSliceE(i)
 	return v
 }
 
-// ToIntSliceE converts any tpye to []int slice.
+// ToIntSliceE 将任意类型转换为 []int，并在转换失败时返回错误。
 func ToIntSliceE(i any) ([]int, error) {
 	if i == nil {
 		return []int{}, nil
@@ -93,14 +93,14 @@ func ToIntSliceE(i any) ([]int, error) {
 	}
 }
 
-// ToInt8Slice converts an interface to []int8.
-// For example, covert []string{"1", "2", "3"} to []int8{1, 2, 3}.
+// ToInt8Slice 将任意类型转换为 []int8（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []int8{1, 2, 3}。
 func ToInt8Slice(i any) []int8 {
 	v, _ := ToInt8SliceE(i)
 	return v
 }
 
-// ToInt8SliceE converts an interface to []int8 with error.
+// ToInt8SliceE 将任意类型转换为 []int8，并在转换失败时返回错误。
 func ToInt8SliceE(i any) ([]int8, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []int8", i, i)
@@ -134,14 +134,14 @@ func ToInt8SliceE(i any) ([]int8, error) {
 	return []int8{v}, nil
 }
 
-// ToInt16Slice converts an interface to []int16.
-// For example, covert []string{"1", "2", "3"} to []int16{1, 2, 3}.
+// ToInt16Slice 将任意类型转换为 []int16（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []int16{1, 2, 3}。
 func ToInt16Slice(i any) []int16 {
 	v, _ := ToInt16SliceE(i)
 	return v
 }
 
-// ToInt16SliceE converts an interface to []int16 with error.
+// ToInt16SliceE 将任意类型转换为 []int16，并在转换失败时返回错误。
 func ToInt16SliceE(i any) ([]int16, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []int16", i, i)
@@ -175,14 +175,14 @@ func ToInt16SliceE(i any) ([]int16, error) {
 	return []int16{v}, nil
 }
 
-// ToInt32Slice converts an interface to []int32.
-// For example, covert []string{"1", "2", "3"} to []int32{1, 2, 3}.
+// ToInt32Slice 将任意类型转换为 []int32（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []int32{1, 2, 3}。
 func ToInt32Slice(i any) []int32 {
 	v, _ := ToInt32SliceE(i)
 	return v
 }
 
-// ToInt32SliceE converts an interface to []int32 with error.
+// ToInt32SliceE 将任意类型转换为 []int32，并在转换失败时返回错误。
 func ToInt32SliceE(i any) ([]int32, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []int32", i, i)
@@ -216,14 +216,14 @@ func ToInt32SliceE(i any) ([]int32, error) {
 	return []int32{v}, nil
 }
 
-// ToInt64Slice converts an interface to []int64 slice.
-// For example, covert []string{"1", "2", "3"} to []int64{1, 2, 3}.
+// ToInt64Slice 将任意类型转换为 []int64（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []int64{1, 2, 3}。
 func ToInt64Slice(i any) []int64 {
 	v, _ := ToInt64SliceE(i)
 	return v
 }
 
-// ToInt64SliceE converts an interface to []int64 slice with error.
+// ToInt64SliceE 将任意类型转换为 []int64，并在转换失败时返回错误。
 func ToInt64SliceE(i any) ([]int64, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []int64", i, i)
@@ -257,14 +257,14 @@ func ToInt64SliceE(i any) ([]int64, error) {
 	return []int64{v}, nil
 }
 
-// ToUintSlice converts an interface to []uint.
-// For example, covert []string{"1", "2", "3"} to []uint{1, 2, 3}.
+// ToUintSlice 将任意类型转换为 []uint（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []uint{1, 2, 3}。
 func ToUintSlice(i any) []uint {
 	v, _ := ToUintSliceE(i)
 	return v
 }
 
-// ToUintSliceE converts an interface to []uint with error.
+// ToUintSliceE 将任意类型转换为 []uint，并在转换失败时返回错误。
 func ToUintSliceE(i any) ([]uint, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []uint", i, i)
@@ -298,14 +298,14 @@ func ToUintSliceE(i any) ([]uint, error) {
 	return []uint{v}, nil
 }
 
-// ToUint8Slice converts an interface to []uint8.
-// E.g. covert []string{"1", "2", "3"} to []uint8{1, 2, 3}.
+// ToUint8Slice 将任意类型转换为 []uint8（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []uint8{1, 2, 3}。
 func ToUint8Slice(i any) []uint8 {
 	v, _ := ToUint8SliceE(i)
 	return v
 }
 
-// ToUint8SliceE converts an interface to []uint8 slice with error.
+// ToUint8SliceE 将任意类型转换为 []uint8，并在转换失败时返回错误。
 func ToUint8SliceE(i any) ([]uint8, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []uint8", i, i)
@@ -339,14 +339,14 @@ func ToUint8SliceE(i any) ([]uint8, error) {
 	return []uint8{u}, nil
 }
 
-// ToUint16Slice converts an interface to []uint16.
-// For example, covert []string{"1", "2", "3"} to []uint16{1, 2, 3}.
+// ToUint16Slice 将任意类型转换为 []uint16（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []uint16{1, 2, 3}。
 func ToUint16Slice(i any) []uint16 {
 	v, _ := ToUint16SliceE(i)
 	return v
 }
 
-// ToUint16SliceE converts an interface to []uint16 slice with error.
+// ToUint16SliceE 将任意类型转换为 []uint16，并在转换失败时返回错误。
 func ToUint16SliceE(i any) ([]uint16, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []uint16", i, i)
@@ -380,14 +380,14 @@ func ToUint16SliceE(i any) ([]uint16, error) {
 	return []uint16{u}, nil
 }
 
-// ToUint32Slice converts an interface to []uint32.
-// For example, covert []string{"1", "2", "3"} to []uint32{1, 2, 3}.
+// ToUint32Slice 将任意类型转换为 []uint32（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []uint32{1, 2, 3}。
 func ToUint32Slice(i any) []uint32 {
 	v, _ := ToUint32SliceE(i)
 	return v
 }
 
-// ToUint32SliceE converts an interface to []uint32 slice with error.
+// ToUint32SliceE 将任意类型转换为 []uint32，并在转换失败时返回错误。
 func ToUint32SliceE(i any) ([]uint32, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []uint32", i, i)
@@ -421,14 +421,14 @@ func ToUint32SliceE(i any) ([]uint32, error) {
 	return []uint32{u}, nil
 }
 
-// ToUint64Slice converts an interface to []uint64.
-// For example, covert []string{"1", "2", "3"} to []uint64{1, 2, 3}.
+// ToUint64Slice 将任意类型转换为 []uint64（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []uint64{1, 2, 3}。
 func ToUint64Slice(i any) []uint64 {
 	v, _ := ToUint64SliceE(i)
 	return v
 }
 
-// ToUint64SliceE converts an interface to []uint64 slice with error.
+// ToUint64SliceE 将任意类型转换为 []uint64，并在转换失败时返回错误。
 func ToUint64SliceE(i any) ([]uint64, error) {
 	if i == nil {
 		return nil, fmt.Errorf("unable to cast %#v of type %T to []uint64", i, i)
@@ -462,24 +462,24 @@ func ToUint64SliceE(i any) ([]uint64, error) {
 	return []uint64{u}, nil
 }
 
-// ToByteSlice converts an interface to []byte.
-// E.g. covert []string{"1", "2", "3"} to []byte{1, 2, 3}.
+// ToByteSlice 将任意类型转换为 []byte（转换失败时返回 nil）。
+// 例如：[]string{"1", "2", "3"} 会转换为 []byte{1, 2, 3}。
 func ToByteSlice(i any) []byte {
 	return ToUint8Slice(i)
 }
 
-// ToByteSliceE converts an interface to []byte slice with error
+// ToByteSliceE 将任意类型转换为 []byte，并在转换失败时返回错误。
 func ToByteSliceE(i any) ([]byte, error) {
 	return ToUint8SliceE(i)
 }
 
-// ToBoolSlice converts an interface to []bool.
+// ToBoolSlice 将任意类型转换为 []bool（转换失败时返回 nil）。
 func ToBoolSlice(a any) []bool {
 	v, _ := ToBoolSliceE(a)
 	return v
 }
 
-// ToBoolSliceE converts an interface to []bool.
+// ToBoolSliceE 将任意类型转换为 []bool，并在转换失败时返回错误。
 func ToBoolSliceE(i any) ([]bool, error) {
 	if i == nil {
 		return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
@@ -508,13 +508,13 @@ func ToBoolSliceE(i any) ([]bool, error) {
 	}
 }
 
-// ToDurationSlice converts an interface to []time.Duration.
+// ToDurationSlice 将任意类型转换为 []time.Duration（转换失败时返回 nil）。
 func ToDurationSlice(i any) []time.Duration {
 	v, _ := ToDurationSliceE(i)
 	return v
 }
 
-// ToDurationSliceE converts any type to []time.Duration with error.
+// ToDurationSliceE 将任意类型转换为 []time.Duration，并在转换失败时返回错误。
 func ToDurationSliceE(i any) ([]time.Duration, error) {
 	if i == nil {
 		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)

@@ -13,11 +13,23 @@ import (
 )
 
 const (
+	// INDEX_NOT_FOUND 表示「未找到」的位置，与 strings.Index/LastIndex
+	// 的 -1 返回值保持一致。
 	INDEX_NOT_FOUND = -1
-	EMPTY_STRING    = ""
+	// EMPTY_STRING 是空字符串的语义常量，便于在表达式中复用并表达
+	// 「此处意图为空」的语义。
+	EMPTY_STRING = ""
 )
 
-// Abbreviates a String using a given replacement marker
+// Abbreviate 在固定宽度内截断字符串，超出部分用 abbrevMarker 替换。
+//
+// 行为细节：
+//   - 当 str 或 abbrevMarker 为空时，函数不会真正截断；
+//   - offset 表示从 str 哪个位置开始考虑截断；
+//   - 当 maxWidth 过小（小于 abbrevMarker 长度 + 1）会返回错误；
+//   - 当 maxWidth 已经能装下整个 str，原样返回。
+//
+// 该函数常用于日志、表格、UI 等需要严格限制字符串宽度的场景。
 func Abbreviate(str, abbrevMarker string, offset, maxWidth int) (string, error) {
 	if IsEmpty(str) && IsEmpty(abbrevMarker) {
 		return str, nil
@@ -60,7 +72,15 @@ func Abbreviate(str, abbrevMarker string, offset, maxWidth int) (string, error) 
 	return abbrevMarker + SubString(str, l-(maxWidth-abbrevMarkerLength), -1), nil
 }
 
-// AbbreviateMiddle a String to the length passed, replacing the middle characters with the supplied replacement String.
+// AbbreviateMiddle 将字符串截断到指定长度，并用 middle 替换中间字符。
+//
+// 行为细节：
+//   - 当 str 或 middle 为空时直接返回原字符串，不做截断；
+//   - 当 length >= len(str) 时原样返回；
+//   - 当 length < len(middle)+2 时无法容纳替换标记，同样原样返回；
+//   - 其余情况下按 (length-len(middle))/2 对称地从前/后各取一段，中间用 middle 拼接。
+//
+// 典型场景：脱敏显示长字符串（如手机号、身份证号、文件名等）。
 func AbbreviateMiddle(str, middle string, length int) string {
 	if IsEmpty(str) || IsEmpty(middle) {
 		return str
@@ -79,11 +99,13 @@ func AbbreviateMiddle(str, middle string, length int) string {
 		SubString(str, endOffset, -1)
 }
 
-// Capitalize a String changing the first letter to upper case
-// str.Capitalize("hello") = "Hello"
-// str.Capitalize("HEllo") = "HEllo"
-// str.Capitalize("") = ""
-// str.Capitalize("12h") = "12h"
+// Capitalize 将字符串首字符转换为大写形式（非 ASCII 字符保持原样）。
+//
+// 示例：
+//   - Capitalize("hello") == "Hello"
+//   - Capitalize("HEllo") == "HEllo"（首字符已经大写则不变）
+//   - Capitalize("")      == ""
+//   - Capitalize("12h")   == "12h"（数字开头则不变）
 func Capitalize(s string) string {
 	if len(s) == 0 {
 		return s
@@ -94,11 +116,13 @@ func Capitalize(s string) string {
 	return string(b)
 }
 
-// Uncapitalize a String changing the first letter to lower case
-// str.Capitalize("hello") = "hello"
-// str.Capitalize("HEllo") = "hEllo"
-// str.Capitalize("") = ""
-// str.Capitalize("12h") = "12h"
+// Uncapitalize 将字符串首字符转换为小写形式（非 ASCII 字符保持原样）。
+//
+// 示例：
+//   - Uncapitalize("hello") == "hello"
+//   - Uncapitalize("HEllo") == "hEllo"（仅首个字符变小写）
+//   - Uncapitalize("")      == ""
+//   - Uncapitalize("12h")   == "12h"（数字开头则不变）
 func Uncapitalize(s string) string {
 	if len(s) == 0 {
 		return s
@@ -109,7 +133,12 @@ func Uncapitalize(s string) string {
 	return string(b)
 }
 
-// SubstringAfter Gets the substring after the first occurrence of a separator
+// SubstringAfter 返回 s 中第一次出现 separator 之后的子串。
+//
+// 行为细节：
+//   - 当 s 为空时返回空串；
+//   - 当 separator 为空时返回 EMPTY_STRING（无明确分隔点）；
+//   - 当 separator 不在 s 中出现时返回 EMPTY_STRING。
 func SubstringAfter(s string, separator string) string {
 	if len(s) == 0 {
 		return s
@@ -127,7 +156,12 @@ func SubstringAfter(s string, separator string) string {
 	return string(s[pos+len(separator):])
 }
 
-// SubstringAfterLast Gets the substring after the last occurrence of a separator.
+// SubstringAfterLast 返回 s 中最后一次出现 separator 之后的子串。
+//
+// 行为细节：
+//   - 当 s 为空时返回空串；
+//   - 当 separator 为空或未在 s 中出现时返回 EMPTY_STRING；
+//   - 当 separator 出现在 s 末尾（即后无内容）时也返回 EMPTY_STRING。
 func SubstringAfterLast(s string, separator string) string {
 	if len(s) == 0 {
 		return s
@@ -145,7 +179,11 @@ func SubstringAfterLast(s string, separator string) string {
 	return string(s[pos+len(separator):])
 }
 
-// SubstringBefore Gets the substring before the first occurrence of a separator
+// SubstringBefore 返回 s 中第一次出现 separator 之前的子串。
+//
+// 行为细节：
+//   - 当 s 为空时返回空串；
+//   - 当 separator 为空或未在 s 中出现时返回 EMPTY_STRING。
 func SubstringBefore(s string, separator string) string {
 	if len(s) == 0 {
 		return s
@@ -163,7 +201,12 @@ func SubstringBefore(s string, separator string) string {
 	return string(s[:pos])
 }
 
-// SubstringBeforeLast  Gets the substring before the last occurrence of a separator
+// SubstringBeforeLast 返回 s 中最后一次出现 separator 之前的子串。
+//
+// 行为细节：
+//   - 当 s 为空时返回空串；
+//   - 当 separator 为空时返回 EMPTY_STRING；
+//   - 当 separator 未在 s 中出现时直接返回 s 本身（与 SubstringBefore 不同）。
 func SubstringBeforeLast(s string, separator string) string {
 	if len(s) == 0 {
 		return s
@@ -180,7 +223,12 @@ func SubstringBeforeLast(s string, separator string) string {
 	return string(s[:pos])
 }
 
-// SubstringMatch to returns whether the given string matches the given substring
+// SubstringMatch 判断 s 从 index 位置开始的字节序列是否与 sub 完全相等。
+//
+// 行为细节：
+//   - 当 index+len(sub) 超出 s 的长度时直接返回 false（不会越界访问）；
+//   - 通过逐字节比较确认匹配，匹配返回 true，否则 false；
+//   - 不调用正则，纯字节比较，性能可控。
 func SubstringMatch(s string, index int, sub string) bool {
 	if index+len(sub) > len(s) {
 		return false
@@ -194,14 +242,23 @@ func SubstringMatch(s string, index int, sub string) bool {
 	return true
 }
 
-// fulfill string by repeat target count of byte
+// Repeat 把单字节 s 重复 count 次拼接成字符串返回。
+//
+// 行为细节：
+//   - count <= 0 时由 xarray.CreateAndFill 的语义决定结果（一般返回空串）；
+//   - 返回值等价于 strings.Repeat(string(s), count)，但只接受单字节，节省分配。
 func Repeat(s byte, count int) string {
 	ret := xarray.CreateAndFill(count, s)
 	return string(ret)
 }
 
-// StringToSlice base on unsafe package to convert string to []byte without copy action
-// key point: copy string's Data and Len to slice's Data and Len, and append Cap value
+// StringToSlice 基于 unsafe 把 string 零拷贝转换为 []byte。
+//
+// 关键点：将 string 的 (Data, Len) 字段直接写入切片头，再额外设置 Cap。
+//
+// 注意：
+//   - 返回的 []byte 与原 string 共享底层内存，修改 []byte 会影响 string；
+//   - 仅在确实需要避免拷贝时才使用，且应避免在 string 仍被其他地方引用时写入。
 func StringToSlice(value string) []byte {
 	// create a new []byte
 	var ret []byte
@@ -216,8 +273,13 @@ func StringToSlice(value string) []byte {
 	return ret
 }
 
-// SliceToString base on unsafe packge to convert []byte to string without copy action
-// key point: copy slice's Data and Len to string's Data and Len.
+// SliceToString 基于 unsafe 把 []byte 零拷贝转换为 string。
+//
+// 关键点：将切片的 (Data, Len) 字段直接写入 string 头。
+//
+// 注意：
+//   - 当 b 为 nil 时返回 EMPTY_STRING，避免解引用空切片；
+//   - 返回的 string 与原切片共享底层内存，修改 b 会改变 string 内容（违反 Go 的不可变约定，慎用）。
 func SliceToString(b []byte) string {
 	if b == nil {
 		return EMPTY_STRING

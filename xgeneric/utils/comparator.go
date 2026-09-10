@@ -20,13 +20,13 @@ type Float interface {
 	~float32 | ~float64
 }
 
-// Comparator Should return a number:
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Comparator 是通用的比较器函数类型。
+// 应当返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
 type Comparator[T any] func(a, b T) int
 
+// OrderedTypeCmp 使用通用比较运算符对满足 Ordered 约束的两个值进行比较。
+// 参数：a、b 为要比较的有序值。
+// 返回：a == b 时返回 0；a < b 时返回 -1；否则返回 1。
 func OrderedTypeCmp[T Ordered](a, b T) int {
 	if a == b {
 		return 0
@@ -37,18 +37,17 @@ func OrderedTypeCmp[T Ordered](a, b T) int {
 	return 1
 }
 
-// Reverse returns a comparator reverse to cmp
+// Reverse 返回一个与传入比较器结果相反的比较器（即反向排序）。
+// 参数：cmp 为原始 Comparator[T]。
+// 返回：cmp 的反向 Comparator[T]，其返回值为 -cmp(a, b)。
 func Reverse[T any](cmp Comparator[T]) Comparator[T] {
 	return func(a, b T) int {
 		return -cmp(a, b)
 	}
 }
 
-// IntComparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// IntComparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func IntComparator(a, b int) int {
 	if a == b {
 		return 0
@@ -59,11 +58,8 @@ func IntComparator(a, b int) int {
 	return 1
 }
 
-// UintComparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// UintComparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func UintComparator(a, b uint) int {
 	if a == b {
 		return 0
@@ -74,11 +70,8 @@ func UintComparator(a, b uint) int {
 	return 1
 }
 
-// Int8Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Int8Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Int8Comparator(a, b int8) int {
 	if a == b {
 		return 0
@@ -89,11 +82,8 @@ func Int8Comparator(a, b int8) int {
 	return 1
 }
 
-// Uint8Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Uint8Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Uint8Comparator(a, b uint8) int {
 	if a == b {
 		return 0
@@ -104,11 +94,8 @@ func Uint8Comparator(a, b uint8) int {
 	return 1
 }
 
-// Int16Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Int16Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Int16Comparator(a, b int16) int {
 	if a == b {
 		return 0
@@ -119,11 +106,8 @@ func Int16Comparator(a, b int16) int {
 	return 1
 }
 
-// Uint16Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Uint16Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Uint16Comparator(a, b uint16) int {
 	if a == b {
 		return 0
@@ -134,11 +118,8 @@ func Uint16Comparator(a, b uint16) int {
 	return 1
 }
 
-// Int32Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Int32Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Int32Comparator(a, b int32) int {
 	if a == b {
 		return 0
@@ -149,11 +130,8 @@ func Int32Comparator(a, b int32) int {
 	return 1
 }
 
-// Uint32Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Uint32Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Uint32Comparator(a, b uint32) int {
 	if a == b {
 		return 0
@@ -164,11 +142,8 @@ func Uint32Comparator(a, b uint32) int {
 	return 1
 }
 
-// Int64Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Int64Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Int64Comparator(a, b int64) int {
 	if a == b {
 		return 0
@@ -179,11 +154,8 @@ func Int64Comparator(a, b int64) int {
 	return 1
 }
 
-// Uint64Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Uint64Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Uint64Comparator(a, b uint64) int {
 	if a == b {
 		return 0
@@ -194,11 +166,8 @@ func Uint64Comparator(a, b uint64) int {
 	return 1
 }
 
-// Float32Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Float32Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Float32Comparator(a, b float32) int {
 	if a == b {
 		return 0
@@ -209,11 +178,8 @@ func Float32Comparator(a, b float32) int {
 	return 1
 }
 
-// Float64Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Float64Comparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Float64Comparator(a, b float64) int {
 	if a == b {
 		return 0
@@ -224,11 +190,8 @@ func Float64Comparator(a, b float64) int {
 	return 1
 }
 
-// StringComparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// StringComparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func StringComparator(a, b string) int {
 	if a == b {
 		return 0
@@ -239,11 +202,8 @@ func StringComparator(a, b string) int {
 	return 1
 }
 
-// UintptrComparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// UintptrComparator 比较 a 与 b，返回：-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func UintptrComparator(a, b uintptr) int {
 	if a == b {
 		return 0
@@ -254,11 +214,8 @@ func UintptrComparator(a, b uintptr) int {
 	return 1
 }
 
-// BoolComparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// BoolComparator 比较两个 bool 值，按 false < true 排序。-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func BoolComparator(a, b bool) int {
 	if a == b {
 		return 0
@@ -269,11 +226,8 @@ func BoolComparator(a, b bool) int {
 	return 1
 }
 
-// Complex64Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Complex64Comparator 先比较实部、再比较虚部。-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Complex64Comparator(a, b complex64) int {
 	if a == b {
 		return 0
@@ -287,11 +241,8 @@ func Complex64Comparator(a, b complex64) int {
 	return 1
 }
 
-// Complex128Comparator compare a with b
-//
-//	-1 , if a < b
-//	0  , if a == b
-//	1  , if a > b
+// Complex128Comparator 先比较实部、再比较虚部。-1 表示 a < b，0 表示 a == b，1 表示 a > b。
+
 func Complex128Comparator(a, b complex128) int {
 	if a == b {
 		return 0

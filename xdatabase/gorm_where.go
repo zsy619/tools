@@ -9,24 +9,40 @@ import (
 )
 
 const (
-	GormWhere_Exp            = "exp"
-	GormWhere_ExpPrefix      = GormWhere_Exp + ":::"
-	GormWhere_String         = "_string"
-	GormWhere_StringPrefix   = GormWhere_String + ":::"
-	GormWhere_StringOr       = "_string_or"
+	// GormWhere_Exp 表达式模式 key（解析为 field op value）。
+	GormWhere_Exp = "exp"
+	// GormWhere_ExpPrefix 表达式模式前缀，使用 "exp:::" 开头。
+	GormWhere_ExpPrefix = GormWhere_Exp + ":::"
+	// GormWhere_String 以 AND 连接的字符串片段模式 key。
+	GormWhere_String = "_string"
+	// GormWhere_StringPrefix 字符串模式前缀，使用 "_string:::" 开头。
+	GormWhere_StringPrefix = GormWhere_String + ":::"
+	// GormWhere_StringOr 以 OR 连接的字符串片段模式 key。
+	GormWhere_StringOr = "_string_or"
+	// GormWhere_StringOrPrefix 字符串 OR 模式前缀。
 	GormWhere_StringOrPrefix = GormWhere_StringOr + ":::"
-	GormWhere_Like           = "like"
-	GormWhere_LikePrefix     = GormWhere_Like + ":::"
-	GormWhere_Or             = "or"
-	GormWhere_OrPrefix       = GormWhere_Or + ":::"
-	GormWhere_In             = "in"
-	GormWhere_InPrefix       = GormWhere_In + ":::"
+	// GormWhere_Like 模糊匹配模式 key。
+	GormWhere_Like = "like"
+	// GormWhere_LikePrefix 模糊匹配模式前缀。
+	GormWhere_LikePrefix = GormWhere_Like + ":::"
+	// GormWhere_Or 或逻辑模式 key。
+	GormWhere_Or = "or"
+	// GormWhere_OrPrefix 或逻辑模式前缀。
+	GormWhere_OrPrefix = GormWhere_Or + ":::"
+	// GormWhere_In IN 子句模式 key。
+	GormWhere_In = "in"
+	// GormWhere_InPrefix IN 子句模式前缀。
+	GormWhere_InPrefix = GormWhere_In + ":::"
 )
 
+// GormWhere 灵活的查询条件构造器，底层使用 map 存储，可表达多种 SQL 片段。
 type GormWhere struct {
 	where map[string]interface{}
 }
 
+// NewGormWhere 创建一个空的 GormWhere。
+//
+// 返回值：初始化完成的 *GormWhere。
 func NewGormWhere() *GormWhere {
 	return &GormWhere{
 		where: make(map[string]interface{}),

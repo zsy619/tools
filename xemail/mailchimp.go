@@ -15,45 +15,45 @@ import (
 	"github.com/zsy619/tools/xjson"
 )
 
-// NOTE(PN): Mainly use this Mailchimp library to add addresses to mailing lists for.
-// Use the Emailer via Sendgrid for delivery of emails.
+// NOTE(PN): 此 Mailchimp 库主要用于将地址加入邮件列表；
+// 实际的邮件投递请通过 Sendgrid 的 Emailer 完成。
 
-// Implements MailingListMemberManager
+// 实现 MailingListMemberManager 接口。
 
-// NewMailchimpAPI is a convenience function to instantiate a new MailChimpAPI
-// struct
+// NewMailchimpAPI 是一个便捷函数，使用指定的 apiKey 实例化一个新的 MailchimpAPI。
 func NewMailchimpAPI(apiKey string) *MailchimpAPI {
 	return &MailchimpAPI{
 		apiKey: apiKey,
 	}
 }
 
-// MailchimpTag is a Mailchimp tag
+// MailchimpTag 表示一个 Mailchimp 标签。
 type MailchimpTag string
 
 const (
-	// ErrTitleResourceNotFound is the error response from Mailchimp
+	// ErrTitleResourceNotFound Mailchimp 返回的资源不存在错误标题。
 	ErrTitleResourceNotFound = "resource not found"
-	// ErrTitleMemberExists is the error response from Mailchimp
+	// ErrTitleMemberExists Mailchimp 返回的成员已存在错误标题。
 	ErrTitleMemberExists = "member exists"
 )
 
 const (
-	// ServiceNameMailchimp is the service name for Mailchimp
+	// ServiceNameMailchimp Mailchimp 在 ListMemberManager 中注册的服务名。
 	ServiceNameMailchimp = "mailchimp"
 )
 
-// MailchimpAPI is a wrapper around the MailChimp API.  Uses the gochimp lib.
+// MailchimpAPI 是对 Mailchimp API 的封装，底层使用 beeker1121/mailchimp-go 库。
 type MailchimpAPI struct {
 	apiKey string
 }
 
-// ServiceName returns the underlying mailing list service
+// ServiceName 返回底层邮件列表服务商名称。
 func (m *MailchimpAPI) ServiceName() string {
 	return ServiceNameMailchimp
 }
 
-// GetListMember returns a Mailchimp mailing list member
+// GetListMember 返回 Mailchimp 指定列表中的成员信息。
+// 邮箱不存在或网络失败时返回错误；成功时填充 ServiceID/EmailAddress/Status/Tags 等字段。
 func (m *MailchimpAPI) GetListMember(listID string, email string) (*ListMember, error) {
 	err := mailchimp.SetKey(m.apiKey)
 	if err != nil {
@@ -96,7 +96,8 @@ func (m *MailchimpAPI) GetListMember(listID string, email string) (*ListMember, 
 	}, nil
 }
 
-// IsSubscribedToList returns true if an email is subscribed on a specified list
+// IsSubscribedToList 判断指定邮箱是否在指定列表中处于已订阅状态。
+// 当成员不存在或状态非 subscribed 时返回 (false, nil)。
 func (m *MailchimpAPI) IsSubscribedToList(listID string, email string) (bool, error) {
 	err := mailchimp.SetKey(m.apiKey)
 	if err != nil {
@@ -122,8 +123,9 @@ func (m *MailchimpAPI) IsSubscribedToList(listID string, email string) (bool, er
 	return true, nil
 }
 
-// SubscribeToList adds an email address to a specified list. Only adds tags on
-// creation, not re-subscribes
+// SubscribeToList 将指定邮箱加入指定列表。
+// 注意：仅在首次创建时附加 params.Tags，重新订阅不会再次写入标签。
+// 若成员已存在则会将其状态更新为已订阅。
 func (m *MailchimpAPI) SubscribeToList(listID string, email string, params *SubscriptionParams) error {
 	err := mailchimp.SetKey(m.apiKey)
 	if err != nil {
@@ -153,7 +155,7 @@ func (m *MailchimpAPI) SubscribeToList(listID string, email string, params *Subs
 
 	member, err := m.newMember(listID, newParams)
 	if err != nil {
-		// If member is already on list, update user to subscribed
+		// 若成员已在列表中，则更新其状态为已订阅。
 		if !m.isMemberAlreadyOnListError(err) {
 			return err
 		}
@@ -179,8 +181,8 @@ func (m *MailchimpAPI) SubscribeToList(listID string, email string, params *Subs
 	return nil
 }
 
-// UnsubscribeFromList unsubscribes an email address from a specified list.  The
-// delete flag will completely delete it from a list.
+// UnsubscribeFromList 将指定邮箱从指定列表中退订。
+// 当 delete 为 true 时会从列表中永久删除该成员；否则仅更新状态为 unsubscribed。
 func (m *MailchimpAPI) UnsubscribeFromList(listID string, email string, delete bool) error {
 	err := mailchimp.SetKey(m.apiKey)
 	if err != nil {
@@ -199,13 +201,15 @@ func (m *MailchimpAPI) UnsubscribeFromList(listID string, email string, delete b
 	return err
 }
 
+// mailchimpUserHash 计算邮箱小写形式的 MD5 哈希，作为 Mailchimp 用户标识。
 func (m *MailchimpAPI) mailchimpUserHash(emailAddress string) string {
-	// md5 hash of lowercase version of the email address
+	// 邮箱地址小写形式的 md5 哈希
 	h := md5.New()                                        // nolint: gosec
 	_, _ = h.Write([]byte(strings.ToLower(emailAddress))) // nolint: gosec, errcheck
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+// isMemberNotFoundError 判断错误是否为 Mailchimp 的“资源不存在”错误。
 func (m *MailchimpAPI) isMemberNotFoundError(err error) bool {
 	e, ok := err.(*mailchimp.APIError)
 	if ok {
@@ -216,6 +220,7 @@ func (m *MailchimpAPI) isMemberNotFoundError(err error) bool {
 	return false
 }
 
+// isMemberAlreadyOnListError 判断错误是否为 Mailchimp 的“成员已存在”错误。
 func (m *MailchimpAPI) isMemberAlreadyOnListError(err error) bool {
 	e, ok := err.(*mailchimp.APIError)
 	if ok {
@@ -226,10 +231,10 @@ func (m *MailchimpAPI) isMemberAlreadyOnListError(err error) bool {
 	return false
 }
 
-// NOTE(PN): The items below extend the mailchimp-go library to include tags
-// Will try and submit a PR into that repo to include these changes when time permits
+// NOTE(PN): 以下内容扩展了 mailchimp-go 库，加入了对 Tags 的支持。
+// 待有空时将尝试向上游提交 PR 合入这些改动。
 
-// NewMemberParams is a version of NewParams that adds a tags field
+// NewMemberParams 是增加了 Tags 字段的成员创建参数版本。
 type NewMemberParams struct {
 	EmailType       members.EmailType      `json:"email_type,omitempty"`
 	Status          members.Status         `json:"status"`
@@ -246,8 +251,8 @@ type NewMemberParams struct {
 	Tags            []MailchimpTag         `json:"tags,omitempty"`
 }
 
-// MarshalJSON handles custom JSON marshalling for the NewMembersParams object.
-// Added here to correct the invalid timestamp format issue.
+// MarshalJSON 自定义 NewMemberParams 的 JSON 序列化，
+// 用于修正 Mailchimp 期望的时间戳格式。
 func (np *NewMemberParams) MarshalJSON() ([]byte, error) {
 	var timestampSignup string
 	var timestampOpt string
@@ -271,13 +276,13 @@ func (np *NewMemberParams) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// MemberTag represents a tag on a Member struct
+// MemberTag 表示 Member 上的一个标签。
 type MemberTag struct {
 	ID   int    `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 }
 
-// Member defines a single member within a list that adds a field for tags
+// Member 表示邮件列表中增加了 Tags 字段的一个成员。
 type Member struct {
 	ID              string                 `json:"id"`
 	EmailAddress    string                 `json:"email_address"`
@@ -302,7 +307,7 @@ type Member struct {
 	Tags            []*MemberTag           `json:"tags,omitempty"`
 }
 
-// newMember adds a new list member with tags
+// newMember 向指定 list 添加一个新成员，支持 tags。
 func (m *MailchimpAPI) newMember(listID string, params *NewMemberParams) (*Member, error) {
 	res := &Member{}
 	path := fmt.Sprintf("lists/%s/members", listID)
@@ -320,7 +325,7 @@ func (m *MailchimpAPI) newMember(listID string, params *NewMemberParams) (*Membe
 	return res, nil
 }
 
-// getMember retrieves information about a specific member within a list with tags
+// getMember 获取指定 list 中指定哈希成员的信息，支持 tags。
 func (m *MailchimpAPI) getMember(listID, hash string, params *members.GetMemberParams) (*Member, error) {
 	res := &Member{}
 	path := fmt.Sprintf("lists/%s/members/%s", listID, hash)

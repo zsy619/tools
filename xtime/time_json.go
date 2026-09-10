@@ -27,6 +27,7 @@ func (t JsonTime) String() string {
 	return time.Time(t).Format(timeFormart)
 }
 
+// JsonTimeNow 返回当前时间的 JsonTime。
 func JsonTimeNow() JsonTime {
 	return JsonTime(time.Now())
 }

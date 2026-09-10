@@ -1,18 +1,31 @@
 package xmath
 
+// floatInfo 描述 IEEE-754 浮点数的表示参数。
 type floatInfo struct {
+	// mantbits 尾数位数。
 	mantbits uint
-	expbits  uint
-	bias     int
+	// expbits 指数位数。
+	expbits uint
+	// bias 指数偏置。
+	bias int
 }
 
 var (
+	// float32info 对应 float32 的 mantbits / expbits / bias。
 	float32info = floatInfo{23, 8, -127}
+	// float64info 对应 float64 的 mantbits / expbits / bias。
 	float64info = floatInfo{52, 11, -1023}
 )
 
 // roundShortest rounds d (= mant * 2^exp) to the shortest number of digits
 // that will let the original floating point value be precisely reconstructed.
+// roundShortest 将 d（= mant * 2^exp）四舍五入到最短的数字序列，使得该十进制表示能精确还原原始浮点数。
+//
+// 参数：
+//   - d: 待舍入的 decimal 指针；函数会原地修改其 nd / 数字序列。
+//   - mant: 尾数（已对齐到 mantbits 位）。
+//   - exp: 指数。
+//   - flt: 浮点表示参数（float32info 或 float64info）。
 func roundShortest(d *decimal, mant uint64, exp int, flt *floatInfo) {
 	// If mantissa is zero, the number is zero; stop now.
 	if mant == 0 {

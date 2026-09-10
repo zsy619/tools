@@ -7,13 +7,12 @@ import (
 	"strings"
 )
 
-// Gethostname gethostname()
+// Gethostname 获取本地主机名（对应 PHP gethostname()）。
 func Gethostname() (string, error) {
 	return os.Hostname()
 }
 
-// Gethostbyname gethostbyname()
-// Get the IPv4 address corresponding to a given Internet host name
+// Gethostbyname 获取指定 Internet 主机名对应的 IPv4 地址（对应 PHP gethostbyname()）。
 func Gethostbyname(hostname string) (string, error) {
 	ips, err := net.LookupIP(hostname)
 	if ips != nil {
@@ -27,8 +26,7 @@ func Gethostbyname(hostname string) (string, error) {
 	return "", err
 }
 
-// Gethostbynamel gethostbynamel()
-// Get a list of IPv4 addresses corresponding to a given Internet host name
+// Gethostbynamel 获取指定 Internet 主机名对应的全部 IPv4 地址列表（对应 PHP gethostbynamel()）。
 func Gethostbynamel(hostname string) ([]string, error) {
 	ips, err := net.LookupIP(hostname)
 	if ips != nil {
@@ -43,8 +41,7 @@ func Gethostbynamel(hostname string) ([]string, error) {
 	return nil, err
 }
 
-// Gethostbyaddr gethostbyaddr()
-// Get the Internet host name corresponding to a given IP address
+// Gethostbyaddr 获取指定 IP 地址对应的 Internet 主机名（对应 PHP gethostbyaddr()）。
 func Gethostbyaddr(ipAddress string) (string, error) {
 	names, err := net.LookupAddr(ipAddress)
 	if names != nil {
@@ -53,8 +50,8 @@ func Gethostbyaddr(ipAddress string) (string, error) {
 	return "", err
 }
 
-// IP2long ip2long()
-// IPv4
+// IP2long 将 IPv4 地址字符串转换为 32 位无符号整数（对应 PHP ip2long()）。
+// 仅支持 IPv4。
 func IP2long(ipAddress string) uint32 {
 	ip := net.ParseIP(ipAddress)
 	if ip == nil {
@@ -63,8 +60,8 @@ func IP2long(ipAddress string) uint32 {
 	return binary.BigEndian.Uint32(ip.To4())
 }
 
-// Long2ip long2ip()
-// IPv4
+// Long2ip 将 32 位无符号整数转换为 IPv4 地址字符串（对应 PHP long2ip()）。
+// 仅支持 IPv4。
 func Long2ip(properAddress uint32) string {
 	ipByte := make([]byte, 4)
 	binary.BigEndian.PutUint32(ipByte, properAddress)

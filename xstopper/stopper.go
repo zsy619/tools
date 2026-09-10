@@ -1,14 +1,13 @@
 package xstopper
 
-// Stopper is an embeddable interface for objects ("stoppees") which have
-// goroutines that need to be stopped at the object's owner's request.
+// Stopper 是可嵌入接口，用于拥有后台 goroutine 且需要被所属对象所有者停止的对象（称为 stoppee）。
 type Stopper interface {
-	// Stop asks the stoppee to stop its goroutines.
+	// Stop 请求 stoppee 停止其 goroutine。
 	Stop()
-	// OnDone registers a callback to be fired once the stop is complete.
+	// OnDone 注册一个回调，在停止完成后触发。
 	OnDone(func())
-	// Finish is called by the stoppee when it has shut down.
+	// Finish 由 stoppee 在自身关闭后调用。
 	Finish()
-	// Done returns true only after Done has been called.
+	// Done 仅在 Finish 被调用之后返回 true。
 	Done() bool
 }

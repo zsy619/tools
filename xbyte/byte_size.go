@@ -4,10 +4,11 @@ import (
 	"fmt"
 )
 
+// ByteSize 表示以字节为单位的可读容量，支持 KB 到 YB 的自动格式化。
 type ByteSize float64
 
 const (
-	_           = iota // ignore first value by assigning to blank identifier
+	_           = iota // 跳过 1 << 0
 	KB ByteSize = 1 << (10 * iota)
 	MB
 	GB
@@ -18,6 +19,10 @@ const (
 	YB
 )
 
+// String 把字节数格式化为最合适的单位（保留两位小数）。
+//
+// 自适应选择 KB / MB / GB / TB / PB / EB / ZB / YB；小于 1 KB 时按
+// "B" 输出。实现 fmt.Stringer 接口，可直接用于 fmt.Print 等场景。
 func (b ByteSize) String() string {
 	switch {
 	case b >= YB:

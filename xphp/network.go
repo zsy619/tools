@@ -7,7 +7,8 @@ import (
 	"strings"
 )
 
-// GetHostByAddr gets the Internet host name corresponding to a given IP address
+// GetHostByAddr 通过 IP 地址反查主机名。
+// 返回第一个 PTR 记录（去掉尾部点号）；解析失败时返回错误。
 func GetHostByAddr(ipAddress string) (string, error) {
 	names, err := net.LookupAddr(ipAddress)
 	if len(names) > 0 {
@@ -16,7 +17,8 @@ func GetHostByAddr(ipAddress string) (string, error) {
 	return "", err
 }
 
-// GetHostByName gets the IPv4 address corresponding to a given Internet host name
+// GetHostByName 查询 hostname 对应的第一个 IPv4 地址。
+// hostname 不可解析或没有 IPv4 记录时返回空串与错误。
 func GetHostByName(hostname string) (string, error) {
 	ips, err := net.LookupIP(hostname)
 	if len(ips) != 0 {
@@ -29,7 +31,8 @@ func GetHostByName(hostname string) (string, error) {
 	return "", err
 }
 
-// GetHostByNamel gets a list of IPv4 addresses corresponding to a given Internet host name
+// GetHostByNamel 返回 hostname 对应的全部 IPv4 地址列表。
+// 查询失败或无 IPv4 记录时返回 nil 与错误。
 func GetHostByNamel(hostname string) ([]string, error) {
 	ips, err := net.LookupIP(hostname)
 	if ips != nil {
@@ -44,12 +47,13 @@ func GetHostByNamel(hostname string) ([]string, error) {
 	return nil, err
 }
 
-// GetHostName gets the host name
+// GetHostName 返回本地主机名（包装 os.Hostname）。
 func GetHostName() (string, error) {
 	return os.Hostname()
 }
 
-// IP2Long converts a string containing an (IPv4) Internet Protocol dotted address into a long integer
+// IP2Long 将点分十进制 IPv4 字符串转换为 uint32（大端）。
+// 无法解析或非 IPv4 时返回 0。
 func IP2Long(ipAddress string) uint32 {
 	ip := net.ParseIP(ipAddress)
 	if ip == nil {
@@ -63,7 +67,7 @@ func IP2Long(ipAddress string) uint32 {
 	return binary.BigEndian.Uint32(ipByte)
 }
 
-// Long2IP converts an long integer address into a string in (IPv4) Internet standard dotted format
+// Long2IP 将 uint32 数值转换回点分十进制 IPv4 字符串（大端）。
 func Long2IP(properAddress uint32) string {
 	ipByte := make([]byte, 4)
 	binary.BigEndian.PutUint32(ipByte, properAddress)

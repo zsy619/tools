@@ -7,6 +7,7 @@ import (
 
 var WeekdayChineseArray []string
 
+// GetCurrentDate 按指定格式返回当前日期；格式为空时使用默认格式。
 func GetCurrentDate(format string) string {
 	rt := time.Now().Format(format)
 	rt = strings.ReplaceAll(rt, "-", "")
@@ -76,6 +77,7 @@ func FormatDate(date time.Time, dateStyle DateStyle) string {
 	return date.Format(layout)
 }
 
+// FormatDateExt 按指定日期样式输出扩展日期字符串；未知样式回退到默认格式。
 func FormatDateExt(date time.Time, dateFormat DateStyle) string {
 	rt := FormatDate(date, dateFormat)
 	rt = strings.ReplaceAll(rt, "-", "")
@@ -85,6 +87,7 @@ func FormatDateExt(date time.Time, dateFormat DateStyle) string {
 	return rt
 }
 
+// WeekdayChinese 返回指定日期对应的中文星期名称。
 func WeekdayChinese(date time.Time) (weekday string) {
 	index := date.Weekday()
 	weekday = WeekdayChineseArray[int(index)]

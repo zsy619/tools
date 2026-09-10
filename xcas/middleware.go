@@ -6,8 +6,9 @@ import (
 	"github.com/golang/glog"
 )
 
-// Handler returns a standard http.HandlerFunc, which will check the authenticated status (redirect user go login if needed)
-// If the user pass the authenticated check, it will call the h's ServeHTTP method
+// Handler 返回一个标准 http.HandlerFunc：检查当前请求是否已通过 CAS 认证。
+// 未认证则重定向到 CAS 登录页；路径为 "/logout" 时重定向到登出页；
+// 其余情况调用 h.ServeHTTP 处理请求。
 func (c *Client) Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if glog.V(2) {

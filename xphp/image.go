@@ -20,15 +20,16 @@ import (
 	"github.com/zsy619/tools/xstring"
 )
 
-// ImageInfo stores the info of an image
+// ImageInfo 描述一张图片的基础信息。
 type ImageInfo struct {
-	Width  int
-	Height int
-	Format string
-	Mime   string
+	Width  int    // 像素宽度
+	Height int    // 像素高度
+	Format string // 解码格式（png/jpeg/gif/bmp 等）
+	Mime   string // 对应的 MIME 类型
 }
 
-// GetImageSize gets the size of an image
+// GetImageSize 读取 filename 指向的图片文件，返回其尺寸与格式信息。
+// 打开文件失败或图片格式无法识别时返回相应错误。
 func GetImageSize(filename string) (ImageInfo, error) {
 	var info ImageInfo
 
@@ -51,7 +52,8 @@ func GetImageSize(filename string) (ImageInfo, error) {
 	return info, nil
 }
 
-// GetImageSizeFromString gets the size of an image from a string
+// GetImageSizeFromString 从内存中的图片字节流解析尺寸与格式。
+// 数据非合法图片或解码失败时返回相应错误。
 func GetImageSizeFromString(data []byte) (ImageInfo, error) {
 	var info ImageInfo
 
@@ -68,16 +70,17 @@ func GetImageSizeFromString(data []byte) (ImageInfo, error) {
 	return info, nil
 }
 
+// FontFamilies 字体文件路径到解析后 *truetype.Font 的缓存。
 var FontFamilies map[string]*truetype.Font
 
 func init() {
 	FontFamilies = make(map[string]*truetype.Font)
 }
 
-// 得到输入文本的区域大小
-// 这几个变量分别是 字体大小, 角度, 字体名称, 字符串
-// MeasureText returns the minimum width and height in pixels necessary for an image to contain
-// the specified text. The supplied text string can contain line break escape sequences (\n).
+// ImageTtfbBox 测量渲染 text 所需的最小宽度与高度（像素）。
+//
+// 参数依次为：字体大小（磅）、旋转角度（当前未使用）、字体文件路径、文本内容。
+// 文本中可包含 \n 换行符；字体加载失败时返回 (0, 0)。
 func ImageTtfbBox(size, angle float64, fontPath string, text string) (with int, heght int) {
 	fontx, err := gntext.NewFont(fontPath)
 	if err != nil {
@@ -87,23 +90,10 @@ func ImageTtfbBox(size, angle float64, fontPath string, text string) (with int, 
 	fontx.SetPointSize(size)
 	fontx.SetHinting(font.HintingNone)
 	return fontx.MeasureText(text)
-	// fontFamily, ok := FontFamilies[fontPath]
-	// if !ok {
-	// 	fontFamily, _ := GetFontFamily(fontPath)
-	// 	FontFamilies[fontPath] = fontFamily
-	// }
-	// f := freetype.NewContext()
-	// // 设置用于绘制文本的字体
-	// f.SetFont(fontFamily)
-	// // 设置屏幕每英寸的分辨率
-	// f.SetDPI(72)
-	// f.SetHinting(font.HintingNone)
-	// f.SetFontSize(size)
-	// fixed := f.PointToFixed(size)
-	// return float64(fixed)
 }
 
-// 获取字符集，仅调用一次
+// GetFontFamily 从 fontPath 指定的 TTF 文件读取并解析字体。
+// 文件读取或字体解析失败时返回错误；建议使用中文字体以避免中文变成方块。
 func GetFontFamily(fontPath string) (*truetype.Font, error) {
 	// 这里需要读取中文字体，否则中文文字会变成方格
 	fontBytes, err := os.ReadFile(fontPath)
@@ -119,7 +109,10 @@ func GetFontFamily(fontPath string) (*truetype.Font, error) {
 	return f, err
 }
 
-// gd库计算文本换行
+// AutoWrap 按 width 与 line 自动将 text 拆分为多行。
+//
+// 参数依次为：字体大小、旋转角度、字体路径、文本、预设宽度、最大行数。
+// 超出最大行数时会截断并追加 "......"。返回拆分后的字符串切片与最后一行的高度。
 func AutoWrap(size, angle float64, fontPath string, text string, width float64, line int) ([]string, int) {
 	// 这几个变量分别是 字体大小, 角度, 字体名称, 字符串, 预设宽度, 行数
 	content := ""
@@ -153,6 +146,8 @@ func AutoWrap(size, angle float64, fontPath string, text string, width float64, 
 	return strings.Split(content, PHP_EOL), height
 }
 
+// LoadFontFace 从 TTF 文件 path 加载指定磅值的 font.Face，使用全 hinting。
+// 读取或解析字体失败时返回错误。
 func LoadFontFace(path string, points float64) (font.Face, error) {
 	fontBytes, err := os.ReadFile(path)
 	if err != nil {
@@ -169,7 +164,8 @@ func LoadFontFace(path string, points float64) (font.Face, error) {
 	return face, nil
 }
 
-// ImageJPEG jpeg图片输出到文件
+// ImageJPEG 将图片 m 以 JPEG 编码写入 fpath。
+// quantity 为图像质量（1-100）。创建文件或编码失败时返回错误，成功返回写入的文件路径。
 func ImageJPEG(fpath string, m image.Image, quantity int) (file string, err error) {
 	f, err := os.Create(fpath) // 创建文件
 	if err != nil {
@@ -181,7 +177,7 @@ func ImageJPEG(fpath string, m image.Image, quantity int) (file string, err erro
 		fmt.Println("ImageJPEG:", err.Error())
 		return "", err
 	}
-	if err = jpeg.Encode(f, m, &jpeg.Options{Quality: quantity}); err != nil { // 写入文件;
+	if err = jpeg.Encode(f, m, &jpeg.Options{Quality: quantity}); err != nil { // 写入文件
 		fmt.Println("ImageJPEG:", err.Error())
 		return "", err
 	}
@@ -190,7 +186,8 @@ func ImageJPEG(fpath string, m image.Image, quantity int) (file string, err erro
 	return
 }
 
-// ImagePNG png图片输出到文件
+// ImagePNG 将图片 m 以 PNG 编码写入 fpath。
+// 创建文件或编码失败时返回错误，成功返回写入的文件路径。
 func ImagePNG(fpath string, m image.Image) (file string, err error) {
 	f, err := os.Create(fpath) // 创建文件
 	if err != nil {
@@ -202,7 +199,7 @@ func ImagePNG(fpath string, m image.Image) (file string, err error) {
 		fmt.Println("ImagePNG:", err.Error())
 		return "", err
 	}
-	if err = png.Encode(f, m); err != nil { // 写入文件;
+	if err = png.Encode(f, m); err != nil { // 写入文件
 		fmt.Println("ImagePNG:", err.Error())
 		return "", err
 	}
@@ -211,7 +208,8 @@ func ImagePNG(fpath string, m image.Image) (file string, err error) {
 	return
 }
 
-// ImageGIF gif图片输出到文件
+// ImageGIF 将图片 m 以 GIF 编码写入 fpath。
+// 创建文件或编码失败时返回错误，成功返回写入的文件路径。
 func ImageGIF(fpath string, m image.Image) (file string, err error) {
 	f, err := os.Create(fpath) // 创建文件
 	if err != nil {
@@ -223,7 +221,7 @@ func ImageGIF(fpath string, m image.Image) (file string, err error) {
 		fmt.Println("ImageGIF:", err.Error())
 		return "", err
 	}
-	if err = gif.Encode(f, m, &gif.Options{}); err != nil { // 写入文件;
+	if err = gif.Encode(f, m, &gif.Options{}); err != nil { // 写入文件
 		fmt.Println("ImageGIF:", err.Error())
 		return "", err
 	}
@@ -232,7 +230,8 @@ func ImageGIF(fpath string, m image.Image) (file string, err error) {
 	return
 }
 
-// ImageBMP bmp图片输出到文件
+// ImageBMP 将图片 m 以 BMP 编码写入 fpath。
+// 创建文件或编码失败时返回错误，成功返回写入的文件路径。
 func ImageBMP(fpath string, m image.Image) (file string, err error) {
 	f, err := os.Create(fpath) // 创建文件
 	if err != nil {
@@ -244,7 +243,7 @@ func ImageBMP(fpath string, m image.Image) (file string, err error) {
 		fmt.Println("ImageBMP:", err.Error())
 		return "", err
 	}
-	if err = bmp.Encode(f, m); err != nil { // 写入文件;
+	if err = bmp.Encode(f, m); err != nil { // 写入文件
 		fmt.Println("ImageBMP:", err.Error())
 		return "", err
 	}
@@ -253,6 +252,8 @@ func ImageBMP(fpath string, m image.Image) (file string, err error) {
 	return
 }
 
+// DrawText 在 target 上以指定字体、颜色与位置绘制单行文本。
+// 文本绘制失败时返回错误，否则返回原图。
 func DrawText(fontFamily *truetype.Font, text string, x, y int, fontSize float64, fontColor *image.Uniform, target *image.NRGBA) (*image.NRGBA, error) {
 	f := freetype.NewContext()
 	// 设置用于绘制文本的字体
@@ -267,9 +268,6 @@ func DrawText(fontFamily *truetype.Font, text string, x, y int, fontSize float64
 	// 以磅为单位设置字体大小
 	f.SetFontSize(fontSize)
 	f.SetHinting(font.HintingNone)
-	// 获取字体的尺寸大小
-	// fixed := f.PointToFixed(fontSize)
-	// pt := freetype.Pt(x-(utf8.RuneCountInString(text)/2)*fixed.Ceil(), y)
 	pt := freetype.Pt(x, y)
 	// 根据 Pt 的坐标值绘制给定的文本内容
 	_, err := f.DrawString(text, pt)
@@ -280,6 +278,8 @@ func DrawText(fontFamily *truetype.Font, text string, x, y int, fontSize float64
 	return target, nil
 }
 
+// DrawTextMultiline 在 target 上按行绘制多行文本，每行垂直间距为 height。
+// 任何一行绘制失败会立即返回错误。
 func DrawTextMultiline(fontFamily *truetype.Font, text []string, height int, x, y int, fontSize float64, maxWidth float64, fontColor *image.Uniform, target *image.NRGBA) (*image.NRGBA, error) {
 	f := freetype.NewContext()
 	// 设置用于绘制文本的字体
@@ -294,7 +294,6 @@ func DrawTextMultiline(fontFamily *truetype.Font, text []string, height int, x, 
 	// 以磅为单位设置字体大小
 	f.SetFontSize(fontSize)
 	f.SetHinting(font.HintingNone)
-	// 获取字体的尺寸大小
 	for i, s := range text {
 		posY := y
 		if i != 0 {

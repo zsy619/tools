@@ -9,7 +9,7 @@ import (
 	"golang.org/x/net/html"
 )
 
-// GetHeaders fetches all the headers sent by the server in response to an HTTP request
+// GetHeaders 获取服务器对 HTTP 请求响应时发送的全部头部信息。
 func GetHeaders(url string) (http.Header, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -20,7 +20,7 @@ func GetHeaders(url string) (http.Header, error) {
 	return resp.Header, nil
 }
 
-// GetMetaTags extracts all meta tag content attributes from http content and returns an array
+// GetMetaTags 从指定 URL 的 HTTP 内容中提取所有 meta 标签的 content 属性，并返回映射。
 func GetMetaTags(url string) (map[string]string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -31,7 +31,7 @@ func GetMetaTags(url string) (map[string]string, error) {
 	return ParseDocument(resp.Body), nil
 }
 
-// ParseDocument parses a document for meta data
+// ParseDocument 解析 HTML 文档，提取其中的 meta 数据（包括页面标题 title）。
 func ParseDocument(doc io.Reader) map[string]string {
 	data := make(map[string]string)
 	z := html.NewTokenizer(doc)
@@ -75,17 +75,17 @@ func ParseDocument(doc io.Reader) map[string]string {
 	}
 }
 
-// RawURLDecode decodes URL-encoded string.
+// RawURLDecode 解码 URL 编码的字符串。
 //
-// RawURLDecode is identical to URLDecode except that it does not unescape '+' to ' ' (space).
+// RawURLDecode 与 URLDecode 基本相同，区别在于它不会把 '+' 解码为 ' '（空格）。
 func RawURLDecode(str string) string {
 	res, _ := url.PathUnescape(str)
 	return res
 }
 
-// RawURLEncode is URL-encode according to RFC 3986.
+// RawURLEncode 按照 RFC 3986 对字符串进行 URL 编码。
 //
-// RawURLEncode is identical to URLEncode except that it does not escape space to +.
+// RawURLEncode 与 URLEncode 基本相同，区别在于它不会把空格转义为 +。
 func RawURLEncode(str string) string {
 	return url.PathEscape(str)
 }

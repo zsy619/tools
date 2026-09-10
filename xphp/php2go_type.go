@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// Intval 获取变量的整数值（对应 PHP intval()）。
 func Intval(val interface{}) (int, error) {
 	switch v := val.(type) {
 	case int:
@@ -20,10 +21,12 @@ func Intval(val interface{}) (int, error) {
 	return 0, nil
 }
 
+// Strval 获取变量的字符串值（对应 PHP strval()）。
 func Strval(val interface{}) string {
 	return fmt.Sprintf("%v", val)
 }
 
+// Boolval 获取变量的布尔值（对应 PHP boolval()）。
 func Boolval(val interface{}) bool {
 
 	switch v := val.(type) {

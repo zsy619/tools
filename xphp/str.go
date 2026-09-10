@@ -10,21 +10,25 @@ import (
 	"strings"
 )
 
-// PadTypes for StrPad
+// PadTypes 为 StrPad 提供可选的填充位置类型。
 const (
+	// StrPadRight 表示在字符串右侧填充。
 	StrPadRight = iota
+	// StrPadLeft 表示在字符串左侧填充。
 	StrPadLeft
+	// StrPadBoth 表示在字符串两侧同时填充。
 	StrPadBoth
 )
 
 const (
+	// PHP_EOL 定义 PHP 风格的换行符常量。
 	PHP_EOL = "\n"
 )
 
-// RuneMatchFunc is function to check if a rune match some condition
+// RuneMatchFunc 是用于判断某个 rune 是否满足条件的函数类型。
 type RuneMatchFunc func(rune) bool
 
-// buildReplaceSlice is a helper function for Replace and Ireplace
+// buildReplaceSlice 是 Replace 与 Ireplace 的辅助函数，负责将 search 与 replace 参数归一化为字符串切片。
 func buildReplaceSlice(search, replace interface{}) ([]string, []string, error) {
 	var aSearch, aReplace []string
 
@@ -57,11 +61,11 @@ func buildReplaceSlice(search, replace interface{}) ([]string, []string, error) 
 	return aSearch, aReplace, nil
 }
 
-// Replace all occurrences of the search string with the replacement string
+// Replace 将 subject 中所有出现的 search 字符串替换为 replace 字符串。
 //
-// This function is an implement of PHP's str_replace
+// 该函数是 PHP str_replace() 的 Go 实现。
 //
-// see http://php.net/manual/en/function.str-replace.php
+// 参见 http://php.net/manual/en/function.str-replace.php
 func Replace(search, replace interface{}, subject string) string {
 	var aSearch, aReplace []string
 
@@ -81,7 +85,7 @@ func Replace(search, replace interface{}, subject string) string {
 	return subject
 }
 
-// Ireplace is case-insensitive version of Replace()
+// Ireplace 是 Replace() 的不区分大小写版本。
 func Ireplace(search, replace interface{}, subject string) string {
 	var aSearch, aReplace []string
 
@@ -103,7 +107,7 @@ func Ireplace(search, replace interface{}, subject string) string {
 	return subject
 }
 
-// Stristr is case-insensitive Strstr()
+// Stristr 是不区分大小写的 Strstr()。
 func Stristr(haystack, needle string) string {
 	haystackx := strings.ToLower(haystack)
 	needlex := strings.ToLower(needle)
@@ -114,22 +118,22 @@ func Stristr(haystack, needle string) string {
 	return Substr(haystack, uint(pos), 0)
 }
 
-// HTMLSpecialchars converts special characters to HTML entities
+// HTMLSpecialchars 将字符串中的特殊字符转换为 HTML 实体。
 func HTMLSpecialchars(str string) string {
 	return html.EscapeString(str)
 }
 
-// HTMLSpecialcharsDecode converts special HTML entities back to characters
+// HTMLSpecialcharsDecode 将特殊的 HTML 实体还原为对应的字符。
 func HTMLSpecialcharsDecode(str string) string {
 	return html.UnescapeString(str)
 }
 
-// DefaultNumberFormat is default NumberFormat for english notation with thousands separator
+// DefaultNumberFormat 以英文千分位记法调用 NumberFormat：小数点为 "."，千位分隔符为 ","。
 func DefaultNumberFormat(number float64, decimals int) string {
 	return NumberFormat(number, uint(decimals), ".", ",")
 }
 
-// StrPad pads a string to a certain length with another string
+// StrPad 使用 padString 将 input 填充到指定长度 padLength，padType 指定填充位置。
 func StrPad(input string, padLength int, padString string, padType int) string {
 	// if the value of padLength is less than or equal to the length of the input string,
 	// no padding takes place, and input will be returned.
@@ -180,6 +184,7 @@ func StrPad(input string, padLength int, padString string, padType int) string {
 	return s
 }
 
+// Num2String 将数字 num 转为可读字符串：num >= 1000 时格式化为保留两位小数的 "x.xxK" 形式，否则返回其十进制表示。
 func Num2String(num int) string {
 	if num >= 1000 {
 		rt := fmt.Sprintf("%0.2f", math.Round(float64(num)/1000*100)/100)

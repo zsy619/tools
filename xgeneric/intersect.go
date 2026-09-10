@@ -1,6 +1,8 @@
 package xgeneric
 
-// Contains returns true if an element is present in a collection.
+// Contains 判断切片中是否包含指定元素。
+// 参数：collection 为待搜索的切片，element 为要查找的元素。
+// 返回：找到则返回 true，否则返回 false。
 func Contains[T comparable](collection []T, element T) bool {
 	for _, item := range collection {
 		if item == element {
@@ -11,7 +13,9 @@ func Contains[T comparable](collection []T, element T) bool {
 	return false
 }
 
-// ContainsBy returns true if predicate function return true.
+// ContainsBy 判断切片中是否存在满足谓词函数的元素。
+// 参数：collection 为待搜索的切片，predicate 为判断元素是否满足条件的函数。
+// 返回：存在则返回 true，否则返回 false。
 func ContainsBy[T any](collection []T, predicate func(T) bool) bool {
 	for _, item := range collection {
 		if predicate(item) {
@@ -22,7 +26,9 @@ func ContainsBy[T any](collection []T, predicate func(T) bool) bool {
 	return false
 }
 
-// Every returns true if all elements of a subset are contained into a collection.
+// Every 判断 subset 中的所有元素是否全部存在于 collection 中。
+// 参数：collection 为被包含的目标切片，subset 为候选元素切片。
+// 返回：subset 中的每个元素都能在 collection 中找到时返回 true，否则返回 false。空 subset 总是返回 true。
 func Every[T comparable](collection []T, subset []T) bool {
 	for _, elem := range subset {
 		if !Contains(collection, elem) {
@@ -33,7 +39,9 @@ func Every[T comparable](collection []T, subset []T) bool {
 	return true
 }
 
-// Some returns true if at least 1 element of a subset is contained into a collection.
+// Some 判断 subset 中是否至少有一个元素存在于 collection 中。
+// 参数：collection 为被包含的目标切片，subset 为候选元素切片。
+// 返回：subset 中存在任一元素可在 collection 中找到时返回 true，否则返回 false。空 subset 总是返回 false。
 func Some[T comparable](collection []T, subset []T) bool {
 	for _, elem := range subset {
 		if Contains(collection, elem) {
@@ -44,7 +52,9 @@ func Some[T comparable](collection []T, subset []T) bool {
 	return false
 }
 
-// Intersect returns the intersection between two collections.
+// Intersect 返回两个切片的交集（仅保留 list1 中出现过的元素，按 list2 顺序）。
+// 参数：list1 与 list2 为输入切片，元素必须可比较。
+// 返回：包含交集元素的新切片（list2 中顺序）。若两者均无重复元素，结果中不会包含重复项。
 func Intersect[T comparable](list1 []T, list2 []T) []T {
 	result := []T{}
 	seen := map[T]struct{}{}
@@ -62,9 +72,9 @@ func Intersect[T comparable](list1 []T, list2 []T) []T {
 	return result
 }
 
-// Difference returns the difference between two collections.
-// The first value is the collection of element absent of list2.
-// The second value is the collection of element absent of list1.
+// Difference 返回两个切片之间的差集。
+// 参数：list1 与 list2 为输入切片，元素必须可比较。
+// 返回：两个切片，第一个是存在于 list1 但不在 list2 中的元素（按 list1 顺序），第二个是存在于 list2 但不在 list1 中的元素（按 list2 顺序）。
 func Difference[T comparable](list1 []T, list2 []T) ([]T, []T) {
 	left := []T{}
 	right := []T{}
@@ -95,8 +105,9 @@ func Difference[T comparable](list1 []T, list2 []T) ([]T, []T) {
 	return left, right
 }
 
-// Union returns all distinct elements from both collections.
-// result returns will not change the order of elements relatively.
+// Union 返回两个切片的所有不同元素的并集，相对顺序保持不变。
+// 参数：list1 与 list2 为输入切片，元素必须可比较。
+// 返回：去重后的并集切片，元素顺序为 list1 中先出现，再追加仅出现在 list2 中的元素。
 func Union[T comparable](list1 []T, list2 []T) []T {
 	result := []T{}
 

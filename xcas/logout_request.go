@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// Represents the XML CAS Single Log Out Request data
+// logoutRequest 表示 CAS 单点登出（SLO）请求的 XML 数据结构。
 type logoutRequest struct {
 	XMLName         xml.Name  `xml:"urn:oasis:names:tc:SAML:2.0:protocol LogoutRequest"`
 	Version         string    `xml:"Version,attr"`
@@ -18,6 +18,8 @@ type logoutRequest struct {
 	SessionIndex    string    `xml:"SessionIndex"`
 }
 
+// parseLogoutRequest 解析 SLO 请求的 XML 数据，转换 IssueInstant 时间格式并清理空白字符。
+// 解析失败或时间格式无法识别时返回错误。
 func parseLogoutRequest(data []byte) (*logoutRequest, error) {
 	l := &logoutRequest{}
 	if err := xml.Unmarshal(data, &l); err != nil {
@@ -36,10 +38,12 @@ func parseLogoutRequest(data []byte) (*logoutRequest, error) {
 	return l, nil
 }
 
+// parseDate 解析 CAS SLO 中的 IssueInstant 时间字符串，先尝试 RFC1123Z，再尝试 ISO8601 格式。
+// 两种格式都不匹配时返回错误。
 func parseDate(raw string) (time.Time, error) {
 	t, err := time.Parse(time.RFC1123Z, raw)
 	if err != nil {
-		// if RFC1123Z does not match, we will try iso8601
+		// 若 RFC1123Z 不匹配，则尝试 ISO8601
 		t, err = time.Parse("2006-01-02T15:04:05Z0700", raw)
 		if err != nil {
 			return t, err
@@ -48,10 +52,11 @@ func parseDate(raw string) (time.Time, error) {
 	return t, nil
 }
 
+// newLogoutRequestID 生成 64 字符的十六进制字符串，用作 LogoutRequest 的 ID。
 func newLogoutRequestID() string {
 	const alphabet = "abcdef0123456789"
 
-	// generate 64 character string
+	// 生成 64 字符字符串
 	bytes := make([]byte, 64)
 	rand.Read(bytes)
 
@@ -62,6 +67,8 @@ func newLogoutRequestID() string {
 	return string(bytes)
 }
 
+// xmlLogoutRequest 为指定票据生成 LogoutRequest 的 XML 字节流。
+// 返回的字节可直接作为 SLO 请求的 logoutRequest 表单字段值。
 func xmlLogoutRequest(ticket string) ([]byte, error) {
 	l := &logoutRequest{
 		Version:      "2.0",

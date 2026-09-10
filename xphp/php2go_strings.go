@@ -20,12 +20,14 @@ import (
 	"github.com/zsy619/tools/xjson"
 )
 
+// StringSaveTo 对输入字符串做保存前处理：先将双引号替换为 HTML 实体 &#34;，再调用 Stripslashes 去除转义反斜杠。
 func StringSaveTo(intput string) string {
 	rt := strings.ReplaceAll(intput, "\"", "&#34;")
 	rt = Stripslashes(rt)
 	return rt
 }
 
+// Htmlspecialchars_decode 将 &lt;、&gt;、&amp;、&quot;、&#039; 等 HTML 实体还原为对应的 <、>、&、"、' 字符（对应 PHP htmlspecialchars_decode()）。
 func Htmlspecialchars_decode(s string) string {
 	s = strings.Replace(s, "&lt;", "<", -1)
 	s = strings.Replace(s, "&gt;", ">", -1)
@@ -35,6 +37,7 @@ func Htmlspecialchars_decode(s string) string {
 	return s
 }
 
+// Htmlspecialchars 将 <、>、&、"、单引号分别替换为 &lt;、&gt;、&amp;、&quot;、&#039;（对应 PHP htmlspecialchars()）。
 func Htmlspecialchars(s string) string {
 	s = strings.Replace(s, "<", "&lt;", -1)
 	s = strings.Replace(s, ">", "&gt;", -1)
@@ -44,6 +47,7 @@ func Htmlspecialchars(s string) string {
 	return s
 }
 
+// Strrev 将字符串 s 中的字符顺序反转（对应 PHP strrev()，按 rune 处理）。
 func Strrev(s string) string {
 	if s == "" {
 		return s
@@ -63,6 +67,7 @@ func Strrev(s string) string {
 	return string(re)
 }
 
+// Chr 返回 ASCII 码 ascii 对应的单字符字符串（对应 PHP chr()）；ascii 超出 32-127 范围时返回错误。
 func Chr(ascii int) (string, error) {
 	if ascii > 127 || ascii < 32 {
 		return "", errors.New("invalid ascii code")
@@ -102,7 +107,7 @@ func Chunk_split(body string, chunklen int, end string) (str string, err error) 
 	return buf.String(), nil
 }
 
-// Strpos strpos()
+// Strpos 在 haystack 中从 offset 起查找 needle 首次出现的位置（字节下标，offset 可为负数；对应 PHP strpos()）。找不到时返回 -1。
 func Strpos(haystack, needle string, offset int) int {
 	length := len(haystack)
 	if length == 0 || offset > length || -offset > length {
@@ -119,7 +124,7 @@ func Strpos(haystack, needle string, offset int) int {
 	return pos + offset
 }
 
-// Stripos stripos()
+// Stripos 是不区分大小写的 Strpos()（对应 PHP stripos()）。
 func Stripos(haystack, needle string, offset int) int {
 	length := len(haystack)
 	if length == 0 || offset > length || -offset > length {
@@ -137,7 +142,7 @@ func Stripos(haystack, needle string, offset int) int {
 	return pos + offset
 }
 
-// Strrpos strrpos()
+// Strrpos 在 haystack 中查找 needle 最后一次出现的位置（字节下标，支持负数 offset；对应 PHP strrpos()）。找不到时返回 -1。
 func Strrpos(haystack, needle string, offset int) int {
 	pos, length := 0, len(haystack)
 	if length == 0 || offset > length || -offset > length {
@@ -156,7 +161,7 @@ func Strrpos(haystack, needle string, offset int) int {
 	return pos
 }
 
-// Strripos strripos()
+// Strripos 是不区分大小写的 Strrpos()（对应 PHP strripos()）。
 func Strripos(haystack, needle string, offset int) int {
 	pos, length := 0, len(haystack)
 	if length == 0 || offset > length || -offset > length {
@@ -175,15 +180,17 @@ func Strripos(haystack, needle string, offset int) int {
 	return pos
 }
 
-// StrReplace str_replace()
+// StrReplace 将 subject 中前 count 次出现的 search 替换为 replace（对应 PHP str_replace()）。
 func StrReplace(search, replace, subject string, count int) string {
 	return strings.Replace(subject, search, replace, count)
 }
 
+// StrReplaceNoLimit 将 subject 中所有出现的 search 替换为 replace（等价于替换次数无限制的 StrReplace）。
 func StrReplaceNoLimit(search, replace, subject string) string {
 	return strings.Replace(subject, search, replace, -1)
 }
 
+// StrReplaceEnter 移除 subject 中的所有换行符（\r\n、\r、\n），用于将多行文本压缩为单行。
 func StrReplaceEnter(subject string) (result string) {
 	result = subject
 	result = strings.ReplaceAll(result, "\r\n", "")
@@ -192,17 +199,17 @@ func StrReplaceEnter(subject string) (result string) {
 	return
 }
 
-// Strtoupper strtoupper()
+// Strtoupper 将 str 中的字母全部转为大写（对应 PHP strtoupper()）。
 func Strtoupper(str string) string {
 	return strings.ToUpper(str)
 }
 
-// Strtolower strtolower()
+// Strtolower 将 str 中的字母全部转为小写（对应 PHP strtolower()）。
 func Strtolower(str string) string {
 	return strings.ToLower(str)
 }
 
-// Ucfirst ucfirst()
+// Ucfirst 将 str 的首字母转为大写（对应 PHP ucfirst()）。
 func Ucfirst(str string) string {
 	for _, v := range str {
 		u := string(unicode.ToUpper(v))
@@ -211,7 +218,7 @@ func Ucfirst(str string) string {
 	return ""
 }
 
-// Lcfirst lcfirst()
+// Lcfirst 将 str 的首字母转为小写（对应 PHP lcfirst()）。
 func Lcfirst(str string) string {
 	for _, v := range str {
 		u := string(unicode.ToLower(v))
@@ -220,13 +227,13 @@ func Lcfirst(str string) string {
 	return ""
 }
 
-// Ucwords ucwords()
+// Ucwords 将 str 中每个单词的首字母转为大写（对应 PHP ucwords()）。
 func Ucwords(str string) string {
 	caser := cases.Title(language.English)
 	return caser.String(str)
 }
 
-// Substr substr()
+// Substr 返回 str 从 start 起、长度为 length 的子串（对应 PHP substr()；length 为 -1 表示截到末尾，为 0 返回空串，按字节处理）。
 func Substr(str string, start uint, length int) string {
 	if length < -1 {
 		return str
@@ -244,14 +251,14 @@ func Substr(str string, start uint, length int) string {
 	return str[start:end]
 }
 
-// ParseStr parse_str()
+// ParseStr 将 URL 编码的查询字符串解析到 result 中，支持嵌套 key（对应 PHP parse_str()）。
 // f1=m&f2=n -> map[f1:m f2:n]
 // f[a]=m&f[b]=n -> map[f:map[a:m b:n]]
 // f[a][a]=m&f[a][b]=n -> map[f:map[a:map[a:m b:n]]]
 // f[]=m&f[]=n -> map[f:[m n]]
 // f[a][]=m&f[a][]=n -> map[f:map[a:[m n]]]
-// f[][]=m&f[][]=n -> map[f:[map[]]] // Currently does not support nested slice.
-// f=m&f[a]=n -> error // This is not the same as PHP.
+// f[][]=m&f[][]=n -> map[f:[map[]]] // 目前不支持嵌套切片。
+// f=m&f[a]=n -> error // 这与 PHP 的行为不同。
 // a .[[b=c -> map[a___[b:c]
 func ParseStr(encodedString string, result map[string]interface{}) error {
 	// build nested map.
@@ -393,10 +400,10 @@ func ParseStr(encodedString string, result map[string]interface{}) error {
 	return nil
 }
 
-// NumberFormat number_format()
-// decimals: Sets the number of decimal points.
-// decPoint: Sets the separator for the decimal point.
-// thousandsSep: Sets the thousands separator.
+// NumberFormat 对 number 进行千分位格式化（对应 PHP number_format()）。
+// decimals：设置小数位数（四舍五入）。
+// decPoint：设置小数点的分隔符。
+// thousandsSep：设置千位分隔符。
 func NumberFormat(number float64, decimals uint, decPoint, thousandsSep string) string {
 	neg := false
 	if number < 0 {
@@ -439,7 +446,7 @@ func NumberFormat(number float64, decimals uint, decPoint, thousandsSep string) 
 	return s
 }
 
-// ChunkSplit chunk_split()
+// ChunkSplit 将 body 按 chunklen 个字符（rune）切分成小块，并用 end 连接每一块（对应 PHP chunk_split()）。
 func ChunkSplit(body string, chunklen uint, end string) string {
 	if end == "" {
 		end = "\r\n"
@@ -462,12 +469,12 @@ func ChunkSplit(body string, chunklen uint, end string) string {
 	return string(ns)
 }
 
-// StrWordCount str_word_count()
+// StrWordCount 返回 str 中的单词列表，单词按空白字符分隔（对应 PHP str_word_count()）。
 func StrWordCount(str string) []string {
 	return strings.Fields(str)
 }
 
-// Wordwrap wordwrap()
+// Wordwrap 按 width 宽度对 str 进行换行，br 为换行符；cut 为 true 时允许在超宽单词中间强制断开（对应 PHP wordwrap()）。
 func Wordwrap(str string, width uint, br string, cut bool) string {
 	strlen := len(str)
 	brlen := len(br)
@@ -517,16 +524,17 @@ func Wordwrap(str string, width uint, br string, cut bool) string {
 	return string(ns)
 }
 
-// Strlen strlen()
+// Strlen 返回 str 的字节长度（对应 PHP strlen()）。
 func Strlen(str string) int {
 	return len(str)
 }
 
-// MbStrlen mb_strlen()
+// MbStrlen 返回 str 的字符数，按 rune（Unicode 码点）计数（对应 PHP mb_strlen()）。
 func MbStrlen(str string) int {
 	return utf8.RuneCountInString(str)
 }
 
+// MbSubstr 返回 str 从 start 起、长度为 length 的子串（按 rune 处理，start 与 length 可为负；对应 PHP mb_substr()）。
 func MbSubstr(str string, start, length int) string {
 	runes := []rune(str)
 	if start < 0 {
@@ -545,12 +553,12 @@ func MbSubstr(str string, start, length int) string {
 	return string(runes[start:end])
 }
 
-// StrRepeat str_repeat()
+// StrRepeat 将 input 重复 multiplier 次后拼接返回（对应 PHP str_repeat()）。
 func StrRepeat(input string, multiplier int) string {
 	return strings.Repeat(input, multiplier)
 }
 
-// Strstr strstr()
+// Strstr 在 haystack 中查找 needle 首次出现的位置，并返回该匹配之后的剩余子串（对应 PHP strstr()）。找不到或 needle 为空时返回空串。
 func Strstr(haystack string, needle string) string {
 	if needle == "" {
 		return ""
@@ -562,12 +570,12 @@ func Strstr(haystack string, needle string) string {
 	return haystack[idx+len([]byte(needle))-1:]
 }
 
-// Strtr strtr()
+// Strtr 按替换规则转换 haystack 中的字符（对应 PHP strtr()）。
 //
-// If the parameter length is 1, type is: map[string]string
-// Strtr("baab", map[string]string{"ab": "01"}) will return "ba01"
-// If the parameter length is 2, type is: string, string
-// Strtr("baab", "ab", "01") will return "1001", a => 0; b => 1.
+// 若参数数量为 1，参数类型为 map[string]string：
+// Strtr("baab", map[string]string{"ab": "01"}) 将返回 "ba01"
+// 若参数数量为 2，参数类型为 string, string：
+// Strtr("baab", "ab", "01") 将返回 "1001"，即 a => 0；b => 1。
 func Strtr(haystack string, params ...interface{}) string {
 	ac := len(params)
 	if ac == 1 {
@@ -628,7 +636,7 @@ func Strtr(haystack string, params ...interface{}) string {
 	return haystack
 }
 
-// StrShuffle str_shuffle()
+// StrShuffle 随机打乱 str 中字符的顺序（对应 PHP str_shuffle()）。
 func StrShuffle(str string) string {
 	runes := []rune(str)
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -639,7 +647,7 @@ func StrShuffle(str string) string {
 	return string(s)
 }
 
-// Trim trim()
+// Trim 去除 str 首尾的空白字符；若提供了 characterMask，则去除其中指定的字符（对应 PHP trim()）。
 func Trim(str string, characterMask ...string) string {
 	if len(characterMask) == 0 {
 		return strings.TrimSpace(str)
@@ -647,7 +655,7 @@ func Trim(str string, characterMask ...string) string {
 	return strings.Trim(str, characterMask[0])
 }
 
-// Ltrim ltrim()
+// Ltrim 去除 str 开头的空白字符；若提供了 characterMask，则去除其中指定的字符（对应 PHP ltrim()）。
 func Ltrim(str string, characterMask ...string) string {
 	if len(characterMask) == 0 {
 		return strings.TrimLeftFunc(str, unicode.IsSpace)
@@ -655,7 +663,7 @@ func Ltrim(str string, characterMask ...string) string {
 	return strings.TrimLeft(str, characterMask[0])
 }
 
-// Rtrim rtrim()
+// Rtrim 去除 str 末尾的空白字符；若提供了 characterMask，则去除其中指定的字符（对应 PHP rtrim()）。
 func Rtrim(str string, characterMask ...string) string {
 	if len(characterMask) == 0 {
 		return strings.TrimRightFunc(str, unicode.IsSpace)
@@ -663,23 +671,24 @@ func Rtrim(str string, characterMask ...string) string {
 	return strings.TrimRight(str, characterMask[0])
 }
 
-// Explode explode()
+// Explode 以 delimiter 为分隔符将 str 拆分为字符串切片（对应 PHP explode()）。
 func Explode(delimiter, str string) []string {
 	return strings.Split(str, delimiter)
 }
 
+// ExplodeComma 以逗号 "," 为分隔符将字符串 str 拆分。
 func ExplodeComma(str string) []string {
 	return strings.Split(str, ",")
 }
 
-// Ord ord()
+// Ord 返回 char 中首个字符的 ASCII/Unicode 码点（对应 PHP ord()）。
 func Ord(char string) int {
 	r, _ := utf8.DecodeRune([]byte(char))
 	return int(r)
 }
 
-// Nl2br nl2br()
-// \n\r, \r\n, \r, \n
+// Nl2br 将字符串中的换行符替换为 <br />（isXhtml 为 true）或 <br> 标签（对应 PHP nl2br()）。
+// 可识别的换行形式：\n\r、\r\n、\r、\n。
 func Nl2br(str string, isXhtml bool) string {
 	r, n, runes := '\r', '\n', []rune(str)
 	var br []byte
@@ -711,23 +720,24 @@ func Nl2br(str string, isXhtml bool) string {
 	return buf.String()
 }
 
+// Json_decode 将 JSON 字符串 data 解码为 map[string]interface{}。
 func Json_decode(data string) (map[string]interface{}, error) {
 	var dat map[string]interface{}
 	err := xjson.Unmarshal([]byte(data), &dat)
 	return dat, err
 }
 
-// JSONDecode json_decode()
+// JSONDecode 将 JSON 数据 data 解码到 val 指向的变量中（对应 PHP json_decode()）。
 func JSONDecode(data []byte, val interface{}) error {
 	return xjson.Unmarshal(data, val)
 }
 
-// JSONEncode json_encode()
+// JSONEncode 将 val 编码为 JSON 数据（对应 PHP json_encode()）。
 func JSONEncode(val interface{}) ([]byte, error) {
 	return xjson.Marshal(val)
 }
 
-// Addslashes addslashes()
+// Addslashes 在单引号、双引号与反斜杠前添加转义反斜杠（对应 PHP addslashes()）。
 func Addslashes(str string) string {
 	var buf bytes.Buffer
 	for _, char := range str {
@@ -740,7 +750,7 @@ func Addslashes(str string) string {
 	return buf.String()
 }
 
-// Stripslashes stripslashes()
+// Stripslashes 去除字符串中的转义反斜杠（对应 PHP stripslashes()）。
 func Stripslashes(str string) string {
 	var buf bytes.Buffer
 	l, skip := len(str), false
@@ -758,7 +768,7 @@ func Stripslashes(str string) string {
 	return buf.String()
 }
 
-// Quotemeta quotemeta()
+// Quotemeta 在正则表达式元字符（. + \ ( $ ) [ ^ ] * ? 等）前添加转义反斜杠（对应 PHP quotemeta()）。
 func Quotemeta(str string) string {
 	var buf bytes.Buffer
 	for _, char := range str {
@@ -771,20 +781,21 @@ func Quotemeta(str string) string {
 	return buf.String()
 }
 
-// Htmlentities htmlentities()
+// Htmlentities 将字符串转换为对应的 HTML 实体（对应 PHP htmlentities()）。
 func Htmlentities(str string) string {
 	return html.EscapeString(str)
 }
 
-// HTMLEntityDecode html_entity_decode()
+// HTMLEntityDecode 将 HTML 实体解码为对应字符（对应 PHP html_entity_decode()）。
 func HTMLEntityDecode(str string) string {
 	return html.UnescapeString(str)
 }
 
-// Levenshtein levenshtein()
-// costIns: Defines the cost of insertion.
-// costRep: Defines the cost of replacement.
-// costDel: Defines the cost of deletion.
+// Levenshtein 计算 str1 与 str2 之间的编辑距离（对应 PHP levenshtein()）。
+// costIns：定义插入操作的代价。
+// costRep：定义替换操作的代价。
+// costDel：定义删除操作的代价。
+// 任一字符串长度超过 255 字节时返回 -1。
 func Levenshtein(str1, str2 string, costIns, costRep, costDel int) int {
 	maxLen := 255
 	l1 := len(str1)
@@ -833,7 +844,7 @@ func Levenshtein(str1, str2 string, costIns, costRep, costDel int) int {
 	return c0
 }
 
-// SimilarText similar_text()
+// SimilarText 计算 first 与 second 中相同字符的数量；若 percent 非空，则把相似度百分比写入其中（对应 PHP similar_text()）。
 func SimilarText(first, second string, percent *float64) int {
 	var similarText func(string, string, int, int) int
 	similarText = func(str1, str2 string, len1, len2 int) int {
@@ -878,8 +889,8 @@ func SimilarText(first, second string, percent *float64) int {
 	return sim
 }
 
-// Soundex soundex()
-// Calculate the soundex key of a string.
+// Soundex 计算字符串的 soundex 键，用于按英语发音近似匹配单词（对应 PHP soundex()）。
+// 传入空字符串会触发 panic。
 func Soundex(str string) string {
 	if str == "" {
 		panic("str: cannot be an empty string")
@@ -937,7 +948,7 @@ func Soundex(str string) string {
 	return string(sd)
 }
 
-// Returns string with all alphabetic characters converted to lowercase.
+// StrToLower 返回将字符串中所有字母字符转换为小写后的结果。
 func StrToLower(s string) string {
 	return strings.ToLower(s)
 }

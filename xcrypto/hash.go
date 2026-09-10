@@ -13,16 +13,16 @@ import (
 	"github.com/zsy619/tools/xjson"
 )
 
-// https://github.com/pinpt/go-common/blob/master/hash/hash.go
+// 参考来源：https://github.com/pinpt/go-common/blob/master/hash/hash.go
 
-// Values will convert all objects to a string and return a SHA256 of the concatenated values.
-// Uses xxhash to calculate a faster hash value that is not cryptographically secure but is OK since
-// we use hashing mainfully for generating consistent key values or equality checks.
+// Values 会将所有对象转换为字符串，并返回拼接值经过哈希运算后的校验值。
+// 它使用 xxhash 计算更快的哈希值；该哈希不具备密码学安全性，但对我们来说已经足够，
+// 因为我们主要利用哈希生成一致的键值或进行相等性检查。
 func Values(objects ...interface{}) string {
 	return hashValues(objects...)
 }
 
-// Modulo returns the modulo of sha value into num
+// Modulo 返回 sha 值对 num 取模后的余数
 func Modulo(sha string, num int) int {
 	hasher := fnv.New32a()
 	_, _ = hasher.Write([]byte(sha))
@@ -36,8 +36,8 @@ func Modulo(sha string, num int) int {
 func hashValues(objects ...interface{}) string {
 	h := xxhash.New()
 
-	// This is a type switch, pointers have to be handled differently unfortunately
-	// Note: It appears fmt.Fprintf is second fastest to _, _ = io.WriteString.
+	// 这是一个类型断言；遗憾的是，指针必须单独处理。
+	// 注：看起来 fmt.Fprintf 是仅次于 _, _ = io.WriteString 的第二快写法。
 	for _, o := range objects {
 		if o == nil {
 			_, _ = io.WriteString(h, "")
@@ -61,14 +61,14 @@ func hashValues(objects ...interface{}) string {
 		case int, int8, int16, int32, int64:
 			fmt.Fprintf(h, "%d", s)
 		case float32:
-			// truncate without decimals if a float like 123.00
+			// 如果是形如 123.00 的浮点数，则去掉小数部分
 			if s == float32(int32(s)) {
 				fmt.Fprintf(h, "%d", int32(s))
 			} else {
 				fmt.Fprintf(h, "%f", s)
 			}
 		case float64:
-			// truncate without decimals if a float like 123.00
+			// 如果是形如 123.00 的浮点数，则去掉小数部分
 			if s == float64(int64(s)) {
 				fmt.Fprintf(h, "%d", int64(s))
 			} else {
@@ -114,7 +114,7 @@ func hashValues(objects ...interface{}) string {
 			if s == nil {
 				_, _ = io.WriteString(h, "")
 			} else {
-				// truncate without decimals if a float like 123.00
+				// 如果是形如 123.00 的浮点数，则去掉小数部分
 				if *s == float32(int32(*s)) {
 					fmt.Fprintf(h, "%d", int32(*s))
 				} else {
@@ -125,7 +125,7 @@ func hashValues(objects ...interface{}) string {
 			if s == nil {
 				_, _ = io.WriteString(h, "")
 			} else {
-				// truncate without decimals if a float like 123.00
+				// 如果是形如 123.00 的浮点数，则去掉小数部分
 				if *s == float64(int64(*s)) {
 					fmt.Fprintf(h, "%d", int64(*s))
 				} else {
@@ -159,13 +159,13 @@ func hashValues(objects ...interface{}) string {
 	return fmt.Sprintf("%016x", h.Sum64())
 }
 
-// Sha256Checksum will return a sha256 checksum of r
+// Sha256Checksum 返回 r 的 sha256 校验和
 func Sha256Checksum(r io.Reader) ([]byte, error) {
 	_, sum, err := ChecksumFrom(r, sha256.New())
 	return sum, err
 }
 
-// ChecksumFrom will read all of r 8096 bytes at a time into hasher and return the sum
+// ChecksumFrom 每次从 r 读取 8096 字节写入 hasher，最后返回写入的字节总数与校验和
 func ChecksumFrom(r io.Reader, hasher hash.Hash) (int64, []byte, error) {
 	var written int
 	for {
@@ -186,7 +186,7 @@ func ChecksumFrom(r io.Reader, hasher hash.Hash) (int64, []byte, error) {
 	return int64(written), hasher.Sum(nil), nil
 }
 
-// ChecksumCopy will do the same as io.Copy, but also returns a sha256 checksum for the data read
+// ChecksumCopy 与 io.Copy 行为相同，但同时返回所读数据的 sha256 校验和
 func ChecksumCopy(dst io.Writer, src io.Reader) (int64, []byte, error) {
 	return ChecksumFrom(io.TeeReader(src, dst), sha256.New())
 }

@@ -8,17 +8,18 @@ import (
 )
 
 const (
+	// sessionCookieName 客户端会话 Cookie 名称。
 	sessionCookieName = "_cas_session"
 )
 
-// clientHandler handles CAS Protocol HTTP requests
+// clientHandler 处理 CAS 协议相关的 HTTP 请求。
 type clientHandler struct {
 	c *Client
 	h http.Handler
 }
 
-// ServeHTTP handles HTTP requests, processes CAS requests
-// and passes requests up to its child http.Handler.
+// ServeHTTP 处理 HTTP 请求，识别并处理 CAS 请求后将请求转发给子 http.Handler。
+// 单点登出（SLO）请求会被直接处理，不会进入下游处理器。
 func (ch *clientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if glog.V(2) {
 		glog.Infof("cas: handling %v request for %v", r.Method, r.URL)
@@ -35,9 +36,10 @@ func (ch *clientHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ch.h.ServeHTTP(w, r)
 }
 
-// isSingleLogoutRequest determines if the http.Request is a CAS Single Logout Request.
+// isSingleLogoutRequest 判断当前请求是否为 CAS 单点登出（SLO）请求。
 //
-// The rules for a SLO request are, HTTP POST urlencoded form with a logoutRequest parameter.
+// SLO 请求的特征：HTTP POST、Content-Type 为 application/x-www-form-urlencoded，
+// 且表单中包含 logoutRequest 参数。
 func isSingleLogoutRequest(r *http.Request) bool {
 	if r.Method != "POST" {
 		return false
@@ -55,7 +57,8 @@ func isSingleLogoutRequest(r *http.Request) bool {
 	return true
 }
 
-// performSingleLogout processes a single logout request
+// performSingleLogout 处理单点登出请求：解析 logoutRequest XML，删除对应票据与会话。
+// 解析失败或票据删除失败会以 500 响应写出错误信息。
 func (ch *clientHandler) performSingleLogout(w http.ResponseWriter, r *http.Request) {
 	rawXML := r.FormValue("logoutRequest")
 	logoutRequest, err := parseLogoutRequest([]byte(rawXML))

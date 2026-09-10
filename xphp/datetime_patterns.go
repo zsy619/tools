@@ -5,19 +5,22 @@ import (
 	"time"
 )
 
-// pattern stores the mapping of golang datetime layout and php datetime format
+// pattern 存储 PHP 日期格式与 Go layout 之间的映射关系。
+//
+// 通过 regexp 匹配用户输入的日期字符串，再用 layout 调用 time.Parse。
 type pattern struct {
-	regexp string // golang regular expression
-	layout string // golang datetime layout
-	format string // php datetime format
+	regexp string // 用于匹配的 Go 正则表达式
+	layout string // Go 的时间 layout
+	format string // PHP 的日期格式
 }
 
-// patterns is an array of pattern
+// patterns 是 pattern 的集合类型。
 type patterns []pattern
 
+// _defaultPatterns 内置的 PHP/Go 日期格式映射表，在 init 中初始化。
 var _defaultPatterns patterns
 
-// formatMap is the mapping of php date format to golang layout
+// formatMap 是 PHP 单字符日期格式 -> Go layout 的映射表。
 var formatMap map[string]string
 
 func init() {
@@ -152,7 +155,10 @@ func init() {
 	}
 }
 
-// getPattern gets the matched pattern by the given php style date/time format string
+// getPattern 按 PHP 风格日期格式字符串查找对应的 pattern。
+//
+// 找不到匹配项时返回 errors.New("no pattern found")；调用方应自行
+// 决定是回退到 convertLayout 还是直接报错。
 func getPattern(format string) (pattern, error) {
 	for _, p := range _defaultPatterns {
 		if p.format == format {
@@ -163,7 +169,12 @@ func getPattern(format string) (pattern, error) {
 	return pattern{}, errors.New("no pattern found")
 }
 
-// convertLayout converts php date format string to golang date layout
+// convertLayout 把任意 PHP 日期格式字符串转换为对应的 Go layout。
+//
+// 与 getPattern 不同，本函数不需要输入在 _defaultPatterns 中已注册；
+// 它按字符逐位查 formatMap，未识别的字符（如分隔符 / 字面量）原样保留。
+// 因此可用于任意自定义 PHP 格式字符串的转换，但无法保证一定能被
+// time.Parse 成功解析。
 func convertLayout(format string) string {
 	var layout string
 	for _, s := range format {

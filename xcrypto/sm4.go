@@ -36,6 +36,16 @@ import (
  * @param {string} key 密钥
  * @return {*}
  */
+// Sm4Pkcs7Encrypt 使用 SM4-CBC 算法对 data 进行加密，结果使用十六进制字符串返回。
+//
+// 密钥派生：key 经 SHA-256 摘要后取前 16 字节作为 SM4 密钥，IV 使用全零向量；
+// 数据填充使用 PKCS#7。
+//
+// 参数：
+//   - data: 明文字符串。
+//   - key: 用户传入的密码（任意长度）。
+//
+// 返回值：十六进制编码的密文；底层 sm4.NewCipher 出错时返回错误。
 func Sm4Pkcs7Encrypt(data string, key string) (string, error) {
 	// 密码填充、向量和密钥
 	dataByte := []byte(data)
@@ -66,6 +76,13 @@ func Sm4Pkcs7Encrypt(data string, key string) (string, error) {
  * @param {string} key 密钥
  * @return {*}
  */
+// Sm4Pkcs7Decrypt 是 Sm4Pkcs7Encrypt 对应的解密版本，使用全零 IV。
+//
+// 参数：
+//   - data: 十六进制编码的密文。
+//   - key: 与加密时相同的密码。
+//
+// 返回值：解密后的明文字符串；任意步骤失败时返回错误。
 func Sm4Pkcs7Decrypt(data string, key string) (string, error) {
 	keyHash := sha256.Sum256([]byte(key))
 	key16 := keyHash[0:16]
@@ -94,6 +111,13 @@ func Sm4Pkcs7Decrypt(data string, key string) (string, error) {
  * @param {string} key 密钥
  * @return {*}
  */
+// Sm4Encrypt 使用 SM4-CBC 算法加密 data，IV 取自 key 的 SHA-256 摘要前 16 字节，填充使用 Zero Padding。
+//
+// 参数：
+//   - data: 明文字符串。
+//   - key: 用户密钥（任意长度，会被 SHA-256 派生）。
+//
+// 返回值：十六进制编码的密文；底层 sm4.NewCipher 出错时返回错误。
 func Sm4Encrypt(data string, key string) (string, error) {
 	// 密码填充、向量和密钥
 	keyHash := sha256.Sum256([]byte(key))
@@ -121,6 +145,13 @@ func Sm4Encrypt(data string, key string) (string, error) {
  * @param {string} key 密钥
  * @return {*}
  */
+// Sm4Decrypt 是 Sm4Encrypt 对应的解密版本。
+//
+// 参数：
+//   - data: 十六进制编码的密文。
+//   - key: 与加密时相同的密码。
+//
+// 返回值：解密后的明文字符串；任意步骤失败时返回错误。
 func Sm4Decrypt(data string, key string) (string, error) {
 	keyHash := sha256.Sum256([]byte(key))
 	key16 := keyHash[0:16]
@@ -140,12 +171,25 @@ func Sm4Decrypt(data string, key string) (string, error) {
 	return outStr, nil
 }
 
+// ZeroPadding 使用 0x00 字节将 data 长度填充到 blocksize 的整数倍。
+//
+// 参数：
+//   - data: 原始字节切片。
+//   - blocksize: 目标块大小。
+//
+// 返回值：填充后的新切片（不会修改原 data）。
 func ZeroPadding(data []byte, blocksize int) []byte {
 	paddingLen := blocksize - len(data)%blocksize
 	padding := make([]byte, paddingLen)
 	return append(data, padding...)
 }
 
+// ZeroUnPadding 移除 ZeroPadding 追加在末尾的 0x00 字节。
+//
+// 参数：
+//   - data: 已填充的字节切片。
+//
+// 返回值：去掉末尾零字节后的切片。
 func ZeroUnPadding(data []byte) []byte {
 	length := len(data)
 	i := length - 1
@@ -158,6 +202,12 @@ func ZeroUnPadding(data []byte) []byte {
 }
 
 // ReverseString 字符串反转
+// ReverseString 返回将字符串 s 反转后的结果。
+//
+// 参数：
+//   - s: 原始字符串。
+//
+// 返回值：反转后的字符串。
 func ReverseString(s string) string {
 	b := []byte(s)
 	n := len(b)
@@ -173,6 +223,13 @@ func ReverseString(s string) string {
  * @param {string} key 密钥(字符串反转并转换为小写字母)
  * @return {*}
  */
+// Sm4EncryptReverse 是 Sm4Encrypt 的封装，会先将 key 反转并转小写后再加密。
+//
+// 参数：
+//   - data: 明文字符串。
+//   - key: 原始密钥（函数内部会调用 xstring.Reverse 转小写）。
+//
+// 返回值：十六进制编码的密文；密钥反转失败时返回错误。
 func Sm4EncryptReverse(data string, key string) (string, error) {
 	str, err := xstring.Reverse(key)
 	if err != nil {
@@ -188,6 +245,13 @@ func Sm4EncryptReverse(data string, key string) (string, error) {
  * @param {string} key 密钥(字符串反转并转换为小写字母)
  * @return {*}
  */
+// Sm4DecryptReverse 是 Sm4Decrypt 的封装，使用与 Sm4EncryptReverse 相同的密钥派生规则。
+//
+// 参数：
+//   - data: 十六进制编码的密文。
+//   - key: 原始密钥（内部会反转并转小写）。
+//
+// 返回值：解密后的明文字符串；密钥反转失败时返回错误。
 func Sm4DecryptReverse(data string, key string) (string, error) {
 	str, err := xstring.Reverse(key)
 	if err != nil {

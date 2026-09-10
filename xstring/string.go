@@ -1,4 +1,15 @@
-// Package strings contains various common utils for strings
+// Package xstring 提供了一系列常用的字符串处理工具函数。
+//
+// 本包以标准库 strings 为基础，针对常见业务场景补充了大量扩展工具，主要涵盖：
+//   - 整型/无符号整型/浮点型与布尔类型等基本类型与字符串之间的相互转换（含默认值兜底）；
+//   - 切片（int、字符串、common.Address 等）与字符串之间的相互转换（拼接、拆分、类型互转）；
+//   - 字符串常用操作：截取、填充、翻转、命名风格转换（驼峰、蛇形、短横线等）；
+//   - 字符串查找与判断：包含、前缀/后缀、子串定位、URL 与合约地址合法性校验等；
+//   - 字符串清洗与格式化：HTML 标签去除、空格处理、不可打印字符过滤、敏感信息掩码等；
+//   - 文本相似度等高级工具：汉明距离、UTF-8 合法性校验等。
+//
+// 所有函数均为无状态纯函数（除复用 sync.Pool 提升性能的小段缓冲外），可在并发场景下安全使用。
+// 涉及以太坊相关能力时复用 go-ethereum 的 common 包；JSON 序列化复用 xjson 包以保证行为一致。
 package xstring
 
 import (
@@ -20,8 +31,15 @@ import (
 )
 
 var (
+	// validEthAddressExp 用于校验以太坊节点/合约调用 URL 的正则：
+	// 要求协议必须是 http/https/ws/wss 之一，主机部分可以是：
+	//   - 形如 "a.bcdef" 的常规域名（顶级域长度 2~5）；
+	//   - 或特殊主机名 localhost、ethereum、127.0.0.1。
+	// 端口部分可选，端口号至少为两位数字，后面允许任意路径/参数。
 	validEthAddressExp = regexp.MustCompile(`^(http|https|ws|wss):\/\/((.+?)\.(.{2,5})|localhost|ethereum|127\.0\.0\.1)(\:[0-9]{2,})*.*$`)
-	bfPool             = sync.Pool{
+	// bfPool 是一个 *bytes.Buffer 的 sync.Pool，用于复用字符串拼接时的中间缓冲，
+	// 减少高频调用（如 JoinInts）场景下的内存分配开销。
+	bfPool = sync.Pool{
 		New: func() any {
 			return bytes.NewBuffer([]byte{})
 		},
@@ -100,8 +118,13 @@ func StrToPtr(s string) *string {
 	return &s
 }
 
-// IsValidEthAPIURL returns true if the given string matches a valid
-// eth endpoint URL
+// IsValidEthAPIURL 判断传入的字符串是否为合法的以太坊节点/合约调用 URL。
+//
+// 参数：
+//   - url string：待校验的 URL 字符串。
+//
+// 返回值：
+//   - bool：合法返回 true，不合法返回 false。该函数只判断格式，不访问远程地址。
 func IsValidEthAPIURL(url string) bool {
 	return validEthAddressExp.MatchString(url)
 }
@@ -643,9 +666,21 @@ func CutstrHtml(s string) string {
 	return strx
 }
 
-// Strval 获取变量的字符串值
-// 浮点型 3.0将会转换成字符串3, "3"
-// 非数值或字符类型的变量将会被转换成JSON格式字符串
+// ToVal 把任意类型的变量转换为字符串表示。
+//
+// 支持的常见类型映射如下：
+//   - float32 / float64：使用 strconv.FormatFloat 转为十进制字符串，例如 float64(3.0) 会变成 "3"；
+//   - int / int8 / int16 / int32 / int64：使用 strconv.Itoa 或 strconv.FormatInt 转为十进制字符串；
+//   - uint / uint8 / uint16 / uint32 / uint64：使用 strconv.Itoa 或 strconv.FormatUint 转为十进制字符串；
+//   - string：原样返回；
+//   - []byte：使用 string(bytes) 转为字符串；
+//   - 其他类型：尝试使用 xjson.Marshal 序列化为 JSON 字符串，序列化失败时得到空字节数组并返回 ""。
+//
+// 参数：
+//   - value any：任意输入值；nil 时返回空字符串 ""。
+//
+// 返回值：
+//   - string：转换后的字符串结果。
 func ToVal(value any) string {
 	// interface 转 string
 	var key string
@@ -702,7 +737,17 @@ func ToVal(value any) string {
 	return key
 }
 
-// Reverse 函数接收一个字符串参数s，返回翻转后的字符串和可能发生的错误
+// Reverse 把字符串 s 按 rune（Unicode 码点）顺序翻转，并返回翻转结果。
+//
+// 函数首先校验输入是否合法 UTF-8；遇到非法 UTF-8 时直接返回原字符串与 error，
+// 不会尝试做任何修复或替换。
+//
+// 参数：
+//   - s string：待翻转的字符串。
+//
+// 返回值：
+//   - string：翻转后的字符串；输入不是合法 UTF-8 时返回原始 s。
+//   - error：输入不是合法 UTF-8 时返回 errors.New("input is not valid UTF-8")，否则返回 nil。
 func Reverse(s string) (string, error) {
 	if !utf8.ValidString(s) {
 		return s, errors.New("input is not valid UTF-8")
@@ -829,26 +874,78 @@ func PadEnd(source string, size int, padStr string) string {
 	return padAtPosition(source, size, padStr, 2)
 }
 
+// KebabCase 把字符串 s 转换为短横线连接的小写命名（kebab-case）。
+//
+// 内部通过 splitIntoStrings 先将字符串拆分为若干子串，再以 "-" 连接，
+// 每个子串保持原样（不做大小写转换）。空字符串调用返回 ""。
+//
+// 参数：
+//   - s string：待转换的字符串。
+//
+// 返回值：
+//   - string：kebab-case 形式的小写命名字符串。
 func KebabCase(s string) string {
 	result := splitIntoStrings(s, false)
 	return strings.Join(result, "-")
 }
 
+// UpperKebabCase 把字符串 s 转换为短横线连接的大写命名（UPPER-KEBAB-CASE）。
+//
+// 内部通过 splitIntoStrings 将字符串拆分为若干子串后再以 "-" 连接，
+// 子串按 upperCase=true 的策略统一转大写。空字符串调用返回 ""。
+//
+// 参数：
+//   - s string：待转换的字符串。
+//
+// 返回值：
+//   - string：UPPER-KEBAB-CASE 形式的大写命名字符串。
 func UpperKebabCase(s string) string {
 	result := splitIntoStrings(s, true)
 	return strings.Join(result, "-")
 }
 
+// SnakeCase 把字符串 s 转换为下划线连接的小写命名（snake_case）。
+//
+// 内部通过 splitIntoStrings 先将字符串拆分为若干子串，再以 "_" 连接，
+// 每个子串保持原样（不做大小写转换）。空字符串调用返回 ""。
+//
+// 参数：
+//   - s string：待转换的字符串。
+//
+// 返回值：
+//   - string：snake_case 形式的小写命名字符串。
 func SnakeCase(s string) string {
 	result := splitIntoStrings(s, false)
 	return strings.Join(result, "_")
 }
 
+// UpperSnakeCase 把字符串 s 转换为下划线连接的大写命名（UPPER_SNAKE_CASE）。
+//
+// 内部通过 splitIntoStrings 将字符串拆分为若干子串后再以 "_" 连接，
+// 子串按 upperCase=true 的策略统一转大写。空字符串调用返回 ""。
+//
+// 参数：
+//   - s string：待转换的字符串。
+//
+// 返回值：
+//   - string：UPPER_SNAKE_CASE 形式的大写命名字符串。
 func UpperSnakeCase(s string) string {
 	result := splitIntoStrings(s, true)
 	return strings.Join(result, "_")
 }
 
+// Before 返回字符串 s 中第一次出现 char 之前的子串（不含 char 本身）。
+//
+// 边界行为：
+//   - s 为空、char 为空、或 s 中不包含 char 时，返回原始 s；
+//   - char 出现在首位置时返回 ""。
+//
+// 参数：
+//   - s string：源字符串。
+//   - char string：分隔标记字符串，按完整子串匹配。
+//
+// 返回值：
+//   - string：char 首次出现之前的子串。
 func Before(s, char string) string {
 	i := strings.Index(s, char)
 
@@ -859,6 +956,18 @@ func Before(s, char string) string {
 	return s[0:i]
 }
 
+// BeforeLast 返回字符串 s 中最后一次出现 char 之前的子串（不含 char 本身）。
+//
+// 边界行为：
+//   - s 为空、char 为空、或 s 中不包含 char 时，返回原始 s；
+//   - char 出现在首位置时返回 ""。
+//
+// 参数：
+//   - s string：源字符串。
+//   - char string：分隔标记字符串，按完整子串匹配。
+//
+// 返回值：
+//   - string：char 最后一次出现之前的子串。
 func BeforeLast(s, char string) string {
 	i := strings.LastIndex(s, char)
 
@@ -869,6 +978,18 @@ func BeforeLast(s, char string) string {
 	return s[0:i]
 }
 
+// After 返回字符串 s 中第一次出现 char 之后的子串（不含 char 本身）。
+//
+// 边界行为：
+//   - s 为空、char 为空、或 s 中不包含 char 时，返回原始 s；
+//   - char 出现在末位置时返回 ""。
+//
+// 参数：
+//   - s string：源字符串。
+//   - char string：分隔标记字符串，按完整子串匹配。
+//
+// 返回值：
+//   - string：char 首次出现之后的子串。
 func After(s, char string) string {
 	i := strings.Index(s, char)
 
@@ -879,6 +1000,18 @@ func After(s, char string) string {
 	return s[i+len(char):]
 }
 
+// AfterLast 返回字符串 s 中最后一次出现 char 之后的子串（不含 char 本身）。
+//
+// 边界行为：
+//   - s 为空、char 为空、或 s 中不包含 char 时，返回原始 s；
+//   - char 出现在末位置时返回 ""。
+//
+// 参数：
+//   - s string：源字符串。
+//   - char string：分隔标记字符串，按完整子串匹配。
+//
+// 返回值：
+//   - string：char 最后一次出现之后的子串。
 func AfterLast(s, char string) string {
 	i := strings.LastIndex(s, char)
 
@@ -889,6 +1022,13 @@ func AfterLast(s, char string) string {
 	return s[i+len(char):]
 }
 
+// IsString 判断任意类型 v 是否为字符串类型。
+//
+// 参数：
+//   - v any：任意输入值，nil 时返回 false。
+//
+// 返回值：
+//   - bool：v 的动态类型为 string 时返回 true，否则返回 false（包含 nil）。
 func IsString(v any) bool {
 	if v == nil {
 		return false
@@ -901,6 +1041,21 @@ func IsString(v any) bool {
 	}
 }
 
+// Unwrap 把字符串 str 开头和结尾处的 wrapToken 包装层去掉。
+//
+// 仅当 wrapToken 同时出现在字符串首部和尾部时才会被剥除，其它情况下原样返回。
+//
+// 边界行为：
+//   - str 或 wrapToken 为空时直接返回 str；
+//   - wrapToken 仅在尾部出现、或仅在首部出现、或不在首尾位置出现时，str 不会被修改；
+//   - 内部还要求 wrapToken 的长度不超过 lastIndex，否则也不剥除（保持现状）。
+//
+// 参数：
+//   - str string：原始字符串。
+//   - wrapToken string：包装标记字符串，按完整子串匹配。
+//
+// 返回值：
+//   - string：去掉首尾包装后的字符串；若条件不满足则返回原始 str。
 func Unwrap(str string, wrapToken string) string {
 	if str == "" || wrapToken == "" {
 		return str
@@ -918,6 +1073,22 @@ func Unwrap(str string, wrapToken string) string {
 	return str
 }
 
+// SplitEx 按分隔符 sep 拆分字符串 s，并可通过 removeEmptyString 控制是否跳过空串。
+//
+// 行为说明：
+//   - sep 为空时直接返回空切片 []string{}；
+//   - removeEmptyString 为 true 时，位于分隔符之间的空子串将被丢弃；
+//   - removeEmptyString 为 false 时，保留拆分产生的所有元素，包括末尾可能出现的空串。
+//
+// 该函数与 strings.Split 类似，但提供了“是否丢弃空串”的可配置能力。
+//
+// 参数：
+//   - s string：待拆分的字符串。
+//   - sep string：分隔符，sep 为空时直接返回空切片。
+//   - removeEmptyString bool：是否丢弃拆分产生的空子串。
+//
+// 返回值：
+//   - []string：拆分后的字符串切片。
 func SplitEx(s, sep string, removeEmptyString bool) []string {
 	if sep == "" {
 		return []string{}
@@ -966,6 +1137,22 @@ func SplitEx(s, sep string, removeEmptyString bool) []string {
 	return ret
 }
 
+// Substring 在字符串 s 中按 rune（Unicode 码点）位置截取子串，并去掉 NUL 字符。
+//
+// offset 与 length 的语义：
+//   - offset 为负值时按从字符串末尾倒数的方式处理（offset = size + offset），
+//     仍小于 0 时会被夹紧到 0；
+//   - offset 超过字符串长度时返回 ""；
+//   - length 超出可取范围时会被夹紧到剩余长度；
+//   - 最终结果会移除所有 '\x00' 字符。
+//
+// 参数：
+//   - s string：源字符串。
+//   - offset int：起始下标，可为负值。
+//   - length uint：要截取的长度（按 rune 计数）。
+//
+// 返回值：
+//   - string：截取后的子串；越界时返回 ""。
 func Substring(s string, offset int, length uint) string {
 	rs := []rune(s)
 	size := len(rs)
@@ -989,6 +1176,17 @@ func Substring(s string, offset int, length uint) string {
 	return strings.Replace(str, "\x00", "", -1)
 }
 
+// SplitWords 把字符串 s 按“字母序列”切分为单词切片。
+//
+// 规则：连续字母（unicode.IsLetter 判定为 true）被视为一个单词；
+// 单词内部的 '\” 与 '-' 被视作单词的一部分，不会触发拆分；
+// 遇到其它字符时结束当前单词。最终可能返回 0 个或多个单词。
+//
+// 参数：
+//   - s string：待拆分的字符串。
+//
+// 返回值：
+//   - []string：拆分得到的单词切片。
 func SplitWords(s string) []string {
 	var word string
 	var words []string
@@ -1029,6 +1227,16 @@ func SplitWords(s string) []string {
 	return words
 }
 
+// WordCount 统计字符串 s 中按字母序列计数的单词个数。
+//
+// 规则与 SplitWords 保持一致：连续字母序列计为 1 个单词；
+// 单词内部的 '\” 与 '-' 不影响计数。
+//
+// 参数：
+//   - s string：待统计的字符串。
+//
+// 返回值：
+//   - int：单词数量，无单词时返回 0。
 func WordCount(s string) int {
 	var r rune
 	var size, count int
@@ -1058,6 +1266,17 @@ func WordCount(s string) int {
 	return count
 }
 
+// RemoveNonPrintable 移除字符串 s 中所有不可打印的 rune（unicode.IsPrint 返回 false 的字符）。
+//
+// 使用 strings.Map 遍历，对每个 rune 调用 unicode.IsPrint：
+//   - 可打印字符原样保留；
+//   - 不可打印字符返回 -1，由 strings.Map 删除。
+//
+// 参数：
+//   - s string：源字符串。
+//
+// 返回值：
+//   - string：过滤掉不可打印字符后的字符串。
 func RemoveNonPrintable(s string) string {
 	result := strings.Map(func(r rune) rune {
 		if unicode.IsPrint(r) {
@@ -1069,14 +1288,47 @@ func RemoveNonPrintable(s string) string {
 	return result
 }
 
+// BytesToString 通过 unsafe.Pointer 把 []byte 零拷贝转换为 string。
+//
+// 警告：该函数不会复制底层字节数组，因此返回的 string 与入参 bytes 共享同一段内存；
+// 在 bytes 被修改或回收后，string 内容也会随之改变。请仅在 bytes 的生命周期
+// 明确长于 string 的使用周期，或 bytes 之后不会再被修改的场景下使用。
+//
+// 参数：
+//   - bytes []byte：待转换的字节切片。
+//
+// 返回值：
+//   - string：与 bytes 共享底层内存的字符串。
 func BytesToString(bytes []byte) string {
 	return *(*string)(unsafe.Pointer(&bytes))
 }
 
+// IsNotBlank 是 IsBlank 的取反便捷封装。
+//
+// 当字符串 s 至少包含一个非空白字符时返回 true；
+// 全部由空白字符组成或为空字符串时返回 false。
+//
+// 参数：
+//   - s string：待检测的字符串。
+//
+// 返回值：
+//   - bool：s 非空白返回 true，否则返回 false。
 func IsNotBlank(s string) bool {
 	return !IsBlank(s)
 }
 
+// HasPrefixAny 判断字符串 s 是否以 prefixes 切片中的任意一个前缀开头。
+//
+// 边界行为：
+//   - s 为空、或 prefixes 为空时返回 false；
+//   - 一旦命中任一前缀即返回 true，剩余前缀不再继续判断。
+//
+// 参数：
+//   - s string：待检测的字符串。
+//   - prefixes []string：候选前缀集合。
+//
+// 返回值：
+//   - bool：命中任一前缀返回 true；否则返回 false。
 func HasPrefixAny(s string, prefixes []string) bool {
 	if len(s) == 0 || len(prefixes) == 0 {
 		return false
@@ -1089,6 +1341,18 @@ func HasPrefixAny(s string, prefixes []string) bool {
 	return false
 }
 
+// HasSuffixAny 判断字符串 s 是否以 suffixes 切片中的任意一个后缀结尾。
+//
+// 边界行为：
+//   - s 为空、或 suffixes 为空时返回 false；
+//   - 一旦命中任一后缀即返回 true，剩余后缀不再继续判断。
+//
+// 参数：
+//   - s string：待检测的字符串。
+//   - suffixes []string：候选后缀集合。
+//
+// 返回值：
+//   - bool：命中任一后缀返回 true；否则返回 false。
 func HasSuffixAny(s string, suffixes []string) bool {
 	if len(s) == 0 || len(suffixes) == 0 {
 		return false
@@ -1101,6 +1365,20 @@ func HasSuffixAny(s string, suffixes []string) bool {
 	return false
 }
 
+// IndexOffset 在字符串 s 中从下标 idxFrom 开始向后搜索 substr，并返回其在 s 中的原始下标。
+//
+// 边界行为：
+//   - idxFrom < 0 或 idxFrom > len(s)-1 时直接返回 -1；
+//   - 找不到时返回 -1（来自 strings.Index 的返回值）；
+//   - 命中时返回的是 substr 在 s 中的绝对下标，不是相对于 idxFrom 的偏移。
+//
+// 参数：
+//   - s string：源字符串。
+//   - substr string：要查找的子串。
+//   - idxFrom int：搜索起始位置（绝对下标）。
+//
+// 返回值：
+//   - int：substr 在 s 中的绝对下标；未命中或越界时返回 -1。
 func IndexOffset(s string, substr string, idxFrom int) int {
 	if idxFrom > len(s)-1 || idxFrom < 0 {
 		return -1
@@ -1109,6 +1387,17 @@ func IndexOffset(s string, substr string, idxFrom int) int {
 	return strings.Index(s[idxFrom:], substr) + idxFrom
 }
 
+// ReplaceWithMap 按 replaces 映射批量替换字符串 s 中的子串。
+//
+// 按 map 的迭代顺序依次对 s 执行 strings.ReplaceAll，每次替换作用于上一次的结果；
+// 因此当不同键之间存在包含关系时，替换结果依赖于 Go map 的迭代顺序，结果不确定。
+//
+// 参数：
+//   - s string：源字符串。
+//   - replaces map[string]string：key 为待替换子串，value 为替换后的内容。
+//
+// 返回值：
+//   - string：批量替换完成后的字符串。
 func ReplaceWithMap(s string, replaces map[string]string) string {
 	for k, v := range replaces {
 		s = strings.ReplaceAll(s, k, v)
@@ -1117,7 +1406,11 @@ func ReplaceWithMap(s string, replaces map[string]string) string {
 	return s
 }
 
-// DefaultTrimChars are the characters which are stripped by Trim* functions in default.
+// DefaultTrimChars 是 Trim 类函数默认要去除的字符集合。
+//
+// 包含：制表符 ('\t')、垂直制表符 ('\v')、换行符 ('\n')、
+// 回车符 ('\r')、换页符 ('\f')、普通空格 (' ')、NUL 字节 (0x00)、
+// 删除控制符 (0x85) 以及不间断空格 (0xA0)。
 var DefaultTrimChars = string([]byte{
 	'\t', // Tab.
 	'\v', // Vertical tab.
@@ -1252,8 +1545,13 @@ func ContainsAny(str string, substrs []string) bool {
 }
 
 var (
-	whitespaceRegexMatcher     *regexp.Regexp = regexp.MustCompile(`\s`)
-	mutiWhitespaceRegexMatcher *regexp.Regexp = regexp.MustCompile(`[[:space:]]{2,}|[\s\p{Zs}]{2,}`)
+	// whitespaceRegexMatcher 用于匹配任意一种空白字符（\\s：空格、制表符、换行、回车等）。
+	// 在 RemoveWhiteSpace 中用于将单个非连续空白归一化为单空格。
+	whitespaceRegexMatcher = regexp.MustCompile(`\s`)
+	// mutiWhitespaceRegexMatcher 用于匹配连续两个及以上空白字符，
+	// 包括 POSIX 空白类（[:space:]）和 Unicode 空格分隔符（\\p{Zs}）。
+	// 在 RemoveWhiteSpace 中用于将连续空白折叠为单空格。
+	mutiWhitespaceRegexMatcher = regexp.MustCompile(`[[:space:]]{2,}|[\s\p{Zs}]{2,}`)
 )
 
 // RemoveWhiteSpace 函数用于去除字符串中的空格

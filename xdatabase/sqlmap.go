@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Queryer 抽象了数据库连接的最小查询能力，*sql.DB 与 *sql.Tx 都满足该接口。
 type Queryer interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 }
@@ -62,6 +63,16 @@ func SelectScan(rows *sql.Rows) ([]map[string]interface{}, error) {
 	return results, nil
 }
 
+// Get 通过 Queryer 执行查询并返回第一条记录。
+//
+// 参数：
+//   - db: 实现 Queryer 接口的数据库连接或事务。
+//   - query: 待执行的 SQL 语句（带占位符 ?）。
+//   - args: 占位符对应的参数列表。
+//
+// 返回值：
+//   - map[string]interface{}: 命中行的列名 -> 值映射；无记录时为 nil。
+//   - error: db.Query 失败时返回错误；无记录时 GetScan 返回 sql.ErrNoRows。
 func Get(db Queryer, query string, args ...interface{}) (map[string]interface{}, error) {
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -70,6 +81,16 @@ func Get(db Queryer, query string, args ...interface{}) (map[string]interface{},
 	return GetScan(rows)
 }
 
+// GetScan 从 *sql.Rows 中读取第一条记录并扫描为 map。
+//
+// 参数：
+//   - rows: 已经执行查询得到的 *sql.Rows。
+//
+// 返回值：
+//   - map[string]interface{}: 命中行的列名 -> 值映射。
+//   - error: 无记录时返回 sql.ErrNoRows；其他错误来自 Columns/Scan/Rows.Err。
+//
+// 副作用：函数内部会关闭 rows。
 func GetScan(rows *sql.Rows) (map[string]interface{}, error) {
 	defer rows.Close()
 
@@ -103,6 +124,17 @@ func GetScan(rows *sql.Rows) (map[string]interface{}, error) {
 	return result, nil
 }
 
+// Rows2StringInterfaceMapSlice 将 *sql.Rows 转换为 map 列表，并对常见类型做规范化（[]byte 转 string、time.Time 格式化）。
+//
+// 参数：
+//   - rows: 已经执行查询得到的 *sql.Rows。
+//   - cols: 可选列名列表；为空时使用 rows.Columns() 自动获取。
+//
+// 返回值：
+//   - []map[string]interface{}: 每行数据按 cols 顺序构造为 map。
+//   - error: rows.Columns()/rows.Scan 失败时返回错误。
+//
+// 注意：函数不会关闭 rows，调用方需自行处理。
 func Rows2StringInterfaceMapSlice(rows *sql.Rows, cols ...string) ([]map[string]interface{}, error) {
 	var err error
 	if len(cols) == 0 {

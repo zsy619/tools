@@ -10,7 +10,7 @@ import (
 	"github.com/golang/glog"
 )
 
-// NewServiceTicketValidator create a new *ServiceTicketValidator
+// NewServiceTicketValidator 创建一个新的 ServiceTicketValidator。
 func NewServiceTicketValidator(client *http.Client, casURL *url.URL) *ServiceTicketValidator {
 	return &ServiceTicketValidator{
 		client: client,
@@ -18,15 +18,15 @@ func NewServiceTicketValidator(client *http.Client, casURL *url.URL) *ServiceTic
 	}
 }
 
-// ServiceTicketValidator is responsible for the validation of a service ticket
+// ServiceTicketValidator 负责校验 service ticket。
 type ServiceTicketValidator struct {
 	client *http.Client
 	casURL *url.URL
 }
 
-// ValidateTicket validates the service ticket for the given server. The method will try to use the service validate
-// endpoint of the cas >= 2 protocol, if the service validate endpoint not available, the function will use the cas 1
-// validate endpoint.
+// ValidateTicket 校验给定 service 的 service ticket。
+// 默认使用 CAS 2.0+ 的 serviceValidate 接口；若服务端返回 404，则回退到 CAS 1.0 的 validate 接口。
+// 任意网络或解析失败会返回错误；CAS 1.0 接口下若响应为 "no\n\n" 则返回 (nil, nil) 表示未登录。
 func (validator *ServiceTicketValidator) ValidateTicket(serviceURL *url.URL, ticket string) (*AuthenticationResponse, error) {
 	if glog.V(2) {
 		glog.Infof("Validating ticket %v for service %v", ticket, serviceURL)
@@ -90,8 +90,8 @@ func (validator *ServiceTicketValidator) ValidateTicket(serviceURL *url.URL, tic
 	return success, nil
 }
 
-// ServiceValidateUrl creates the service validation url for the cas >= 2 protocol.
-// TODO the function is only exposed, because of the clients ServiceValidateUrl function
+// ServiceValidateUrl 构造 CAS 2.0+ serviceValidate 接口的完整 URL。
+// TODO: 仅因 Client.ServiceValidateUrl 调用而对外暴露。
 func (validator *ServiceTicketValidator) ServiceValidateUrl(serviceURL *url.URL, ticket string) (string, error) {
 	u, err := validator.casURL.Parse(path.Join(validator.casURL.Path, "serviceValidate"))
 	if err != nil {
@@ -106,6 +106,9 @@ func (validator *ServiceTicketValidator) ServiceValidateUrl(serviceURL *url.URL,
 	return u.String(), nil
 }
 
+// validateTicketCas1 使用 CAS 1.0 协议校验 service ticket。
+// 响应体格式为 "yes\n<username>\n"，未登录时为 "no\n\n"。
+// 当响应为未登录时返回 (nil, nil)；其它状态码或读取错误返回相应错误。
 func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL, ticket string) (*AuthenticationResponse, error) {
 	u, err := validator.ValidateUrl(serviceURL, ticket)
 	if err != nil {
@@ -152,7 +155,7 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 	}
 
 	if body == "no\n\n" {
-		return nil, nil // not logged in
+		return nil, nil // 未登录
 	}
 
 	success := &AuthenticationResponse{
@@ -166,8 +169,8 @@ func (validator *ServiceTicketValidator) validateTicketCas1(serviceURL *url.URL,
 	return success, nil
 }
 
-// ValidateUrl creates the validation url for the cas >= 1 protocol.
-// TODO the function is only exposed, because of the clients ValidateUrl function
+// ValidateUrl 构造 CAS 1.0 validate 接口的完整 URL。
+// TODO: 仅因 Client.ValidateUrl 调用而对外暴露。
 func (validator *ServiceTicketValidator) ValidateUrl(serviceURL *url.URL, ticket string) (string, error) {
 	u, err := validator.casURL.Parse(path.Join(validator.casURL.Path, "validate"))
 	if err != nil {

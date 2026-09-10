@@ -5,19 +5,19 @@ import (
 	"reflect"
 )
 
-// ToSet converts a slice or array to map[T]struct{} and returns a nil if error occurred.
+// ToSet 将切片或数组转换为 map[T]struct{}，转换失败时返回 nil。
+// 参数：i 为任意类型的切片或数组。
+// 返回：以 T 为键、struct{}{} 为值的 map；底层调用 ToSetE[T]，转换失败时返回 nil（不返回错误）。
 func ToSet[T comparable](i any) map[T]struct{} {
 	m, _ := ToSetE[T](i)
 	return m
 }
 
-// ToSetE converts a slice or array to map[T]struct{} and returns an error if occurred.
-// Note that the the element type of input don't need to be equal to the map key type.
-// For example, []uint64{1, 2, 3} can be converted to map[uint64]struct{}{1:struct{}, 2:struct{},3:struct{}}
-// and also can be converted to map[string]struct{}{"1":struct{}, "2":struct{}, "3":struct{}}
-// if you want.
-// Note that this function is implemented through 1.18 generics, so the element type needs to
-// be specified when calling it, e.g. ToSetE[int]([]int{1,2,3}).
+// ToSetE 将切片或数组转换为 map[T]struct{}，并在转换失败时返回错误。
+// 注意：输入元素的类型不必与映射键类型完全相同，例如 []uint64{1, 2, 3} 既可以转换为
+// map[uint64]struct{}{1:struct{}{}, 2:struct{}{}, 3:struct{}{}}，也可以转换为
+// map[string]struct{}{"1":struct{}{}, "2":struct{}{}, "3":struct{}{}}。
+// 注意：该函数基于 Go 1.18 泛型实现，调用时需显式指定元素类型，例如 ToSetE[int]([]int{1,2,3})。
 func ToSetE[T comparable](i any) (map[T]struct{}, error) {
 	// Check param.
 	if i == nil {

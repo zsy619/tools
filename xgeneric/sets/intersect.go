@@ -1,7 +1,9 @@
 package sets
 
-// Intersect the intersection of some sets(eg. A, B)
-// is the set containing all elements of A that also belong to B
+// Intersect 返回多个集合的交集。
+// 即同时存在于所有传入集合中的元素组成的 Set[T]。
+// 参数：sets 为可变数量的 Set[T]。
+// 返回：包含所有集合共有元素的新 Set[T]。
 func Intersect[T comparable](sets ...Set[T]) Set[T] {
 	records := map[T]int{}
 

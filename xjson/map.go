@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// Convert json string to map
+// JsonToMap 将 JSON 字符串解析为 map 后返回。
 func JsonToMap[K comparable, V any](jsonStr string) (map[K]V, error) {
 	m := make(map[K]V)
 	err := Unmarshal([]byte(jsonStr), &m)
@@ -20,7 +20,7 @@ func JsonToMap[K comparable, V any](jsonStr string) (map[K]V, error) {
 	return m, nil
 }
 
-// Convert map json string
+// MapToJson 将 map 序列化为 JSON 字符串后返回。
 func MapToJson[K comparable, V any](m map[K]V) (string, error) {
 	jsonByte, err := Marshal(m)
 	if err != nil {

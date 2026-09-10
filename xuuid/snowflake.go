@@ -7,22 +7,22 @@ import (
 )
 
 const (
-	// custom epoch - time offset, milliseconds
-	// Oct 25, 2014 05:06:02.373 UTC, incidentally equal to the first few digits of sqrt(2)
+	// 自定义纪元起点——时间偏移量，单位为毫秒
+	// 即 2014 年 10 月 25 日 05:06:02.373 UTC，恰好等于 sqrt(2) 的前几位数字
 	epoch int64 = 1414213562373
 
-	// number of bits allocated for the server id (max 1023)
+	// 分配给服务器 ID 的位数（最大 1023）
 	numWorkerBits = 10
-	// # of bits allocated for the counter per millisecond
+	// 分配给每毫秒计数器的位数
 	numSequenceBits = 12
 
-	// workerId mask
+	// workerId 掩码
 	maxWorkerId = -1 ^ (-1 << numWorkerBits)
-	// sequence mask
+	// 序号掩码
 	maxSequence = -1 ^ (-1 << numSequenceBits)
 )
 
-// SnowFlake is a structure which holds snowflake-specific data.
+// SnowFlake 是保存雪花算法（Snowflake）相关数据的状态结构体。
 type SnowFlake struct {
 	lastTimestamp uint64
 	sequence      uint32
@@ -30,14 +30,14 @@ type SnowFlake struct {
 	lock          sync.Mutex
 }
 
-// Pack bits into a snowflake value.
+// Pack 将各字段按位打包成一个雪花 ID 值。
 func (sf *SnowFlake) pack() uint64 {
 	return (sf.lastTimestamp << (numWorkerBits + numSequenceBits)) |
 		(uint64(sf.workerId) << numSequenceBits) |
 		(uint64(sf.sequence))
 }
 
-// NewSnowFlake initializes the generator.
+// NewSnowFlake 使用给定的 workerId 初始化雪花 ID 生成器。
 func NewSnowFlake(workerId uint32) (*SnowFlake, error) {
 	if workerId > maxWorkerId {
 		return nil, errors.New("invalid worker Id")
@@ -45,7 +45,7 @@ func NewSnowFlake(workerId uint32) (*SnowFlake, error) {
 	return &SnowFlake{workerId: workerId}, nil
 }
 
-// Next generates the next unique ID.
+// Next 生成下一个唯一的 ID。
 func (sf *SnowFlake) Next() (uint64, error) {
 	sf.lock.Lock()
 	defer sf.lock.Unlock()
@@ -67,7 +67,7 @@ func (sf *SnowFlake) Next() (uint64, error) {
 	return sf.pack(), nil
 }
 
-// Sequence exhausted. Wait till the next millisecond.
+// 序列号已耗尽，等待下一个毫秒到来。
 func (sf *SnowFlake) waitNextMilli(ts uint64) uint64 {
 	for ts == sf.lastTimestamp {
 		time.Sleep(100 * time.Microsecond)
@@ -77,6 +77,6 @@ func (sf *SnowFlake) waitNextMilli(ts uint64) uint64 {
 }
 
 func timestamp() uint64 {
-	// Convert from nanoseconds to milliseconds, adjust for the custom epoch.
+	// 将纳秒转换为毫秒，并扣除自定义纪元起点。
 	return uint64(time.Now().UnixNano()/int64(1000000) - epoch)
 }

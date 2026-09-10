@@ -9,18 +9,18 @@ import (
 	"github.com/golang/glog"
 )
 
-// Options : Client configuration options
+// Options CAS 客户端的可配置选项。
 type Options struct {
-	URL          *url.URL     // URL to the CAS service
-	Store        TicketStore  // Custom TicketStore, if nil a MemoryStore will be used
-	Client       *http.Client // Custom http client to allow options for http connections
-	SendService  bool         // Custom sendService to determine whether you need to send service param
-	URLScheme    URLScheme    // Custom url scheme, can be used to modify the request urls for the client
-	Cookie       *http.Cookie // http.Cookie options, uses Path, Domain, MaxAge, HttpOnly, & Secure
-	SessionStore SessionStore
+	URL          *url.URL     // CAS 服务的根 URL
+	Store        TicketStore  // 自定义票据存储，若为 nil 则使用 MemoryStore
+	Client       *http.Client // 自定义 HTTP 客户端，便于配置连接参数
+	SendService  bool         // 是否在请求中附带 service 参数
+	URLScheme    URLScheme    // 自定义 URL Scheme，用于改写客户端的请求地址
+	Cookie       *http.Cookie // 会话 Cookie 选项，使用 Path、Domain、MaxAge、HttpOnly 与 Secure
+	SessionStore SessionStore // 自定义会话存储，若为 nil 则使用内存存储
 }
 
-// Client implements the main protocol
+// Client 实现 CAS 主协议。
 type Client struct {
 	tickets   TicketStore
 	client    *http.Client
@@ -33,7 +33,8 @@ type Client struct {
 	stValidator *ServiceTicketValidator
 }
 
-// NewClient creates a Client with the provided Options.
+// NewClient 根据传入的 Options 创建一个 Client。
+// 若 options 为 nil 会触发空指针解引用，请勿传入 nil。
 func NewClient(options *Options) *Client {
 	if glog.V(2) {
 		glog.Infof("cas: new client with options %v", options)
@@ -89,7 +90,7 @@ func NewClient(options *Options) *Client {
 	}
 }
 
-// Handle wraps a http.Handler to provide CAS authentication for the handler.
+// Handle 将一个 http.Handler 包装为带有 CAS 认证能力的处理器。
 func (c *Client) Handle(h http.Handler) http.Handler {
 	return &clientHandler{
 		c: c,
@@ -97,12 +98,14 @@ func (c *Client) Handle(h http.Handler) http.Handler {
 	}
 }
 
-// HandleFunc wraps a function to provide CAS authentication for the handler function.
+// HandleFunc 将一个处理函数包装为带有 CAS 认证能力的处理器。
 func (c *Client) HandleFunc(h func(http.ResponseWriter, *http.Request)) http.Handler {
 	return c.Handle(http.HandlerFunc(h))
 }
 
-// requestURL determines an absolute URL from the http.Request.
+// requestURL 根据 http.Request 计算出绝对 URL。
+// 优先使用 X-Forwarded-Host / X-Forwarded-Proto 头判断反向代理后的真实主机与协议，
+// 否则回退到 r.Host 与 TLS 状态。
 func requestURL(r *http.Request) (*url.URL, error) {
 	u, err := url.Parse(r.URL.String())
 	if err != nil {
@@ -124,7 +127,8 @@ func requestURL(r *http.Request) (*url.URL, error) {
 	return u, nil
 }
 
-// LoginUrlForRequest determines the CAS login URL for the http.Request.
+// LoginUrlForRequest 构造当前请求对应的 CAS 登录 URL（含 service 参数）。
+// 出错时返回底层错误；URL 解析失败会返回相应错误。
 func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
 	u, err := c.urlScheme.Login()
 	if err != nil {
@@ -143,7 +147,8 @@ func (c *Client) LoginUrlForRequest(r *http.Request) (string, error) {
 	return u.String(), nil
 }
 
-// LogoutUrlForRequest determines the CAS logout URL for the http.Request.
+// LogoutUrlForRequest 构造当前请求对应的 CAS 登出 URL；
+// 当 Options.SendService 为 true 时会附带 service 参数。
 func (c *Client) LogoutUrlForRequest(r *http.Request) (string, error) {
 	u, err := c.urlScheme.Logout()
 	if err != nil {
@@ -164,7 +169,7 @@ func (c *Client) LogoutUrlForRequest(r *http.Request) (string, error) {
 	return u.String(), nil
 }
 
-// ServiceValidateUrlForRequest determines the CAS serviceValidate URL for the ticket and http.Request.
+// ServiceValidateUrlForRequest 构造给定 ticket 与请求对应的 CAS serviceValidate URL（CAS 2.0+）。
 func (c *Client) ServiceValidateUrlForRequest(ticket string, r *http.Request) (string, error) {
 	service, err := requestURL(r)
 	if err != nil {
@@ -173,7 +178,7 @@ func (c *Client) ServiceValidateUrlForRequest(ticket string, r *http.Request) (s
 	return c.stValidator.ServiceValidateUrl(service, ticket)
 }
 
-// ValidateUrlForRequest determines the CAS validate URL for the ticket and http.Request.
+// ValidateUrlForRequest 构造给定 ticket 与请求对应的 CAS validate URL（CAS 1.0）。
 func (c *Client) ValidateUrlForRequest(ticket string, r *http.Request) (string, error) {
 	service, err := requestURL(r)
 	if err != nil {
@@ -182,7 +187,8 @@ func (c *Client) ValidateUrlForRequest(ticket string, r *http.Request) (string, 
 	return c.stValidator.ValidateUrl(service, ticket)
 }
 
-// RedirectToLogout replies to the request with a redirect URL to log out of CAS.
+// RedirectToLogout 清理本地会话并以 302 重定向到 CAS 登出地址。
+// 登出 URL 解析失败时会以 500 响应写出错误信息。
 func (c *Client) RedirectToLogout(w http.ResponseWriter, r *http.Request) {
 	u, err := c.LogoutUrlForRequest(r)
 	if err != nil {
@@ -199,7 +205,7 @@ func (c *Client) RedirectToLogout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, u, http.StatusFound)
 }
 
-// RedirectToLogin replies to the request with a redirect URL to authenticate with CAS.
+// RedirectToLogin 以 302 重定向到 CAS 登录地址；登录 URL 解析失败会以 500 响应。
 func (c *Client) RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 	u, err := c.LoginUrlForRequest(r)
 	if err != nil {
@@ -214,7 +220,8 @@ func (c *Client) RedirectToLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, u, http.StatusFound)
 }
 
-// validateTicket performs CAS ticket validation with the given ticket and service.
+// validateTicket 使用给定的 ticket 与 service 请求远程校验票据，并将成功结果写入票据存储。
+// 校验或写入失败会返回相应错误。
 func (c *Client) validateTicket(ticket string, service *http.Request) error {
 	serviceURL, err := requestURL(service)
 	if err != nil {
@@ -233,10 +240,10 @@ func (c *Client) validateTicket(ticket string, service *http.Request) error {
 	return nil
 }
 
-// getSession finds or creates a session for the request.
+// getSession 查找或创建当前请求对应的会话。
 //
-// A cookie is set on the response if one is not provided with the request.
-// Validates the ticket if the URL parameter is provided.
+// 若请求未携带会话 Cookie，会在响应中下发新的 Cookie；
+// 若 URL 中包含 ticket 参数，则先进行票据校验。
 func (c *Client) getSession(w http.ResponseWriter, r *http.Request) {
 	cookie := c.getCookie(w, r)
 
@@ -292,12 +299,12 @@ func (c *Client) getSession(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// getCookie finds or creates the session cookie on the response.
+// getCookie 查找请求中的会话 Cookie；不存在时创建新的会话 Cookie 并写入响应。
+// 注意：默认未启用 HttpOnly，以便 Ajax 请求也能携带该 Cookie。
 func (c *Client) getCookie(w http.ResponseWriter, r *http.Request) *http.Cookie {
 	cookie, err := r.Cookie(sessionCookieName)
 	if err != nil {
-		// NOTE: Intentionally not enabling HttpOnly so the cookie can
-		//       still be used by Ajax requests.
+		// NOTE: 默认未启用 HttpOnly，便于 Ajax 请求使用。
 		cookie = &http.Cookie{
 			Name:     sessionCookieName,
 			Value:    newSessionID(),
@@ -312,18 +319,19 @@ func (c *Client) getCookie(w http.ResponseWriter, r *http.Request) *http.Cookie 
 			glog.Infof("Setting %v cookie with value: %v", cookie.Name, cookie.Value)
 		}
 
-		r.AddCookie(cookie) // so we can find it later if required
+		r.AddCookie(cookie) // 记录到请求，便于后续读取
 		http.SetCookie(w, cookie)
 	}
 
 	return cookie
 }
 
-// newSessionId generates a new opaque session identifier for use in the cookie.
+// newSessionID 生成一个 64 字符的不透明会话标识，用于 Cookie 的 Value。
+// 使用 crypto/rand 生成随机字节并映射到字母数字字符集。
 func newSessionID() string {
 	const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	// generate 64 character string
+	// 生成 64 字符字符串
 	bytes := make([]byte, 64)
 	rand.Read(bytes)
 
@@ -334,13 +342,13 @@ func newSessionID() string {
 	return string(bytes)
 }
 
-// clearCookie invalidates and removes the cookie from the client.
+// clearCookie 将指定 Cookie 设为过期并下发给客户端，达到清除的效果。
 func clearCookie(w http.ResponseWriter, c *http.Cookie) {
 	c.MaxAge = -1
 	http.SetCookie(w, c)
 }
 
-// setSession stores the session id to ticket mapping in the Client.
+// setSession 在 SessionStore 中记录会话 ID 与票据的映射关系。
 func (c *Client) setSession(id string, ticket string) {
 	if glog.V(2) {
 		glog.Infof("Recording session, %v -> %v", id, ticket)
@@ -349,7 +357,8 @@ func (c *Client) setSession(id string, ticket string) {
 	c.sessions.Set(id, ticket)
 }
 
-// clearSession removes the session from the client and clears the cookie.
+// clearSession 移除本地会话记录并下发过期 Cookie；同时尝试删除对应票据。
+// 删除票据失败时仅打印错误日志，不影响 Cookie 清理。
 func (c *Client) clearSession(w http.ResponseWriter, r *http.Request) {
 	cookie := c.getCookie(w, r)
 
@@ -367,7 +376,7 @@ func (c *Client) clearSession(w http.ResponseWriter, r *http.Request) {
 	clearCookie(w, cookie)
 }
 
-// deleteSession removes the session from the client
+// deleteSession 从 SessionStore 中删除指定会话 ID。
 func (c *Client) deleteSession(id string) {
 	c.sessions.Delete(id)
 }

@@ -12,48 +12,48 @@ type Ordered interface {
 		~string
 }
 
-// Signed is a constraint that permits any signed integer type.
-// If future releases of Go add new predeclared signed integer types,
-// this constraint will be modified to include them.
+// Signed 是一个允许任意有符号整数类型的约束。
+// 如果未来版本的 Go 增加了新的预声明有符号整数类型，
+// 该约束会被修改以包含这些新类型。
 type Signed interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64
 }
 
-// Unsigned is a constraint that permits any unsigned integer type.
-// If future releases of Go add new predeclared unsigned integer types,
-// this constraint will be modified to include them.
+// Unsigned 是一个允许任意无符号整数类型的约束。
+// 如果未来版本的 Go 增加了新的预声明无符号整数类型，
+// 该约束会被修改以包含这些新类型。
 type Unsigned interface {
 	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
 }
 
-// Integer is a constraint that permits any integer type.
-// If future releases of Go add new predeclared integer types,
-// this constraint will be modified to include them.
+// Integer 是一个允许任意整数类型的约束。
+// 如果未来版本的 Go 增加了新的预声明整数类型，
+// 该约束会被修改以包含这些新类型。
 type Integer interface {
 	Signed | Unsigned
 }
 
-// Float is a constraint that permits any floating-point type.
-// If future releases of Go add new predeclared floating-point types,
-// this constraint will be modified to include them.
+// Float 是一个允许任意浮点类型的约束。
+// 如果未来版本的 Go 增加了新的预声明浮点类型，
+// 该约束会被修改以包含这些新类型。
 type Float interface {
 	~float32 | ~float64
 }
 
-// Complex is a constraint that permits any complex numeric type.
-// If future releases of Go add new predeclared complex numeric types,
-// this constraint will be modified to include them.
+// Complex 是一个允许任意复数类型的约束。
+// 如果未来版本的 Go 增加了新的预声明复数类型，
+// 该约束会被修改以包含这些新类型。
 type Complex interface {
 	~complex64 | ~complex128
 }
 
-// Entry defines a key/value pairs.
+// Entry 定义一个键值对。
 type Entry[K comparable, V any] struct {
 	Key   K
 	Value V
 }
 
-// Tuple2 is a group of 2 elements (pair).
+// Tuple2 是一个包含 2 个元素（键值对）的元组。
 type Tuple2[A any, B any] struct {
 	A A
 	B B
@@ -74,7 +74,7 @@ func NewTuple2[A any, B any](a A, b B) Tuple2[A, B] {
 	return Tuple2[A, B]{A: a, B: b}
 }
 
-// Tuple3 is a group of 3 elements.
+// Tuple3 是一个包含 3 个元素的元组。
 type Tuple3[A any, B any, C any] struct {
 	A A
 	B B
@@ -91,7 +91,7 @@ func NewTuple3[A any, B any, C any](a A, b B, c C) Tuple3[A, B, C] {
 	return Tuple3[A, B, C]{A: a, B: b, C: c}
 }
 
-// Tuple4 is a group of 4 elements.
+// Tuple4 是一个包含 4 个元素的元组。
 type Tuple4[A any, B any, C any, D any] struct {
 	A A
 	B B
@@ -99,8 +99,7 @@ type Tuple4[A any, B any, C any, D any] struct {
 	D D
 }
 
-// Unbox 返回 Tuple4[A, B, C, D] 类型的值中的四个元素 A, B, C, D
-// Unbox 返回 Tuple4[A, B, C, D] 类型的值中的四个元素 A, B, C, D
+// Unbox 返回 Tuple4[A, B, C, D] 类型的值中的四个元素 A, B, C, D。
 func (t Tuple4[A, B, C, D]) Unbox() (A, B, C, D) {
 	return t.A, t.B, t.C, t.D
 }
@@ -109,7 +108,7 @@ func NewTuple4[A any, B any, C any, D any](a A, b B, c C, d D) Tuple4[A, B, C, D
 	return Tuple4[A, B, C, D]{A: a, B: b, C: c, D: d}
 }
 
-// Tuple5 is a group of 5 elements.
+// Tuple5 是一个包含 5 个元素的元组。
 type Tuple5[A any, B any, C any, D any, E any] struct {
 	A A
 	B B
@@ -128,7 +127,7 @@ func NewTuple5[A any, B any, C any, D any, E any](a A, b B, c C, d D, e E) Tuple
 	return Tuple5[A, B, C, D, E]{A: a, B: b, C: c, D: d, E: e}
 }
 
-// Tuple6 is a group of 6 elements.
+// Tuple6 是一个包含 6 个元素的元组。
 type Tuple6[A any, B any, C any, D any, E any, F any] struct {
 	A A
 	B B
@@ -152,7 +151,7 @@ func NewTuple6[A any, B any, C any, D any, E any, F any](a A, b B, c C, d D, e E
 	return Tuple6[A, B, C, D, E, F]{A: a, B: b, C: c, D: d, E: e, F: f}
 }
 
-// Tuple7 is a group of 7 elements.
+// Tuple7 是一个包含 7 个元素的元组。
 type Tuple7[A any, B any, C any, D any, E any, F any, G any] struct {
 	A A
 	B B
@@ -175,7 +174,7 @@ func NewTuple7[A any, B any, C any, D any, E any, F any, G any](a A, b B, c C, d
 	return Tuple7[A, B, C, D, E, F, G]{A: a, B: b, C: c, D: d, E: e, F: f, G: g}
 }
 
-// Tuple8 is a group of 8 elements.
+// Tuple8 是一个包含 8 个元素的元组。
 type Tuple8[A any, B any, C any, D any, E any, F any, G any, H any] struct {
 	A A
 	B B
@@ -200,7 +199,7 @@ func NewTuple8[A any, B any, C any, D any, E any, F any, G any, H any](a A, b B,
 	return Tuple8[A, B, C, D, E, F, G, H]{A: a, B: b, C: c, D: d, E: e, F: f, G: g, H: h}
 }
 
-// Tuple9 is a group of 9 elements.
+// Tuple9 是一个包含 9 个元素的元组。
 type Tuple9[A any, B any, C any, D any, E any, F any, G any, H any, I any] struct {
 	A A
 	B B
@@ -227,7 +226,7 @@ func NewTuple9[A any, B any, C any, D any, E any, F any, G any, H any, I any](a 
 	return Tuple9[A, B, C, D, E, F, G, H, I]{A: a, B: b, C: c, D: d, E: e, F: f, G: g, H: h, I: i}
 }
 
-// Tuple10 is a group of 9 elements.
+// Tuple10 是一个包含 10 个元素的元组。
 type Tuple10[A any, B any, C any, D any, E any, F any, G any, H any, I any, J any] struct {
 	A A
 	B B

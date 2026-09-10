@@ -1,3 +1,14 @@
+// Package xinterface/change_format.go 提供一组将 interface{} 强转为各种
+// 目标类型的工具函数，覆盖字符串、整型、浮点、时间、字节等基础类型。
+//
+// 设计动机：在弱类型场景（如解析 JSON、读取数据库可变字段）下，
+// 调用方拿到的是 interface{}，需要做一系列类型断言才能得到想要的值。
+// 本文件将这些常用断言集中到 ToXxx 函数中，配合类型 switch 给出明确
+// 的支持范围与失败时的 panic 信息。
+//
+// 注意：
+//   - 这些函数对未支持的类型会 panic，请仅在已知类型集合的代码中使用；
+//   - 在公开 API 边界（解析外部输入）建议改为返回 (T, error) 的版本。
 package xinterface
 
 import (
@@ -8,12 +19,18 @@ import (
 	"unsafe"
 )
 
-// ToString
-/**
- * @Description: 转换为string类型
- * @param data
- * @return str
- */
+// ToString 将任意 interface{} 转换为字符串。
+//
+// 支持的类型：bool、string、uint/uint8/16/32/64、int/int8/16/32/64、
+// float32、float64、time.Time、[]byte、error。
+//
+// 行为细节：
+//   - 数值类型使用 strconv.Itoa/FormatInt/FormatFloat 转换；
+//   - time.Time 使用 "2006-01-02 15:04:05" 格式；
+//   - []byte 通过 unsafe 零拷贝转 string，要求调用方保证 b 不可变；
+//   - error 直接调用 Error()。
+//
+// 未支持的类型会触发 panic("该类型暂不支持")。
 func ToString(i interface{}) (str string) {
 	switch i := i.(type) {
 	case bool:
@@ -57,12 +74,18 @@ func ToString(i interface{}) (str string) {
 	return
 }
 
-// ToUint
-/**
- * @description: 转换为uint类型
- * @param {interface{}} i
- * @return uint error
- */
+// ToUint 将任意类型转换为 uint。
+//
+// 支持的来源类型：uint/uint8/16/32/64、int/int8/16/32/64、float32/64、
+// string（通过 strconv.Atoi 解析十进制）。
+//
+// 注意事项：
+//   - 负数 -> uint 会按位补码解释为一个非常大的正数；
+//   - float 截断小数部分；NaN / Inf 行为未定义；
+//   - 64 位源类型向 uint 收窄时可能发生精度丢失。
+//
+// 仅 string 分支会返回错误（解析失败），其余分支始终返回 nil error。
+// 未支持的类型触发 panic("该类型暂不支持")。
 func ToUint(i interface{}) (num uint, err error) {
 	switch i := i.(type) {
 	case uint:
@@ -103,12 +126,13 @@ func ToUint(i interface{}) (num uint, err error) {
 	return
 }
 
-// ToUint32 转换为uint32类型
-/**
- * @description: 转换为uint32类型
- * @param {interface{}} i
- * @return uint32 error
- */
+// ToUint32 将任意类型转换为 uint32。
+//
+// 支持的来源类型与 ToUint 类似，但目标宽度收窄到 32 位。
+// 当来源类型为 64 位（uint64/int64/float64）时可能发生精度或溢出
+// 截断。
+//
+// 仅 string 分支会返回错误，未支持的类型触发 panic。
 func ToUint32(i interface{}) (num uint32, err error) {
 	switch i := i.(type) {
 	case uint:
@@ -149,12 +173,12 @@ func ToUint32(i interface{}) (num uint32, err error) {
 	return
 }
 
-// ToUint64 *
-/**
- * @description: 转换为uint64类型
- * @param {interface{}} i
- * @return uint64 error
- */
+// ToUint64 将任意类型转换为 uint64。
+//
+// 支持的来源类型与 ToUint 类似，目标是 64 位无符号整数，
+// 一般不会出现溢出（除非 int64 负值）。
+//
+// 仅 string 分支会返回错误，未支持的类型触发 panic。
 func ToUint64(i interface{}) (num uint64, err error) {
 	switch i := i.(type) {
 	case uint:
@@ -193,7 +217,15 @@ func ToUint64(i interface{}) (num uint64, err error) {
 	return
 }
 
-// ToInt 转换为int类型
+// ToInt 将任意类型转换为 int。
+//
+// 支持的来源类型与 ToUint 类似，但目标是有符号整型。
+//
+// 注意事项：
+//   - 64 位源类型向 int 收窄时可能发生精度丢失；
+//   - float 截断小数部分；NaN / Inf 行为未定义。
+//
+// 仅 string 分支会返回错误，未支持的类型触发 panic。
 func ToInt(i interface{}) (num int, err error) {
 	switch i := i.(type) {
 	case uint:
@@ -234,13 +266,13 @@ func ToInt(i interface{}) (num int, err error) {
 	return
 }
 
-// ToInt32
-/**
- * @Description: 将任意类型转为int32类型
- * @param i
- * @return num
- * @return err
- */
+// ToInt32 将任意类型转换为 int32。
+//
+// 支持的来源类型与 ToInt 类似，目标宽度收窄到 32 位。
+// 当来源类型为 64 位（uint64/int64/float64）时可能发生精度或溢出
+// 截断。
+//
+// 仅 string 分支会返回错误，未支持的类型触发 panic。
 func ToInt32(i interface{}) (num int32, err error) {
 	switch i := i.(type) {
 	case uint:
@@ -281,13 +313,15 @@ func ToInt32(i interface{}) (num int32, err error) {
 	return
 }
 
-// ToInt64
-/**
- * @Description: 将任意类型转为int64类型
- * @param i
- * @return num
- * @return err
- */
+// ToInt64 将任意类型转换为 int64。
+//
+// 支持的来源类型：所有整型、浮点型以及 string（通过 strconv.ParseInt
+// 按十进制解析）。
+//
+// 推荐用于存储数据库主键、雪花 ID、时间戳等场景，因为 int64 是 Go
+// 在大多数架构上最自然的「整数容器」。
+//
+// 仅 string 分支会返回错误，未支持的类型触发 panic。
 func ToInt64(i interface{}) (num int64, err error) {
 	switch i := i.(type) {
 	case uint:
@@ -322,13 +356,13 @@ func ToInt64(i interface{}) (num int64, err error) {
 	return
 }
 
-// ToFloat32
-/**
- * @Description: 将任意类型转为float32类型
- * @param i
- * @return num
- * @return err
- */
+// ToFloat32 将任意类型转换为 float32。
+//
+// 支持的来源类型：所有整型、float32/64、string（通过 strconv.ParseFloat
+// 以 float32 精度解析）。
+//
+// 从 float64 收窄到 float32 时可能发生精度丢失；string 解析失败时
+// 返回错误，未支持的类型触发 panic。
 func ToFloat32(i interface{}) (num float32, err error) {
 	switch i := i.(type) {
 	case string:
@@ -367,13 +401,13 @@ func ToFloat32(i interface{}) (num float32, err error) {
 	return
 }
 
-// ToFloat64
-/**
- * @Description: 将任意类型转为float64类型
- * @param i
- * @return num
- * @return err
- */
+// ToFloat64 将任意类型转换为 float64。
+//
+// 支持的来源类型：所有整型、float32/64、string（通过 strconv.ParseFloat
+// 按 64 位精度解析）。
+//
+// float64 是 Go 默认的浮点宽度，推荐在不需要极致性能或节省内存的场景
+// 使用；string 解析失败时返回错误，未支持的类型触发 panic。
 func ToFloat64(i interface{}) (num float64, err error) {
 	switch i := i.(type) {
 	case string:
@@ -408,12 +442,14 @@ func ToFloat64(i interface{}) (num float64, err error) {
 	return
 }
 
-// ToByteArray
-/**
- *  @Description: 转换为[]byte
- *  @param i
- *  @return b
- */
+// ToByteArray 将任意类型转换为 []byte。
+//
+// 支持的来源类型：
+//   - int：调用 IntToBytesBigEndian 输出大端字节序；
+//   - int32：使用 encoding/binary.BigEndian 写入 4 字节；
+//   - string：通过 unsafe 零拷贝切片化，要求 s 不可变。
+//
+// 未支持的类型触发 panic("该类型暂不支持")。
 func ToByteArray(i interface{}) (b []byte) {
 	switch i := i.(type) {
 	case int:
@@ -432,6 +468,14 @@ func ToByteArray(i interface{}) (b []byte) {
 	}
 }
 
+// IntToBytesBigEndian 将 int 转换为大端序字节序列。
+//
+// 根据 unsafe.Sizeof(x) 自动选择 4 字节（32 位平台）或 8 字节
+// （64 位平台）的输出长度。
+//
+// 大端序在网络协议、文件格式（如 JPEG、PNG）以及跨平台传输中非常常用。
+//
+// 注意：返回的切片是新分配的，调用方可以自由修改。
 func IntToBytesBigEndian(x int) []byte {
 	var bytes []byte
 	if unsafe.Sizeof(x) == 4 { // 检查系统架构是32位还是64位
@@ -456,6 +500,12 @@ func IntToBytesBigEndian(x int) []byte {
 	return bytes
 }
 
+// IntToBytesLittleEndian 将 int 转换为小端序字节序列。
+//
+// 与 IntToBytesBigEndian 对称，适用于 x86/ARM 等原生小端平台的数据
+// 读写或与其它小端系统交互的场景。
+//
+// 注意：返回的切片是新分配的，调用方可以自由修改。
 func IntToBytesLittleEndian(x int) []byte {
 	var bytes []byte
 	if unsafe.Sizeof(x) == 4 {

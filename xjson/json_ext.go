@@ -17,10 +17,12 @@ type JsonLowerCase struct {
 	Value interface{}
 }
 
+// NewJsonLowerCase 创建一个 JsonLowerCase 包装器，用于将 JSON 字段键名转换为小写。
 func NewJsonLowerCase(value interface{}) JsonLowerCase {
 	return JsonLowerCase{Value: value}
 }
 
+// MarshalJSON 实现 json.Marshaler：序列化时将所有 JSON 字段键名转换为小写。
 func (c JsonLowerCase) MarshalJSON() ([]byte, error) {
 	// Regexp definitions
 	keyMatchRegex := regexp.MustCompile(`\"(\w+)\":`)
@@ -42,10 +44,12 @@ type JsonUpperCase struct {
 	Value interface{}
 }
 
+// NewJsonUpperCase 创建一个 JsonUpperCase 包装器，用于将 JSON 字段键名转换为大写。
 func NewJsonUpperCase(value interface{}) JsonUpperCase {
 	return JsonUpperCase{Value: value}
 }
 
+// MarshalJSON 实现 json.Marshaler：序列化时将所有 JSON 字段键名转换为大写。
 func (c JsonUpperCase) MarshalJSON() ([]byte, error) {
 	// Regexp definitions
 	keyMatchRegex := regexp.MustCompile(`\"(\w+)\":`)
@@ -67,10 +71,12 @@ type JsonSnakeCase struct {
 	Value interface{}
 }
 
+// NewJsonSnakeCase 创建一个 JsonSnakeCase 包装器，用于将 JSON 字段键名转换为下划线风格。
 func NewJsonSnakeCase(value interface{}) JsonSnakeCase {
 	return JsonSnakeCase{Value: value}
 }
 
+// MarshalJSON 实现 json.Marshaler：序列化时将所有 JSON 字段键名转换为下划线风格。
 func (c JsonSnakeCase) MarshalJSON() ([]byte, error) {
 	// Regexp definitions
 	keyMatchRegex := regexp.MustCompile(`\"(\w+)\":`)
@@ -93,10 +99,12 @@ type JsonCamelCase struct {
 	Value interface{}
 }
 
+// NewJsonCamelCase 创建一个 JsonCamelCase 包装器，用于将 JSON 字段键名转换为驼峰风格。
 func NewJsonCamelCase(value interface{}) JsonCamelCase {
 	return JsonCamelCase{Value: value}
 }
 
+// MarshalJSON 实现 json.Marshaler：序列化时将所有 JSON 字段键名转换为驼峰风格。
 func (c JsonCamelCase) MarshalJSON() ([]byte, error) {
 	keyMatchRegex := regexp.MustCompile(`\"(\w+)\":`)
 	marshalled, err := Marshal(c.Value)
@@ -157,10 +165,12 @@ type Buffer struct {
 	*bytes.Buffer
 }
 
+// NewBuffer 创建一个新的字符串缓冲区。
 func NewBuffer() *Buffer {
 	return &Buffer{Buffer: new(bytes.Buffer)}
 }
 
+// Append 将值追加写入缓冲区（支持 int、int64、uint、uint64、string、[]byte、rune 类型），返回自身便于链式调用。
 func (b *Buffer) Append(i interface{}) *Buffer {
 	switch val := i.(type) {
 	case int:

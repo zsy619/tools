@@ -6,10 +6,16 @@ import (
 	"sort"
 )
 
-// ArrayUnique removes duplicate values from an array,
-// if the input is not a slice or empty then return the original input
+// ArrayUniqueItf 去除切片/数组中的重复元素并返回与原类型相同的去重结果。
 //
-// you can use type assertion to convert the result to the type of input
+// 行为：
+//   - array 为 nil：返回 nil；
+//   - array 不是切片/数组类型：原样返回 array；
+//   - array 长度为 0：原样返回 array；
+//   - 其它情况：根据首元素类型返回相应类型的切片（bool/int*/uint*/float*/complex*/string）；
+//     不支持的类型退化为 []interface{}。
+//
+// 提示：可通过类型断言将返回值转换为原输入的具体切片类型。
 func ArrayUniqueItf(array interface{}) interface{} {
 	type empty struct{}
 
@@ -139,9 +145,9 @@ func ArrayUniqueItf(array interface{}) interface{} {
 	}
 }
 
-// InArray checks if a value exists in an array or map
-//
-// needle is the element to search, haystack is the slice or map to be search
+// InArrayItf 判断 needle 是否存在于 haystack（切片、数组或 map 的值）中。
+// 使用 reflect.DeepEqual 比较元素；map 情况下比较的是 value 而非 key。
+// haystack 为 nil 或其它不支持的类型时返回 false。
 func InArrayItf(needle interface{}, haystack interface{}) bool {
 	val := reflect.ValueOf(haystack)
 	switch val.Kind() {
@@ -162,7 +168,8 @@ func InArrayItf(needle interface{}, haystack interface{}) bool {
 	return false
 }
 
-// ArrayChunk splits an array into chunks, returns nil if size < 1
+// ArrayChunkItf 按 size 将 array 切分为若干子切片。
+// size < 1 时返回 nil；最后一个子切片可能不足 size 个元素。
 func ArrayChunkItf(array []interface{}, size int) [][]interface{} {
 	if size < 1 {
 		return nil
@@ -181,7 +188,8 @@ func ArrayChunkItf(array []interface{}, size int) [][]interface{} {
 	return chunks
 }
 
-// ArrayColumn returns the values from a single column in the input array
+// ArrayColumnItf 从 input 中提取每个 map 在 columnKey 列上的值，返回扁平 []interface{}。
+// 元素中若不存在 columnKey 则跳过；不会触发 panic。
 func ArrayColumnItf(input []map[string]interface{}, columnKey string) []interface{} {
 	columns := make([]interface{}, 0, len(input))
 	for _, val := range input {
@@ -192,7 +200,8 @@ func ArrayColumnItf(input []map[string]interface{}, columnKey string) []interfac
 	return columns
 }
 
-// ArrayCombine creates an array by using one array for keys and another for its values
+// ArrayCombineItf 使用 keys 作为键、values 作为值构造 map[interface{}]interface{}。
+// 当 keys 与 values 长度不一致时返回 nil。
 func ArrayCombineItf(keys, values []interface{}) map[interface{}]interface{} {
 	if len(keys) != len(values) {
 		return nil
@@ -204,7 +213,7 @@ func ArrayCombineItf(keys, values []interface{}) map[interface{}]interface{} {
 	return m
 }
 
-// ArrayDiff computes the difference of arrays
+// ArrayDiffItf 返回在 array1 但不在 array2 中的元素（保持 array1 顺序）。
 func ArrayDiffItf(array1, array2 []interface{}) []interface{} {
 	var res []interface{}
 	for _, v := range array1 {
@@ -215,7 +224,7 @@ func ArrayDiffItf(array1, array2 []interface{}) []interface{} {
 	return res
 }
 
-// ArrayIntersect computes the intersection of arrays
+// ArrayIntersectItf 返回同时存在于 array1 与 array2 中的元素（保持 array1 顺序）。
 func ArrayIntersectItf(array1, array2 []interface{}) []interface{} {
 	var res []interface{}
 	for _, v := range array1 {
@@ -226,7 +235,8 @@ func ArrayIntersectItf(array1, array2 []interface{}) []interface{} {
 	return res
 }
 
-// ArrayFlip exchanges all keys with their associated values in an array
+// ArrayFlipItf 交换切片/数组的下标与元素值，或交换 map 的 key 与 value。
+// 输入为 nil、空切片或非切片/数组/map 类型时返回 nil。
 func ArrayFlipItf(input interface{}) interface{} {
 	if input == nil {
 		return nil
@@ -251,7 +261,8 @@ func ArrayFlipItf(input interface{}) interface{} {
 	return nil
 }
 
-// ArrayKeys returns all the keys or a subset of the keys of an array
+// ArrayKeysItf 返回切片/数组的所有下标（[]int）或 map 的所有 key（排序后的 []string）。
+// 输入为 nil 或长度为 0 时返回 nil。
 func ArrayKeysItf(input interface{}) interface{} {
 	if input == nil {
 		return nil
@@ -280,18 +291,18 @@ func ArrayKeysItf(input interface{}) interface{} {
 	return nil
 }
 
-// ArrayKeyExists is alias of KeyExists()
+// ArrayKeyExistsItf 是 KeyExistsItf 的别名，判断给定 key 是否存在于 map 中。
 func ArrayKeyExistsItf(k interface{}, m map[interface{}]interface{}) bool {
 	return KeyExistsItf(k, m)
 }
 
-// KeyExists checks if the given key or index exists in the array
+// KeyExistsItf 判断给定 key 是否存在于 map 中。
 func KeyExistsItf(k interface{}, m map[interface{}]interface{}) bool {
 	_, ok := m[k]
 	return ok
 }
 
-// Count counts all elements in an array or map
+// CountItf 返回数组/切片/map 中的元素数量；nil 返回 0。
 func CountItf(v interface{}) int {
 	if v == nil {
 		return 0
@@ -299,7 +310,8 @@ func CountItf(v interface{}) int {
 	return reflect.ValueOf(v).Len()
 }
 
-// ArrayFilter filters elements of an array using a callback function
+// ArrayFilterItf 使用 callback 对切片/数组或 map 进行过滤。
+// 输入为 nil/空或非支持类型时返回 nil；callback 为 nil 时使用默认的“非 nil 即保留”规则。
 func ArrayFilterItf(input interface{}, callback func(interface{}) bool) interface{} {
 	if input == nil {
 		return nil
@@ -337,7 +349,10 @@ func ArrayFilterItf(input interface{}, callback func(interface{}) bool) interfac
 	return input
 }
 
-// ArrayPad pads array to the specified length with a value
+// ArrayPadItf 使用 value 将 array 填充到指定长度 size。
+//   - size == 0、size > 0 但小于 len(array)、size < 0 但大于 -len(array)：原样返回；
+//   - size > 0：在尾部填充；
+//   - size < 0：在头部填充。
 func ArrayPadItf(array []interface{}, size int, value interface{}) []interface{} {
 	if size == 0 || (size > 0 && size < len(array)) || (size < 0 && size > -len(array)) {
 		return array
@@ -357,7 +372,7 @@ func ArrayPadItf(array []interface{}, size int, value interface{}) []interface{}
 	return append(tmp, array...)
 }
 
-// ArrayPop pops the element off the end of array
+// ArrayPopItf 弹出切片末尾元素并从切片中移除；s 为 nil 或空时返回 nil。
 func ArrayPopItf(s *[]interface{}) interface{} {
 	if s == nil || len(*s) == 0 {
 		return nil
@@ -368,8 +383,7 @@ func ArrayPopItf(s *[]interface{}) interface{} {
 	return e
 }
 
-// ArrayPush pushes one or more elements onto the end of array,
-// returns the new number of elements in the array
+// ArrayPushItf 将一个或多个元素追加到切片末尾，返回追加后切片的新长度；s 为 nil 时返回 0。
 func ArrayPushItf(s *[]interface{}, elements ...interface{}) int {
 	if s == nil {
 		return 0
@@ -378,7 +392,7 @@ func ArrayPushItf(s *[]interface{}, elements ...interface{}) int {
 	return len(*s)
 }
 
-// ArrayShift shifts an element off the beginning of array
+// ArrayShiftItf 移除并返回切片首元素；s 为 nil 或空时返回 nil。
 func ArrayShiftItf(s *[]interface{}) interface{} {
 	if s == nil || len(*s) == 0 {
 		return nil
@@ -388,8 +402,7 @@ func ArrayShiftItf(s *[]interface{}) interface{} {
 	return f
 }
 
-// ArrayUnshift prepends one or more elements to the beginning of a array,
-// returns the new number of elements in the array.
+// ArrayUnshiftItf 将一个或多个元素插入到切片头部，返回插入后切片的新长度；s 为 nil 时返回 0。
 func ArrayUnshiftItf(s *[]interface{}, elements ...interface{}) int {
 	if s == nil {
 		return 0
@@ -398,7 +411,7 @@ func ArrayUnshiftItf(s *[]interface{}, elements ...interface{}) int {
 	return len(*s)
 }
 
-// ArrayReverse returns an array with elements in reverse order
+// ArrayReverseItf 反转切片并返回（原地修改）。
 func ArrayReverseItf(s []interface{}) []interface{} {
 	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
 		s[i], s[j] = s[j], s[i]
@@ -406,7 +419,8 @@ func ArrayReverseItf(s []interface{}) []interface{} {
 	return s
 }
 
-// ArraySlice extracts a slice of the array
+// ArraySliceItf 按 offset 与 length 从 array 中截取子切片。
+// offset 大于 len(array) 时返回 nil；length 越界时取到末尾。
 func ArraySliceItf(array []interface{}, offset, length uint) []interface{} {
 	if offset > uint(len(array)) {
 		return nil
@@ -418,7 +432,9 @@ func ArraySliceItf(array []interface{}, offset, length uint) []interface{} {
 	return array[offset:]
 }
 
-// ArraySum returns the sum of values in an array
+// ArraySumItf 对切片/数组元素求和，返回与元素类型相对应的求和值。
+// 整型返回 int64，无符号整型返回 uint64，浮点返回 float64，字符串返回拼接结果；
+// 不支持的类型返回 nil。
 func ArraySumItf(array interface{}) interface{} {
 	if array == nil {
 		return nil
@@ -463,7 +479,8 @@ func ArraySumItf(array interface{}) interface{} {
 	return nil
 }
 
-// Sort sorts an array (lowest to highest)
+// SortItf 对切片/数组按从小到大排序，返回按其元素类型排序后的新切片。
+// array 为 nil、非切片/数组类型或长度为 0 时返回原值；不支持的类型原样返回。
 func SortItf(array interface{}) interface{} {
 	if array == nil {
 		return nil
@@ -520,7 +537,8 @@ func SortItf(array interface{}) interface{} {
 	return array
 }
 
-// Rsort sorts an array in reverse order (highest to lowest)
+// RsortItf 对切片/数组按从大到小排序，返回按其元素类型排序后的新切片。
+// array 为 nil、非切片/数组类型或长度为 0 时返回原值；不支持的类型原样返回。
 func RsortItf(array interface{}) interface{} {
 	if array == nil {
 		return nil

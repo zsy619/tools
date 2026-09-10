@@ -16,6 +16,12 @@ import (
  * @description: 生成秘钥对
  * @return {*}
  */
+// Sm2GenerateKey 生成一对新的 SM2 公私钥。
+//
+// 返回值：
+//   - *sm2.PrivateKey: 生成的 SM2 私钥指针。
+//   - *sm2.PublicKey: 从私钥派生的公钥指针。
+//   - error: 生成失败时返回错误（如底层熵源不足）。
 func Sm2GenerateKey() (*sm2.PrivateKey, *sm2.PublicKey, error) {
 	priKey, err := sm2.GenerateKey(rand.Reader)
 	if err != nil {
@@ -31,6 +37,12 @@ func Sm2GenerateKey() (*sm2.PrivateKey, *sm2.PublicKey, error) {
  * @param {*sm2.PrivateKey} priKey
  * @return {*}
  */
+// Sm2PriKeyToPubKey 由 SM2 私钥派生出对应的公钥（基点乘法）。
+//
+// 参数：
+//   - priKey: SM2 私钥指针。
+//
+// 返回值：派生的 SM2 公钥指针。
 func Sm2PriKeyToPubKey(priKey *sm2.PrivateKey) *sm2.PublicKey {
 	pub := new(sm2.PublicKey)
 	pub.Curve = priKey.Curve
@@ -44,6 +56,16 @@ func Sm2PriKeyToPubKey(priKey *sm2.PrivateKey) *sm2.PublicKey {
  * @param {[]byte} data
  * @return {*}
  */
+// Sm2Encrypt 使用 SM2 公钥加密 data，并返回 Base64 编码的密文。
+//
+// 参数：
+//   - pubKey: SM2 公钥。
+//   - data: 待加密的明文字符串。
+//   - mode: 密文顺序模式（C1C2C3 或 C1C3C2）。
+//
+// 返回值：
+//   - string: Base64 编码的密文。
+//   - error: 加密失败时返回错误。
 func Sm2Encrypt(pubKey *sm2.PublicKey, data string, mode int) (string, error) {
 	ciphertxt, err := sm2.Encrypt(pubKey, []byte(data), rand.Reader, mode)
 	if err != nil {
@@ -58,6 +80,16 @@ func Sm2Encrypt(pubKey *sm2.PublicKey, data string, mode int) (string, error) {
  * @param {string} data
  * @return {*}
  */
+// Sm2Decrypt 使用 SM2 私钥解密 Base64 编码的密文 data。
+//
+// 参数：
+//   - priKey: SM2 私钥。
+//   - data: Base64 编码的密文。
+//   - mode: 密文顺序模式，需要与加密时一致。
+//
+// 返回值：
+//   - string: 解密后的明文字符串。
+//   - error: Base64 解码失败或解密失败时返回错误。
 func Sm2Decrypt(priKey *sm2.PrivateKey, data string, mode int) (string, error) {
 	ciphertxt, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
@@ -76,6 +108,16 @@ func Sm2Decrypt(priKey *sm2.PrivateKey, data string, mode int) (string, error) {
  * @param {string} data
  * @return {*}
  */
+// Sm2Sign 使用 SM2 私钥对 data 进行签名。
+//
+// 参数：
+//   - priKey: SM2 私钥。
+//   - data: 待签名的原始字符串。
+//
+// 返回值：
+//   - string: 签名结果（字节字符串形式）。
+//   - *sm2.PublicKey: 用于验签的公钥。
+//   - error: 签名失败时返回错误。
 func Sm2Sign(priKey *sm2.PrivateKey, data string) (string, *sm2.PublicKey, error) {
 	curve := sm2.P256Sm2() // 椭圆曲线
 	priv := new(sm2.PrivateKey)
@@ -98,6 +140,14 @@ func Sm2Sign(priKey *sm2.PrivateKey, data string) (string, *sm2.PublicKey, error
  * @param {string} sign
  * @return {*}
  */
+// Sm2Verify 使用 SM2 公钥校验 data 与签名 sign 是否一致。
+//
+// 参数：
+//   - pubKey: SM2 公钥。
+//   - data: 原始数据。
+//   - sign: 签名结果。
+//
+// 返回值：验签通过返回 true，否则返回 false。
 func Sm2Verify(pubKey *sm2.PublicKey, data, sign string) bool {
 	curve := sm2.P256Sm2() // 椭圆曲线
 	pub := new(sm2.PublicKey)
@@ -113,6 +163,12 @@ func Sm2Verify(pubKey *sm2.PublicKey, data, sign string) bool {
  * @param {*sm2.PublicKey} pubKey
  * @return {*}
  */
+// Sm2PubKeyToBase64 将 SM2 公钥转换为带 X.509 算法 OID 头部的标准 Base64 字符串。
+//
+// 参数：
+//   - pubKey: SM2 公钥指针。
+//
+// 返回值：编码后的 Base64 字符串。
 func Sm2PubKeyToBase64(pubKey *sm2.PublicKey) string {
 	// pubKey.GetRawBytes()
 	bytes := pubKey.X.Bytes()
@@ -128,6 +184,12 @@ func Sm2PubKeyToBase64(pubKey *sm2.PublicKey) string {
  * @param {string} pubStr
  * @return {*}
  */
+// Sm2Base64ToPubKey 将 Sm2PubKeyToBase64 编码的 Base64 字符串还原为 SM2 公钥指针。
+//
+// 参数：
+//   - pubStr: 公钥的 Base64 字符串。
+//
+// 返回值：对应的 SM2 公钥指针；解析失败时其内部字段为零值。
 func Sm2Base64ToPubKey(pubStr string) *sm2.PublicKey {
 	decode, _ := base64.StdEncoding.DecodeString(pubStr)
 	pubHex := hex.EncodeToString(decode)
@@ -137,6 +199,7 @@ func Sm2Base64ToPubKey(pubStr string) *sm2.PublicKey {
 	return pub
 }
 
+// Sm2PriKeyToBase64 返回 SM2 私钥的十六进制字符串（等价于 Sm2PriKeyToHex）。
 func Sm2PriKeyToBase64(priKey *sm2.PrivateKey) string {
 	hex := hex.EncodeToString(GetPriKeyRawBytes(priKey))
 	return hex
@@ -147,6 +210,12 @@ func Sm2PriKeyToBase64(priKey *sm2.PrivateKey) string {
  * @param {*sm2.PrivateKey} priKey
  * @return {*}
  */
+// Sm2PriKeyToHex 将 SM2 私钥转换为十六进制字符串。
+//
+// 参数：
+//   - priKey: SM2 私钥指针。
+//
+// 返回值：固定长度（KeyBytes*2）字符的十六进制字符串。
 func Sm2PriKeyToHex(priKey *sm2.PrivateKey) string {
 	hex := hex.EncodeToString(GetPriKeyRawBytes(priKey))
 	return hex
@@ -157,6 +226,14 @@ func Sm2PriKeyToHex(priKey *sm2.PrivateKey) string {
  * @param {string} priStr
  * @return {*}
  */
+// Sm2HexToPriKey 将 Sm2PriKeyToHex 输出的十六进制字符串解析为 SM2 私钥指针。
+//
+// 参数：
+//   - priStr: SM2 私钥的十六进制字符串。
+//
+// 返回值：对应的 SM2 私钥指针。
+//
+// panic 条件：当私钥长度不合法或解析失败时 panic。
 func Sm2HexToPriKey(priStr string) *sm2.PrivateKey {
 	// 解码hex私钥
 	privateKeyByte, _ := hex.DecodeString(priStr)

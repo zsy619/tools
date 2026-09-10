@@ -18,7 +18,9 @@ var (
 	fmtStringerType = reflect.TypeOf((*fmt.Stringer)(nil)).Elem()
 )
 
-// ToBoolE casts any type to a bool type.
+// ToBoolE 将任意类型的值转换为 bool 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 bool 值与 nil 错误；nil 输入返回 (false, nil)；字符串使用 strconv.ParseBool；无法转换时返回 error。
 func ToBoolE(i any) (bool, error) {
 	i = indirect(i)
 
@@ -39,7 +41,9 @@ func ToBoolE(i any) (bool, error) {
 	}
 }
 
-// ToIntE casts any type to an int type.
+// ToIntE 将任意类型的值转换为 int 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 int 值与 nil 错误；nil 输入返回 0；bool true 返回 1、false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToIntE(i any) (int, error) {
 	i = indirect(i)
 
@@ -91,7 +95,9 @@ func ToIntE(i any) (int, error) {
 	}
 }
 
-// ToInt8E casts any type to an int8 type.
+// ToInt8E 将任意类型的值转换为 int8 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 int8 值与 nil 错误；nil/布尔 false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToInt8E(i any) (int8, error) {
 	i = indirect(i)
 
@@ -143,7 +149,9 @@ func ToInt8E(i any) (int8, error) {
 	}
 }
 
-// ToInt16E casts any type to an int16 type.
+// ToInt16E 将任意类型的值转换为 int16 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 int16 值与 nil 错误；nil/布尔 false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToInt16E(i any) (int16, error) {
 	i = indirect(i)
 
@@ -195,7 +203,9 @@ func ToInt16E(i any) (int16, error) {
 	}
 }
 
-// ToInt32E casts any type to an int32 type.
+// ToInt32E 将任意类型的值转换为 int32 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 int32 值与 nil 错误；nil/布尔 false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToInt32E(i any) (int32, error) {
 	i = indirect(i)
 
@@ -247,7 +257,9 @@ func ToInt32E(i any) (int32, error) {
 	}
 }
 
-// ToInt64E casts any to an int64 type.
+// ToInt64E 将任意类型的值转换为 int64 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 int64 值与 nil 错误；nil/布尔 false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToInt64E(i any) (int64, error) {
 	i = indirect(i)
 
@@ -299,7 +311,9 @@ func ToInt64E(i any) (int64, error) {
 	}
 }
 
-// ToUintE casts any type to a uint type.
+// ToUintE 将任意类型的值转换为 uint 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 uint 值与 nil 错误；nil/布尔 false 返回 0；负数返回 errNegativeNotAllowed；字符串解析失败或不支持的类型返回 error。
 func ToUintE(i any) (uint, error) {
 	i = indirect(i)
 
@@ -375,7 +389,9 @@ func ToUintE(i any) (uint, error) {
 	}
 }
 
-// ToUint8E casts any type to a uint type.
+// ToUint8E 将任意类型的值转换为 uint8 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 uint8 值与 nil 错误；nil/布尔 false 返回 0；负数返回 errNegativeNotAllowed；字符串解析失败或不支持的类型返回 error。
 func ToUint8E(i any) (uint8, error) {
 	i = indirect(i)
 
@@ -451,7 +467,9 @@ func ToUint8E(i any) (uint8, error) {
 	}
 }
 
-// ToUint16E casts any type to a uint16 type.
+// ToUint16E 将任意类型的值转换为 uint16 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 uint16 值与 nil 错误；nil/布尔 false 返回 0；负数返回 errNegativeNotAllowed；字符串解析失败或不支持的类型返回 error。
 func ToUint16E(i any) (uint16, error) {
 	i = indirect(i)
 
@@ -527,7 +545,9 @@ func ToUint16E(i any) (uint16, error) {
 	}
 }
 
-// ToUint32E casts any type to a uint32 type.
+// ToUint32E 将任意类型的值转换为 uint32 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 uint32 值与 nil 错误；nil/布尔 false 返回 0；负数返回 errNegativeNotAllowed；字符串解析失败或不支持的类型返回 error。
 func ToUint32E(i any) (uint32, error) {
 	i = indirect(i)
 
@@ -603,7 +623,9 @@ func ToUint32E(i any) (uint32, error) {
 	}
 }
 
-// ToUint64E casts any type to a uint64 type.
+// ToUint64E 将任意类型的值转换为 uint64 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 uint64 值与 nil 错误；nil/布尔 false 返回 0；负数返回 errNegativeNotAllowed；字符串解析失败或不支持的类型返回 error。
 func ToUint64E(i any) (uint64, error) {
 	i = indirect(i)
 
@@ -679,7 +701,9 @@ func ToUint64E(i any) (uint64, error) {
 	}
 }
 
-// ToFloat32E casts any type to a float32 type.
+// ToFloat32E 将任意类型的值转换为 float32 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 float32 值与 nil 错误；nil/布尔 false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToFloat32E(i any) (float32, error) {
 	i = indirect(i)
 
@@ -735,7 +759,9 @@ func ToFloat32E(i any) (float32, error) {
 	}
 }
 
-// ToFloat64E casts any type to a float64 type.
+// ToFloat64E 将任意类型的值转换为 float64 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 float64 值与 nil 错误；nil/布尔 false 返回 0；字符串解析失败或不支持的类型返回 error。
 func ToFloat64E(i any) (float64, error) {
 	i = indirect(i)
 
@@ -791,7 +817,9 @@ func ToFloat64E(i any) (float64, error) {
 	}
 }
 
-// ToStringE casts any type to a string type.
+// ToStringE 将任意类型的值转换为 string 类型。
+// 参数：i 为要转换的任意类型值（指针会被解引用至 fmt.Stringer/error/基础类型）。
+// 返回：转换得到的 string 值与 nil 错误；nil 输入返回空串；无法转换时返回 error。
 func ToStringE(i any) (string, error) {
 	i = indirectToStringerOrError(i)
 
@@ -849,7 +877,9 @@ func ToStringE(i any) (string, error) {
 	}
 }
 
-// ToDurationE casts any type to time.Duration type.
+// ToDurationE 将任意类型的值转换为 time.Duration 类型。
+// 参数：i 为要转换的任意类型值（指针会被 indirect 解引用）。
+// 返回：转换得到的 time.Duration 值与 nil 错误；字符串按 time.ParseDuration 解析；不支持类型返回 error。
 func ToDurationE(i any) (d time.Duration, err error) {
 	i = indirect(i)
 
@@ -880,9 +910,9 @@ func ToDurationE(i any) (d time.Duration, err error) {
 	}
 }
 
-// toInt returns the int value of v if v or v's underlying type
-// is an int.
-// Note that this will return false for int64 etc. types.
+// toInt 在 v 为 int 类型（或 time.Weekday / time.Month 这种基础类型为 int 的具名类型）时返回其值与 true。
+// 参数：v 为任意值。
+// 返回：当 v 为 int、time.Weekday 或 time.Month 时返回 (int(v), true)；其他类型一律返回 (0, false)（包括 int64、uint 等）。
 func toInt(v any) (int, bool) {
 	switch v := v.(type) {
 	case int:
@@ -896,9 +926,10 @@ func toInt(v any) (int, bool) {
 	}
 }
 
-// Copied from html/template/content.go.
-// indirect returns the value, after dereferencing as many times
-// as necessary to reach the base type (or nil).
+// indirect 解引用任意层级的指针，最终返回基础类型或 nil。
+// 该函数复制自 html/template/content.go。
+// 参数：a 为任意值。
+// 返回：若 a 非指针则原样返回；否则沿指针链向下解引用直至到达非指针类型或 nil 指针。
 func indirect(a any) any {
 	if a == nil {
 		return nil
@@ -914,10 +945,10 @@ func indirect(a any) any {
 	return v.Interface()
 }
 
-// Copied from html/template/content.go.
-// indirectToStringerOrError returns the value, after dereferencing as many times
-// as necessary to reach the base type (or nil) or an implementation of fmt.Stringer
-// or error,
+// indirectToStringerOrError 解引用指针直至到达 fmt.Stringer/error 实现或非指针基础类型。
+// 该函数复制自 html/template/content.go。
+// 参数：a 为任意值。
+// 返回：解引用后得到的值；nil 输入返回 nil。
 func indirectToStringerOrError(a any) any {
 	if a == nil {
 		return nil
@@ -929,8 +960,9 @@ func indirectToStringerOrError(a any) any {
 	return v.Interface()
 }
 
-// trimZeroDecimal trims the zero decimal.
-// E.g. 12.00 to 12 while 12.01 still to be 12.01.
+// trimZeroDecimal 去除字符串末尾的小数零部分（例如将 "12.00" 截为 "12"，但 "12.01" 保持不变）。
+// 参数：s 为输入字符串（通常来自 strconv 转换结果）。
+// 返回：去除末尾 ".0" 序列后的字符串；若小数位非零或字符串中无小数点则原样返回。
 func trimZeroDecimal(s string) string {
 	var foundZero bool
 	for i := len(s); i > 0; i-- {

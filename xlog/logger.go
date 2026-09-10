@@ -13,18 +13,19 @@ import (
 	easy "github.com/t-tomalak/logrus-easy-formatter"
 )
 
+// LoggerPath 默认日志根目录，可在 init 之后修改。
 var LoggerPath string
 
 func init() {
 	LoggerPath = "./logs"
 }
 
-// Logger 通用日志信息
+// Logger 通用日志对象，包装 *logrus.Logger 以便直接使用其全部方法。
 type Logger struct {
 	*logrus.Logger
 }
 
-// RouteLogger 通道日志
+// RouteLogger 通道日志，按通道类型分别记录不同动作的日志。
 type RouteLogger struct {
 	Get        *logrus.Logger // 提取
 	Submit     *logrus.Logger // 提交
@@ -35,7 +36,8 @@ type RouteLogger struct {
 	Info       *logrus.Logger // 其他信息
 }
 
-// NewRouteLogger 构造通道日志
+// NewRouteLogger 为指定通道（routeCode + linkIndex）构造一组按动作分类的通道日志。
+// 每类日志会写到 LoggerPath/<routeCode>/<linkIndex>/<action> 目录下。
 func NewRouteLogger(routeCode string, linkIndex int) *RouteLogger {
 	result := new(RouteLogger)
 	result.Info = newRouteLogger(routeCode, "info", linkIndex)
@@ -48,7 +50,8 @@ func NewRouteLogger(routeCode string, linkIndex int) *RouteLogger {
 	return result
 }
 
-// NewLogger 构造日志
+// NewLogger 在 LoggerPath/basePath 下构造通用 Logger。
+// 目录创建失败会打印到标准输出，但不会中断 Logger 构造。
 func NewLogger(basePath string) *Logger {
 	baseLogPath := fmt.Sprintf("%s/%s", LoggerPath, basePath)
 	err := os.MkdirAll(baseLogPath, os.ModePerm)
@@ -58,6 +61,7 @@ func NewLogger(basePath string) *Logger {
 	return &Logger{newLogger(baseLogPath)}
 }
 
+// newRouteLogger 在 LoggerPath/<routeCode>/<linkIndex>/<basePath> 下创建分类日志。
 func newRouteLogger(routeCode, basePath string, linkIndex int) *logrus.Logger {
 	baseLogPath := fmt.Sprintf("%s/%s/%d/%s", LoggerPath, routeCode, linkIndex, basePath)
 	err := os.MkdirAll(baseLogPath, os.ModePerm)
@@ -68,6 +72,8 @@ func newRouteLogger(routeCode, basePath string, linkIndex int) *logrus.Logger {
 	return newLogger(baseLogPath)
 }
 
+// newLogger 构造一个 Info 级别、按天切分的 logrus.Logger。
+// 默认保留 7 天，单个文件最大 1 天后切分。
 func newLogger(baseLogPath string) *logrus.Logger {
 	loginfo := logrus.New()
 	loginfo.SetLevel(logrus.InfoLevel)
@@ -75,6 +81,8 @@ func newLogger(baseLogPath string) *logrus.Logger {
 	return loginfo
 }
 
+// newRotateHook 为 debug/info/warn/error/fatal/panic 各级别分别创建滚动日志 writer。
+// maxAge 为日志最大保留时间，rotationTime 为切分间隔。
 func newRotateHook(logPath string, maxAge, rotationTime time.Duration) *lfshook.LfsHook {
 	d := newLogLevel(logPath, "debug", maxAge, rotationTime) // 调试
 	i := newLogLevel(logPath, "info", maxAge, rotationTime)  // 信息
@@ -97,12 +105,15 @@ func newRotateHook(logPath string, maxAge, rotationTime time.Duration) *lfshook.
 		})
 }
 
+// newLogLevel 为单个日志级别创建 rotatelogs.RotateLogs 写入器。
+// 文件名格式：<logPath>/<logFileName>.%Y%m%d.log，并通过软链指向最新日志文件。
+// 创建失败时打印错误日志到标准输出，但仍会返回（可能为 nil）writer。
 func newLogLevel(logPath, logFileName string, maxAge time.Duration, rotationTime time.Duration) *rotatelogs.RotateLogs {
 	baseLogPath := path.Join(logPath, logFileName)
 	writer, err := rotatelogs.New(
 		baseLogPath+".%Y%m%d.log",                 // 日志文件格式
-		rotatelogs.WithLinkName(baseLogPath),      // 生成软链，指向最新日志文
-		rotatelogs.WithRotationTime(time.Hour*24), // WithRotationTime 設置日誌分割的時間，這裏設置爲一小時分割一次
+		rotatelogs.WithLinkName(baseLogPath),      // 生成软链，指向最新日志文件
+		rotatelogs.WithRotationTime(time.Hour*24), // 设置日志分割时间（此处设为 1 小时）
 		rotatelogs.WithMaxAge(maxAge),             // 文件最大保存时间
 		rotatelogs.WithRotationTime(rotationTime), // 日志切割时间间隔
 	)

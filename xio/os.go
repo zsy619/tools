@@ -6,24 +6,24 @@ import (
 	"strings"
 )
 
-// IsWin determine whether the system is windows.
+// IsWin 判断当前系统是否为 Windows。
 func IsWin() bool {
 	return runtime.GOOS == "windows"
 }
 
-// IsMac determines whether the system is darwin.
+// IsMac 判断当前系统是否为 Darwin（macOS）。
 func IsMac() bool {
 	return runtime.GOOS == "darwin"
 }
 
-// IsLinux determines whether the system is linux.
+// IsLinux 判断当前系统是否为 Linux。
 func IsLinux() bool {
 	return runtime.GOOS == "linux"
 }
 
-// IsSupportColor checks current console whether supports color.
-// Supported: linux, mac, or windows's ConEmu, Cmder, putty, git-bash.exe
-// Not support: windows cmd.exe, powerShell.exe
+// IsSupportColor 判断当前控制台是否支持彩色输出。
+// 支持：linux、mac，或 Windows 下的 ConEmu、Cmder、putty、git-bash.exe
+// 不支持：Windows 自带的 cmd.exe、powerShell.exe
 func IsSupportColor() bool {
 	// Support color: "TERM=xterm" "TERM=xterm-vt220" "TERM=xterm-256color" "TERM=screen-256color"
 	// Don't support color: "TERM=cygwin"
@@ -44,13 +44,13 @@ func IsSupportColor() bool {
 	return false
 }
 
-// IsSupport256Color checks current console whether supports 256 color.
+// IsSupport256Color 判断当前控制台是否支持 256 色输出。
 func IsSupport256Color() bool {
 	// "TERM=xterm-256color" "TERM=screen-256color"
 	return strings.Contains(os.Getenv("TERM"), "256color")
 }
 
-// IsSupportTrueColor checks current console whether supports true color.
+// IsSupportTrueColor 判断当前控制台是否支持真彩色输出。
 func IsSupportTrueColor() bool {
 	// "COLORTERM=truecolor"
 	return strings.Contains(os.Getenv("COLORTERM"), "truecolor")

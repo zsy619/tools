@@ -4,7 +4,7 @@ import "unicode"
 
 // 参考：https://github.com/yumaojun03/simpletable/blob/master/east_asian_width.go
 // EastAsian is the flag for ambiguous character.
-// If this flag is `true`, ambiguous characters are treated as full width.
+// If this flag is `true`, ambiguous characters are treated as full width.。
 // Elsewise, ambiguous characters are treated as half width.
 // Default value is `false`.
 var EastAsian = false
@@ -426,6 +426,7 @@ var EastAsianWide = _EastAsianWide
 //   - "EastAsianFullwidth": 表示东亚全角字符的范围表
 //   - "EastAsianWide": 表示东亚宽字符的范围表
 //
+
 // 如果全局变量EastAsian为真，则映射表中还会包含以下键值对：
 //   - "EastAsianAmbiguous": 表示东亚模糊字符的范围表
 func Fullwidth() map[string]*unicode.RangeTable {
@@ -458,9 +459,11 @@ func Halfwidth() map[string]*unicode.RangeTable {
 
 // IsFullwidth 判断给定的字符是否为全角字符
 //
+
 // 参数：
 // char rune - 待判断的字符
 //
+
 // 返回值：
 // bool - 如果是全角字符返回true，否则返回false
 func IsFullwidth(char rune) bool {
@@ -475,11 +478,14 @@ func IsFullwidth(char rune) bool {
 // IsHalfwidth 判断给定的字符是否为半角字符
 // 参数：
 //
+
 //	char rune - 待判断的字符
 //
+
 // 返回值：
 //
-//	bool - 如果字符为半角字符，则返回true；否则返回false
+
+// bool - 如果字符为半角字符，则返回true；否则返回false
 func IsHalfwidth(char rune) bool {
 	for _, halfwidthRangeTable := range Halfwidth() {
 		if unicode.Is(halfwidthRangeTable, char) {

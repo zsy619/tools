@@ -7,15 +7,18 @@ import (
 	"github.com/zsy619/tools/xstring"
 )
 
-// SplitStrToSlice splits a string to a slice by the specified separator.
+// SplitStrToSlice 按指定分隔符将字符串拆分为 T 类型切片（转换失败时返回 nil）。
+// 参数：s 为输入字符串，sep 为分隔符。
+// 返回：拆分后元素类型为 T 的切片；底层调用 SplitStrToSliceE[T]，转换失败时返回 nil（不返回错误）。
 func SplitStrToSlice[T any](s, sep string) []T {
 	v, _ := SplitStrToSliceE[T](s, sep)
 	return v
 }
 
-// SplitStrToSliceE splits a string to a slice by the specified separator and returns an error if occurred.
-// Note that this function is implemented through 1.18 generics, so the element type needs to
-// be specified when calling it, e.g. SplitStrToSliceE[int]("1,2,3", ",").
+// SplitStrToSliceE 按指定分隔符将字符串拆分为 T 类型切片，转换失败时返回错误。
+// 注意：该函数基于 Go 1.18 泛型实现，调用时需显式指定元素类型，例如 SplitStrToSliceE[int]("1,2,3", ",")。
+// 参数：s 为输入字符串，sep 为分隔符。
+// 返回：拆分得到的 []T 与 nil 错误；若 T 不在支持的类型列表中或解析失败则返回 error。
 func SplitStrToSliceE[T any](s, sep string) ([]T, error) {
 	ss := xstring.Split(s, sep)
 	dst := make([]T, len(ss))

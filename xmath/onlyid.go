@@ -7,19 +7,27 @@ import (
 )
 
 const (
-	numberBits uint8 = 12 // 表示每个集群下的每个节点，1毫秒内可生成的id序号的二进制位 对应上图中的最后一段
-	workerBits uint8 = 10 // 每台机器(节点)的ID位数 10位最大可以有2^10=1024个节点数 即每毫秒可生成 2^12-1=4096个唯一ID 对应上图中的倒数第二段
-	// 这里求最大值使用了位运算，-1 的二进制表示为 1 的补码，感兴趣的同学可以自己算算试试 -1 ^ (-1 << nodeBits) 这里是不是等于 1023
-	workerMax   int64 = -1 ^ (-1 << workerBits) // 节点ID的最大值，用于防止溢出
-	numberMax   int64 = -1 ^ (-1 << numberBits) // 同上，用来表示生成id序号的最大值
-	timeShift   uint8 = workerBits + numberBits // 时间戳向左的偏移量
-	workerShift uint8 = numberBits              // 节点ID向左的偏移量
-	// 41位字节作为时间戳数值的话，大约68年就会用完
-	// 假如你2010年1月1日开始开发系统 如果不减去2010年1月1日的时间戳 那么白白浪费40年的时间戳啊！
-	// 这个一旦定义且开始生成ID后千万不要改了 不然可能会生成相同的ID
-	epoch int64 = 1525705533000 // 这个是我在写epoch这个常量时的时间戳(毫秒)
+	// numberBits 表示每个集群下的每个节点，1 毫秒内可生成的 id 序号的二进制位数（对应 Snowflake ID 的最低位段）。
+	numberBits uint8 = 12
+	// workerBits 每台机器（节点）的 ID 位数。10 位最大可有 2^10 = 1024 个节点，单节点每毫秒最多生成 2^12 = 4096 个唯一 ID。
+	workerBits uint8 = 10
+	// 这里求最大值使用了位运算，-1 的二进制表示为 1 的补码。
+	workerMax int64 = -1 ^ (-1 << workerBits) // 节点 ID 的最大值，用于防止溢出
+	numberMax int64 = -1 ^ (-1 << numberBits) // 同上，表示生成 id 序号的最大值
+	timeShift uint8 = workerBits + numberBits // 时间戳向左的偏移量
+	workerShift uint8 = numberBits            // 节点 ID 向左的偏移量
+	// 41 位字节作为时间戳数值的话，大约 68 年就会用完。
+	// 一旦定义并开始生成 ID，请勿修改 epoch，否则可能生成重复 ID。
+	epoch int64 = 1525705533000 // epoch 常量对应的时间戳（毫秒）
 )
 
+// Worker 雪花算法 ID 生成器实例。
+//
+// 字段说明：
+//   - mu: 互斥锁，用于保证并发安全。
+//   - timestamp: 记录上一次生成 ID 的时间戳（毫秒）。
+//   - workerId: 当前节点的 ID。
+//   - number: 当前毫秒已生成的 ID 序号（从 0 开始累加）。
 type Worker struct {
 	mu        sync.Mutex // 添加互斥锁 确保并发安全
 	timestamp int64      // 记录上一次生成id的时间戳
@@ -33,6 +41,14 @@ type Worker struct {
  * @param {int64} workerId
  * @return {*}
  */
+// NewWorkerDefault 创建一个新的 Worker 节点。
+//
+// 参数：
+//   - workerId: 节点 ID，必须在 [0, workerMax] 范围内。
+//
+// 返回值：
+//   - *Worker: 初始化完成的 Worker 实例。
+//   - error: 当 workerId 越界时返回错误。
 func NewWorkerDefault(workerId int64) (*Worker, error) {
 	// 要先检测workerId是否在上面定义的范围内
 	if workerId < 0 || workerId > workerMax {
@@ -51,6 +67,11 @@ func NewWorkerDefault(workerId int64) (*Worker, error) {
  * @description: 获取下一个ID
  * @return {*}
  */
+// GetId 生成并返回下一个唯一 ID。
+//
+// 返回值：基于时间戳、节点 ID 与本节点序号生成的 int64 唯一 ID。
+//
+// 副作用：内部使用互斥锁，可能在单毫秒内超过 numberMax 上限时空转等待至下一毫秒。
 func (w *Worker) GetId() int64 {
 	// 获取id最关键的一点 加锁 加锁 加锁
 	w.mu.Lock()

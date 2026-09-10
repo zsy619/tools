@@ -16,12 +16,17 @@ import (
 // https://cloud.tencent.com/developer/article/1475706
 
 const (
-	CHAR_SET               = "UTF-8"
-	BASE_64_FORMAT         = "UrlSafeNoPadding"
+	// CHAR_SET 字符编码（当前实现未直接使用）。
+	CHAR_SET = "UTF-8"
+	// BASE_64_FORMAT Base64 格式说明（当前实现统一使用标准编码）。
+	BASE_64_FORMAT = "UrlSafeNoPadding"
+	// RSA_ALGORITHM_KEY_TYPE 密钥格式说明（创建密钥时使用 PKCS#8）。
 	RSA_ALGORITHM_KEY_TYPE = "PKCS8"
-	RSA_ALGORITHM_SIGN     = crypto.SHA256
+	// RSA_ALGORITHM_SIGN 签名时使用的哈希算法（默认 SHA-256）。
+	RSA_ALGORITHM_SIGN = crypto.SHA256
 )
 
+// XRsa 封装了 RSA 公钥与私钥，提供加解密、签名与验签等便捷方法。
 type XRsa struct {
 	publicKey  *rsa.PublicKey
 	privateKey *rsa.PrivateKey
@@ -229,6 +234,14 @@ func (r *XRsa) DecryptWithPublicKey(encrypted string) (string, error) {
 }
 
 // 数据加签
+// Sign 使用私钥对 data 进行 RSA 签名（PKCS#1 v1.5），结果使用标准 Base64 编码。
+//
+// 参数：
+//   - data: 待签名的原始字符串。
+//
+// 返回值：
+//   - string: Base64 编码的签名结果。
+//   - error: 签名过程中发生错误时返回错误；XRsa 未配置私钥时会返回错误。
 func (r *XRsa) Sign(data string) (string, error) {
 	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))
@@ -242,6 +255,13 @@ func (r *XRsa) Sign(data string) (string, error) {
 }
 
 // 数据验签
+// Verify 使用公钥校验 data 与 Base64 编码的签名 sign 是否一致。
+//
+// 参数：
+//   - data: 原始数据。
+//   - sign: Base64 编码的签名结果。
+//
+// 返回值：签名验证通过时返回 nil；签名错误、Base64 解码失败或 XRsa 未配置公钥时返回错误。
 func (r *XRsa) Verify(data string, sign string) error {
 	h := RSA_ALGORITHM_SIGN.New()
 	h.Write([]byte(data))

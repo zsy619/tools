@@ -4,24 +4,23 @@ import (
 	"errors"
 )
 
-// TicketStore errors
+// TicketStore 相关错误。
 var (
-	// Given Ticket is not associated with an AuthenticationResponse
+	// ErrInvalidTicket 给定的票据未关联到任何 AuthenticationResponse。
 	ErrInvalidTicket = errors.New("cas: ticket store: invalid ticket")
 )
 
-// TicketStore provides an interface for storing and retrieving service
-// ticket data.
+// TicketStore 提供对 service ticket 与 AuthenticationResponse 数据的存取接口。
 type TicketStore interface {
-	// Read returns the AuthenticationResponse data associated with a ticket identifier.
+	// Read 返回与票据 ID 关联的 AuthenticationResponse。
 	Read(id string) (*AuthenticationResponse, error)
 
-	// Write stores the AuthenticationResponse data received from a ticket validation.
+	// Write 存储一次票据校验得到的 AuthenticationResponse。
 	Write(id string, ticket *AuthenticationResponse) error
 
-	// Delete removes the AuthenticationResponse data associated with a ticket identifier.
+	// Delete 删除与票据 ID 关联的 AuthenticationResponse。
 	Delete(id string) error
 
-	// Clear removes all of the AuthenticationResponse data from the store.
+	// Clear 清空存储中的全部 AuthenticationResponse 数据。
 	Clear() error
 }

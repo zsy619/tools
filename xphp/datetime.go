@@ -9,30 +9,30 @@ import (
 	"time"
 )
 
-// Microtime returns current Unix timestamp with microseconds
+// Microtime 返回当前时间对应的 Unix 时间戳（带微秒精度）。
 func Microtime() float64 {
 	return Round(float64(time.Now().UnixNano()) / 1000000000)
 }
 
-// IsLeapYear checks if the given time is in a leap year
+// IsLeapYear 判断 t 是否处于闰年（基于 UTC 年末的 YearDay 判断）。
 func IsLeapYear(t time.Time) bool {
 	t2 := time.Date(t.Year(), time.December, 31, 0, 0, 0, 0, time.UTC)
 	return t2.YearDay() == 366
 }
 
-// LastDateOfMonth gets the last date of the month which the given time is in
+// LastDateOfMonth 返回 t 所在月份的最后一天的 00:00:00 UTC 时间。
 func LastDateOfMonth(t time.Time) time.Time {
 	t2 := FirstDateOfNextMonth(t)
 	return time.Unix(t2.Unix()-86400, 0)
 }
 
-// FirstDateOfMonth gets the first date of the month which the given time is in
+// FirstDateOfMonth 返回 t 所在月份第一天的 00:00:00 UTC 时间。
 func FirstDateOfMonth(t time.Time) time.Time {
 	year, month, _ := t.Date()
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 }
 
-// FirstDateOfNextMonth gets the first date of next month
+// FirstDateOfNextMonth 返回 t 所在月份的下一个月的第一天（00:00:00 UTC）。
 func FirstDateOfNextMonth(t time.Time) time.Time {
 	year, month, _ := t.Date()
 	if month == time.December {
@@ -44,7 +44,7 @@ func FirstDateOfNextMonth(t time.Time) time.Time {
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 }
 
-// FirstDateOfLastMonth gets the first date of last month
+// FirstDateOfLastMonth 返回 t 所在月份上一个月的第一天（00:00:00 UTC）。
 func FirstDateOfLastMonth(t time.Time) time.Time {
 	year, month, _ := t.Date()
 	if month == time.January {
@@ -56,79 +56,80 @@ func FirstDateOfLastMonth(t time.Time) time.Time {
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 }
 
-// recognize the character in the php date/time format string
+// recognize 根据 PHP 日期格式字符 c 返回 t 中对应字段的字符串表示。
+// 未识别的字符原样返回 c 自身。
 func recognize(c string, t time.Time) string {
 	switch c {
-	// Day
-	case "d": // Day of the month, 2 digits with leading zeros
+	// 日
+	case "d":
 		return fmt.Sprintf("%02d", t.Day())
-	case "D": // A textual representation of a day, three letters
+	case "D":
 		return t.Format("Mon")
-	case "j": // Day of the month without leading zeros
+	case "j":
 		return fmt.Sprintf("%d", t.Day())
-	case "l": // A full textual representation of the day of the week
+	case "l":
 		return t.Weekday().String()
-	case "w": // Numeric representation of the day of the week
+	case "w":
 		return fmt.Sprintf("%d", t.Weekday())
-	case "z": // The day of the year (starting from 0)
+	case "z":
 		return fmt.Sprintf("%v", t.YearDay()-1)
 
-	// Week
-	case "W": // ISO-8601 week number of year, weeks starting on Monday
+	// 周
+	case "W":
 		_, w := t.ISOWeek()
 		return fmt.Sprintf("%d", w)
 
-	// Month
-	case "F": // A full textual representation of a month
+	// 月
+	case "F":
 		return t.Month().String()
-	case "m": // Numeric representation of a month, with leading zeros
+	case "m":
 		return fmt.Sprintf("%02d", t.Month())
-	case "M": // A short textual representation of a month, three letters
+	case "M":
 		return t.Format("Jan")
-	case "n": // Numeric representation of a month, without leading zeros
+	case "n":
 		return fmt.Sprintf("%d", t.Month())
-	case "t": // Number of days in the given month
+	case "t":
 		return LastDateOfMonth(t).Format("2")
 
-	// Year
-	case "L": // Whether it's a leap year
+	// 年
+	case "L":
 		if IsLeapYear(t) {
 			return "1"
 		}
 		return "0"
 	case "o":
 		fallthrough
-	case "Y": // A full numeric representation of a year, 4 digits
+	case "Y":
 		return fmt.Sprintf("%v", t.Year())
-	case "y": // A two digit representation of a year
+	case "y":
 		return t.Format("06")
 
-	// Time
-	case "a": // Lowercase Ante meridiem and Post meridiem
+	// 时间
+	case "a":
 		return t.Format("pm")
-	case "A": // Uppercase Ante meridiem and Post meridiem
+	case "A":
 		return strings.ToUpper(t.Format("pm"))
-	case "g": // 12-hour format of an hour without leading zeros
+	case "g":
 		return t.Format("3")
-	case "G": // 24-hour format of an hour without leading zeros
+	case "G":
 		return fmt.Sprintf("%d", t.Hour())
-	case "h": // 12-hour format of an hour with leading zeros
+	case "h":
 		return t.Format("03")
-	case "H": // 24-hour format of an hour with leading zeros
+	case "H":
 		return fmt.Sprintf("%02d", t.Hour())
-	case "i": // Minutes with leading zeros
+	case "i":
 		return fmt.Sprintf("%02d", t.Minute())
-	case "s": // Seconds, with leading zeros
+	case "s":
 		return fmt.Sprintf("%02d", t.Second())
-	case "e": // Timezone identifier
+	case "e":
 		fallthrough
-	case "T": // Timezone abbreviation
+	case "T":
 		return t.Format("MST")
-	case "O": // Difference to Greenwich time (GMT) in hours
+	case "O":
 		return t.Format("-0700")
-	case "P": // Difference to Greenwich time (GMT) with colon between hours and minutes
+	case "P":
 		return t.Format("-07:00")
-	case "U": // Seconds since the Unix Epoch (January 1 1970 00:00:00 GMT)
+	case "U":
 		return fmt.Sprintf("%v", t.Unix())
 
 	default:
@@ -136,8 +137,7 @@ func recognize(c string, t time.Time) string {
 	}
 }
 
-// parse returns a textual representation of the time value formatted
-// according to the given php date/time format string
+// parse 将 PHP 风格的 format 字符串逐字符展开为 t 的文本表示。
 func parse(format string, t time.Time) string {
 	result := ""
 	for _, s := range format {
@@ -146,7 +146,7 @@ func parse(format string, t time.Time) string {
 	return result
 }
 
-// format is a wrapper of parse
+// format 优先按内置 pattern 的 layout 格式化，匹配失败则按 PHP 风格逐字符解析。
 func format(f string, t time.Time) string {
 	pattern, err := getPattern(f)
 	if err != nil {
@@ -156,27 +156,28 @@ func format(f string, t time.Time) string {
 	return t.Format(pattern.layout)
 }
 
-// Today returns a string formatted according to the given format string using current timestamp
-//
-// Note that the timezone is using local timezone
+// Today 使用当前时间按 PHP 风格 format 字符串输出；时区使用本地时区。
 func Today(f string) string {
 	return format(f, time.Now())
 }
 
-// LocalDate returns a string formatted according to the given format string using the given integer timestamp
-//
-// Note that the timezone is using local timezone
+// LocalDate 将 Unix 秒级时间戳 timestamp 按本地时区与 PHP 风格 format 字符串输出。
 func LocalDate(f string, timestamp int64) string {
 	return format(f, time.Unix(timestamp, 0))
 }
 
-// DateCreateFromFormat parses a date/time string according to a specified format
+// DateCreateFromFormat 按 PHP 风格 format 解析字符串 t 为 time.Time。
+// 不识别的字符会原样保留在 layout 中，无法解析时返回 time.Parse 的错误。
 func DateCreateFromFormat(f string, t string) (time.Time, error) {
 	return time.Parse(convertLayout(f), t)
 }
 
-// DateCreate parses a date/time string and return a time.Time.
-// Supported Date and Time Formats: https://www.php.net/manual/en/datetime.formats.php
+// DateCreate 将字符串 str 解析为 time.Time，支持以下输入：
+//   - "now"：当前时间；
+//   - 形如 "+N day" / "-2 hours" 的相对时间字符串；
+//   - _defaultPatterns 中预定义的日期/时间格式。
+//
+// 解析失败时返回 time.Time{} 与 "Unsupported date/time string: ..." 错误。
 func DateCreate(str string) (time.Time, error) {
 	if strings.ToLower(str) == "now" {
 		return time.Now(), nil
@@ -200,18 +201,20 @@ func DateCreate(str string) (time.Time, error) {
 	return time.Time{}, errors.New("Unsupported date/time string: " + str)
 }
 
-// DateDateSet sets the date by year, month and day
+// DateDateSet 根据 year/month/day 设置一个 time.Time（按 2006-1-2 layout 解析）。
+// month/day 不会补零，传入 0 可能导致解析失败。
 func DateDateSet(year, month, day int) (time.Time, error) {
 	return time.Parse("2006-1-2", fmt.Sprintf("%04d-%d-%d", year, month, day))
 }
 
-// DateDefaultTimezoneGet gets the default timezone
+// DateDefaultTimezoneGet 获取当前本地时区的名称（如 CST）。
 func DateDefaultTimezoneGet() string {
 	tz, _ := time.Now().Local().Zone()
 	return tz
 }
 
-// DateDefaultTimezoneSet sets the default timezone
+// DateDefaultTimezoneSet 设置进程的默认时区为 tz（影响 time.Local）。
+// tz 非法时返回错误且不修改 time.Local。
 func DateDefaultTimezoneSet(tz string) error {
 	loc, err := time.LoadLocation(tz)
 	if err != nil {
@@ -221,13 +224,13 @@ func DateDefaultTimezoneSet(tz string) error {
 	return nil
 }
 
-// DateTimezoneGet gets the timezone of the given time
+// DateTimezoneGet 返回 t 所在时区的缩写名。
 func DateTimezoneGet(t time.Time) string {
 	tz, _ := t.Zone()
 	return tz
 }
 
-// DateTimezoneSet returns a copy of t with the given timezone
+// DateTimezoneSet 返回 t 在 tz 时区下的副本；tz 非法时返回原始 t 与错误。
 func DateTimezoneSet(t time.Time, tz string) (time.Time, error) {
 	loc, err := time.LoadLocation(tz)
 	if err != nil {
@@ -236,19 +239,21 @@ func DateTimezoneSet(t time.Time, tz string) (time.Time, error) {
 	return t.In(loc), nil
 }
 
-// DateDiff returns the difference between two times (t2 - t1)
+// DateDiff 返回 t2 - t1 的时间间隔。
 func DateDiff(t1 time.Time, t2 time.Time) time.Duration {
 	return t2.Sub(t1)
 }
 
-// DateFormat returns a string formatted according to the given format string using the given time
+// DateFormat 按 PHP 风格 format 字符串输出 t 的字符串表示。
 func DateFormat(t time.Time, f string) string {
 	return format(f, t)
 }
 
-// DateIntervalCreateFromDateString returns a time.Duration from the given string
+// DateIntervalCreateFromDateString 将形如 "+1 day -2 hours" 的字符串解析为 time.Duration。
+// 支持的单位：day/month/year/week/hour/minute/second，可省略数字（默认 1）。
+// 无法匹配时返回 0 与 "unsupported string format" 错误。
 func DateIntervalCreateFromDateString(str string) (time.Duration, error) {
-	reg := regexp.MustCompile(`((\\+|\\-)?\\s*(\\d*)\\s*(day|month|year|week|hour|minute|second)s?\\s*)+?`)
+	reg := regexp.MustCompile(`((\+|\-)?\s*(\d*)\s*(day|month|year|week|hour|minute|second)s?\s*)+?`)
 	matches := reg.FindAllStringSubmatch(str, -1)
 	if matches != nil {
 		var duration int64
@@ -285,7 +290,8 @@ func DateIntervalCreateFromDateString(str string) (time.Duration, error) {
 	return 0, errors.New("unsupported string format")
 }
 
-// DateISODateSet sets a date according to the ISO 8601 standard - using weeks and day offsets rather than specific dates
+// DateISODateSet 按 ISO 8601 周历返回 year 年第 week 周第 day 天的 time.Time。
+// 输入超出合法范围时可能返回意料之外的时间，但不会 panic。
 func DateISODateSet(year, week, day int) (time.Time, error) {
 	firstDateOfYear, err := time.Parse("2006-1-2", fmt.Sprintf("%04d-%d-%d", year, 1, 1))
 	if err != nil {
@@ -298,7 +304,8 @@ func DateISODateSet(year, week, day int) (time.Time, error) {
 	return firstDateOfFirstWeek.Add(time.Duration(((week-1)*7+day-1)*24) * time.Hour), nil
 }
 
-// DateModify alter the time by the given format
+// DateModify 按 PHP 风格相对时间字符串（如 "+1 day"）修改 t 并返回新值。
+// 解析 modify 失败时返回原始 t 与错误。
 func DateModify(t time.Time, modify string) (time.Time, error) {
 	duration, err := DateIntervalCreateFromDateString(modify)
 	if err != nil {
@@ -307,28 +314,28 @@ func DateModify(t time.Time, modify string) (time.Time, error) {
 	return t.Add(duration), nil
 }
 
-// DateOffsetGet returns the timezone offset
+// DateOffsetGet 返回 t 所在时区相对 UTC 的偏移秒数（东时区为正）。
 func DateOffsetGet(t time.Time) int {
 	_, offset := t.Zone()
 	return offset
 }
 
-// DateAdd adds an amount of days, months, years, hours, minutes and seconds to the time t
+// DateAdd 在 t 上加上时长 d，返回新的 time.Time（t 不被修改）。
 func DateAdd(t time.Time, d time.Duration) time.Time {
 	return t.Add(d)
 }
 
-// DateSub subtracts an amount of days, months, years, hours, minutes and seconds from the time t
+// DateSub 在 t 上减去时长 d，返回新的 time.Time（t 不被修改）。
 func DateSub(t time.Time, d time.Duration) time.Time {
 	return t.Add(-d)
 }
 
-// DateTimestampGet gets the Unix timestamp
+// DateTimestampGet 返回 t 对应的 Unix 秒级时间戳。
 func DateTimestampGet(t time.Time) int64 {
 	return t.Unix()
 }
 
-// DateTimestampSet sets the date and time based on an Unix timestamp
+// DateTimestampSet 根据 Unix 秒级时间戳构造对应的 UTC time.Time。
 func DateTimestampSet(timestamp int64) time.Time {
 	return time.Unix(timestamp, 0)
 }

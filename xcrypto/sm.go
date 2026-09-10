@@ -15,11 +15,15 @@ import (
 // https://blog.csdn.net/weixin_42704356/article/details/129669531?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5-129669531-blog-130558002.235%5Ev38%5Epc_relevant_anti_vip&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5-129669531-blog-130558002.235%5Ev38%5Epc_relevant_anti_vip&utm_relevant_index=6
 
 const (
-	BitSize    = 256
-	KeyBytes   = (BitSize + 7) / 8
+	// BitSize SM2 算法所使用的椭圆曲线位长（256 位）。
+	BitSize = 256
+	// KeyBytes 256 位大整数对应的字节数（32 字节）。
+	KeyBytes = (BitSize + 7) / 8
+	// UnCompress 未压缩公钥字节流的前缀字节（0x04）。
 	UnCompress = 0x04
 )
 
+// Sm2CipherTextType SM2 密文顺序标识。
 type Sm2CipherTextType int32
 
 const (
@@ -38,6 +42,7 @@ var (
 )
 var sm2P256V1 P256V1Curve
 
+// P256V1Curve 表示 SM2 算法所使用的 P-256 V1 椭圆曲线参数。
 type P256V1Curve struct {
 	*elliptic.CurveParams
 	A *big.Int

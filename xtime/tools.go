@@ -11,106 +11,129 @@ const (
 
 var YEAR = time.Date(1, 0, 0, 0, 0, 0, 0, time.Local)
 
-// AddDays Adds a number of days to a date returning a new time.Time
+// AddDays Adds a number of days to a date returning a new time.Time。。
+// AddDays 向时间增加指定天数并返回新时间。
 func AddDays(d time.Time, days int) time.Time {
 	return d.AddDate(0, 0, days)
 }
 
-// AddHours Adds a number of hours to a date returning a new time.Time
+// AddHours Adds a number of hours to a date returning a new time.Time。。
+// AddHours 向时间增加指定小时数并返回新时间。
 func AddHours(d time.Time, hours int) time.Time {
 	return d.Add(time.Duration(int(time.Hour) * hours))
 }
 
-// AddMinutes Adds a number of minutes to a date returning a new time.Time
+// AddMinutes Adds a number of minutes to a date returning a new time.Time。。
+// AddMinutes 向时间增加指定分钟数并返回新时间。
 func AddMinutes(d time.Time, minutes int) time.Time {
 	return d.Add(time.Duration(int(time.Minute) * minutes))
 }
 
-// AddMonths Adds a number of months to a date returning a new time.Time
+// AddMonths Adds a number of months to a date returning a new time.Time。。
+// AddMonths 向时间增加指定月数并返回新时间。
 func AddMonths(d time.Time, months int) time.Time {
 	return d.AddDate(0, months, 0)
 }
 
-// AddYears Adds a number of years to a date returning a new time.Time
+// AddYears Adds a number of years to a date returning a new time.Time。。
+// AddYears 向时间增加指定年数并返回新时间。
 func AddYears(d time.Time, years int) time.Time {
 	return d.AddDate(years, 0, 0)
 }
 
-// Truncate this date, leaving the year field specified as the most significant field.
+// Truncate this date, leaving the year field specified as the most significant field.。。
+// TruncateYear 截断到年份精度，保留年份字段。
 func TruncateYear(d time.Time) time.Time {
 	return time.Date(d.Year(), 0, 0, 0, 0, 0, 0, d.Location())
 }
 
-// Truncate this date, leaving the month field specified as the most significant field.
+// Truncate this date, leaving the month field specified as the most significant field.。。
+// TruncateMonth 截断到月份精度，保留年月字段。
 func TruncateMonth(d time.Time) time.Time {
 	return time.Date(d.Year(), d.Month(), 0, 0, 0, 0, 0, d.Location())
 }
 
-// Truncate this date, leaving the day field specified as the most significant field.
+// Truncate this date, leaving the day field specified as the most significant field.。。
+// TruncateDay 截断到日期精度，保留年月日字段。
 func TruncateDay(d time.Time) time.Time {
 	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, d.Location())
 }
 
-// Truncate this date, leaving the hour field specified as the most significant field.
+// Truncate this date, leaving the hour field specified as the most significant field.。。
+// TruncateHour 截断到小时精度。
 func TruncateHour(d time.Time) time.Time {
 	return d.Truncate(time.Hour)
 }
 
-// Truncate this date, leaving the minute field specified as the most significant field.
+// Truncate this date, leaving the minute field specified as the most significant field.。。
+// TruncateMinute 截断到分钟精度。
 func TruncateMinute(d time.Time) time.Time {
 	return d.Truncate(time.Minute)
 }
 
-// Truncate this date, leaving the second field specified as the most significant field.
+// Truncate this date, leaving the second field specified as the most significant field.。。
+// TruncateSecond 截断到秒精度。
 func TruncateSecond(d time.Time) time.Time {
 	return d.Truncate(time.Second)
 }
 
+// ParseSimpleFormat 按简单日期格式解析字符串；解析失败时返回错误。
 func ParseSimpleFormat(s string) (time.Time, error) {
 	return time.Parse(DATE_FORMAT_SIMPLE, s)
 }
 
+// ParseFormat 按当前格式解析字符串；解析失败时返回错误。
 func ParseFormat(s string) (time.Time, error) {
 	return time.Parse(DATE_FORMAT_FULL, s)
 }
 
+// FormatSimple 按简单日期格式输出时间字符串。
 func FormatSimple(t time.Time) string {
 	return t.Format(DATE_FORMAT_SIMPLE)
 }
 
+// Format 按当前格式输出时间字符串。
 func Format(t time.Time) string {
 	return t.Format(DATE_FORMAT_FULL)
 }
 
+// SetYears 替换时间中的年份。
 func SetYears(t time.Time, years int) time.Time {
 	return time.Date(years, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
 }
 
+// SetMonths 替换时间中的月份。
 func SetMonths(t time.Time, months int) time.Time {
 	return time.Date(t.Year(), time.Month(months), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
 }
 
+// SetDays 替换时间中的日。
 func SetDays(t time.Time, days int) time.Time {
 	return time.Date(t.Year(), t.Month(), days, t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), t.Location())
 }
 
+// SetHours 替换时间中的小时。
 func SetHours(t time.Time, hours int) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), hours, t.Minute(), t.Second(), t.Nanosecond(), t.Location())
 }
 
+// SetMinutes 替换时间中的分钟。
 func SetMinutes(t time.Time, minutes int) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), minutes, t.Second(), t.Nanosecond(), t.Location())
 }
 
+// SetSeconds 替换时间中的秒。
 func SetSeconds(t time.Time, seconds int) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), seconds, t.Nanosecond(), t.Location())
 }
 
+// SetMilliSeconds 替换时间中的毫秒。
 func SetMilliSeconds(t time.Time, milliseconds int) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), milliseconds*1000, t.Location())
 }
 
-// ToWeekday convert string to time.Weekday
+// ToWeekday convert string to time.Weekday。。
+// ToWeekday 将星期字符串转换为 time.Weekday；无法识别时返回零值。
 func ToWeekday(week string) time.Weekday {
 	switch week {
 	case "周一", "星期一", "Monday", "Mon", "Mon.", "1", "一":

@@ -15,42 +15,44 @@ var (
 )
 var ErrorNotFound = errors.New("not found")
 
-// Options holds Skiplist's options
+// Options 持有 Skiplist 的配置项（内部使用，外部通过 Option 函数设置）。
 type Options struct {
 	maxLevel int
 	locker   utils.Locker
 }
 
-// Option is a function used to set Options
+// Option 是用于配置 Options 的函数（Functional Options 模式）。
 type Option func(option *Options)
 
-// WithGoroutineSafe sets Skiplist goroutine-safety,
+// WithGoroutineSafe 启用 Skiplist 的并发安全特性（使用 sync.RWMutex 保护内部数据）。
 func WithGoroutineSafe() Option {
 	return func(option *Options) {
 		option.locker = &gosync.RWMutex{}
 	}
 }
 
-// WithMaxLevel sets max level of Skiplist
+// WithMaxLevel 设置 Skiplist 的最大层数。
+// 参数：maxLevel 为期望的最大层数（必须 >= 1）。
 func WithMaxLevel(maxLevel int) Option {
 	return func(option *Options) {
 		option.maxLevel = maxLevel
 	}
 }
 
-// Node is a list node
+// Node 表示跳表中的一个层级节点，仅持有指向各层下一个 Element 的指针数组。
 type Node[K, V any] struct {
 	next []*Element[K, V]
 }
 
-// Element is a kind of node with key-value data
+// Element 是跳表中存储键值对数据的节点，内嵌 Node 并额外持有 key 与 value。
 type Element[K, V any] struct {
 	Node[K, V]
 	key   K
 	value V
 }
 
-// Skiplist is a kind of data structure which can search quickly by exchanging space for time
+// Skiplist 是通过以空间换时间实现快速查找的数据结构（跳表）。
+// 支持自定义键比较器与可选的并发安全模式。
 type Skiplist[K, V any] struct {
 	locker         utils.Locker
 	head           Node[K, V]
@@ -61,7 +63,9 @@ type Skiplist[K, V any] struct {
 	rander         *rand.Rand
 }
 
-// New news a Skiplist
+// New 创建一个跳表。
+// 参数：cmp 为键比较器（返回 <0/<0/>0 分别表示 a<b/a==b/a>b）；opts 为可选的配置项（如 WithGoroutineSafe、WithMaxLevel）。
+// 返回：已分配好头节点与缓存的 *Skiplist[K, V]。
 func New[K, V any](cmp utils.Comparator[K], opts ...Option) *Skiplist[K, V] {
 	option := Options{
 		maxLevel: defaultMaxLevel,
@@ -81,7 +85,10 @@ func New[K, V any](cmp utils.Comparator[K], opts ...Option) *Skiplist[K, V] {
 	return l
 }
 
-// Insert inserts a key-value pair into the skiplist
+// Insert 将键值对插入跳表。
+// 参数：key 为键，value 为值。
+// 当 key 已存在时直接更新其 value。
+// 副作用：会就地修改跳表结构（持有锁时执行，goroutine-safe 模式下安全）。
 func (sl *Skiplist[K, V]) Insert(key K, value V) {
 	sl.locker.Lock()
 	defer sl.locker.Unlock()
@@ -111,7 +118,9 @@ func (sl *Skiplist[K, V]) Insert(key K, value V) {
 	sl.len++
 }
 
-// Get returns the value associated with the passed key if the key is in the skiplist, otherwise returns error
+// Get 根据 key 查找对应的值。
+// 参数：key 为要查找的键。
+// 返回：找到时返回对应的 value 与 nil；未找到时返回 V 的零值与 ErrorNotFound 错误。
 func (sl *Skiplist[K, V]) Get(key K) (V, error) {
 	sl.locker.RLock()
 	defer sl.locker.RUnlock()
@@ -133,7 +142,9 @@ func (sl *Skiplist[K, V]) Get(key K) (V, error) {
 	return *new(V), ErrorNotFound
 }
 
-// Remove removes the key-value pair associated with the passed key and returns true if the key is in the skiplist, otherwise returns false
+// Remove 从跳表中移除指定 key 对应的键值对。
+// 参数：key 为要移除的键。
+// 返回：成功移除返回 true；若 key 不存在则返回 false（无副作用）。
 func (sl *Skiplist[K, V]) Remove(key K) bool {
 	sl.locker.Lock()
 	defer sl.locker.Unlock()
@@ -154,13 +165,14 @@ func (sl *Skiplist[K, V]) Remove(key K) bool {
 	return true
 }
 
-// Len returns the amount of key-value pair in the skiplist
+// Len 返回跳表中键值对的数量。
 func (sl *Skiplist[K, V]) Len() int {
 	sl.locker.RLock()
 	defer sl.locker.RUnlock()
 	return sl.len
 }
 
+// randomLevel 使用幂律分布随机生成新节点的层数（在 [1, maxLevel] 之间）。
 func (sl *Skiplist[K, V]) randomLevel() int {
 	total := uint64(1)<<uint64(sl.maxLevel) - 1 // 2^n-1
 	k := sl.rander.Uint64() % total
@@ -174,6 +186,7 @@ func (sl *Skiplist[K, V]) randomLevel() int {
 	return level
 }
 
+// findPrevNodes 查找各层中目标 key 的前驱节点，缓存到 prevNodesCache 中以复用内存。
 func (sl *Skiplist[K, V]) findPrevNodes(key K) []*Node[K, V] {
 	prevs := sl.prevNodesCache
 	prev := &sl.head
@@ -191,7 +204,8 @@ func (sl *Skiplist[K, V]) findPrevNodes(key K) []*Node[K, V] {
 	return prevs
 }
 
-// Traversal traversals elements in the skiplist, it will stop until to the end or the visitor returns false
+// Traversal 按 key 升序遍历跳表中的所有键值对。
+// 每访问一对 (key, value) 时调用 visitor；当 visitor 返回 false 时停止遍历。
 func (sl *Skiplist[K, V]) Traversal(visitor utils.KvVisitor[K, V]) {
 	sl.locker.RLock()
 	defer sl.locker.RUnlock()
@@ -203,7 +217,8 @@ func (sl *Skiplist[K, V]) Traversal(visitor utils.KvVisitor[K, V]) {
 	}
 }
 
-// Keys returns all keys in the skiplist
+// Keys 返回跳表中所有键组成的切片（按 key 升序）。
+// 返回：包含所有键的 []K；空跳表时返回 nil。
 func (sl *Skiplist[K, V]) Keys() []K {
 	var keys []K
 	sl.Traversal(func(key K, value V) bool {

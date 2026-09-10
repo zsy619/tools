@@ -2,7 +2,7 @@ package xphp
 
 import "reflect"
 
-// array_unique — Removes duplicate values from an array
+// ArrayUnique 实现 PHP array_unique()：去除字符串切片中的重复元素，保持首次出现的顺序。
 func ArrayUnique(arr []string) []string {
 	size := len(arr)
 	result := make([]string, 0, size)
@@ -16,7 +16,8 @@ func ArrayUnique(arr []string) []string {
 	return result
 }
 
-// ArraySlice array_slice()
+// ArraySlice 实现 PHP array_slice()：从 s 的 offset 起取 length 个元素。
+// offset 越界时 panic；length 越界时取到末尾。
 func ArraySlice(s []interface{}, offset, length int) []interface{} {
 	if offset > len(s) {
 		panic("offset: the offset is less than the length of s")
@@ -28,6 +29,7 @@ func ArraySlice(s []interface{}, offset, length int) []interface{} {
 	return s[offset:]
 }
 
+// ArraySliceString 是 ArraySlice 针对字符串切片的便利版本。
 func ArraySliceString(s []string, offset, length int) []string {
 	if offset > len(s) {
 		panic("offset: the offset is less than the length of s")
@@ -39,8 +41,8 @@ func ArraySliceString(s []string, offset, length int) []string {
 	return s[offset:]
 }
 
-// array_diff — Computes the difference of arrays
-// Compares array1 against one or more other arrays and returns the values in array1 that are not present in any of the other arrays.
+// ArrayDiff 实现 PHP array_diff()：返回在 array1 但不在任意 arrayOthers 中的字符串元素。
+// 输出顺序由 map 遍历顺序决定，不保证稳定。
 func ArrayDiff(array1 []string, arrayOthers ...[]string) []string {
 	c := make(map[string]bool)
 	for i := 0; i < len(array1); i++ {
@@ -68,7 +70,7 @@ func ArrayDiff(array1 []string, arrayOthers ...[]string) []string {
 	return result
 }
 
-// array_intersect — Computes the intersection of arrays
+// ArrayIntersect 实现 PHP array_intersect()：返回同时存在于 array1 与任意 arrayOthers 的字符串元素。
 func ArrayIntersect(array1 []string, arrayOthers ...[]string) []string {
 	c := make(map[string]bool)
 	for i := 0; i < len(array1); i++ {
@@ -96,7 +98,9 @@ func ArrayIntersect(array1 []string, arrayOthers ...[]string) []string {
 	return result
 }
 
-// array_search — Searches the array for a given value and returns the first corresponding key if successful
+// ArraySearch 实现 PHP array_search()：在 hystack 中查找 needle。
+// 仅支持切片（reflect.Slice），使用 reflect.DeepEqual 比较元素。
+// 命中返回首个匹配下标，未命中返回 -1。
 func ArraySearch(needle interface{}, hystack interface{}) (index int) {
 	index = -1
 

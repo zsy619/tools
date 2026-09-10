@@ -9,6 +9,7 @@ import (
 	"fmt"
 )
 
+// ChsiAes 封装了使用 AES 对称加解密所需的密钥。
 type ChsiAes struct {
 	key []byte
 }

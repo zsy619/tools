@@ -14,8 +14,7 @@ var Slice = []string{
  * @param {int} num 需要转化的数字，如excel第几列
  * @return string
  */
-// Deprecated: Div is no longer recommended,
-// use ExcelColumnNumberToName instead.
+// Deprecated: Div 已不再推荐使用，请改用 ExcelColumnNumberToName。
 func Div(num int) string {
 	var (
 		Str  string = ""
@@ -47,6 +46,7 @@ func Div(num int) string {
 	return Str
 }
 
+// ExcelColumnNumberToName 将列号(从1开始计数)转换为对应的Excel列名(如 A、B、…、Z、AA)。
 func ExcelColumnNumberToName(columnNumber int) string {
 	var columnName string
 	for columnNumber > 0 {
@@ -57,6 +57,7 @@ func ExcelColumnNumberToName(columnNumber int) string {
 	return columnName
 }
 
+// ExcelColumnNumberToNextName 基于给定列号+1 计算其下一列，并返回对应的 Excel 列名。
 func ExcelColumnNumberToNextName(prevColumnNumber int) (int, string) {
 	columnNumber := prevColumnNumber + 1
 	var columnName string

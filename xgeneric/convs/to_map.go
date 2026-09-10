@@ -6,9 +6,11 @@ import (
 	"reflect"
 )
 
-// Struct2Map converts struct to map[string]any.
-// Such as struct{I int, S string}{I: 1, S: "a"} to map[I:1 S:a].
-// Note that unexported fields of struct can't be converted.
+// Struct2Map 将结构体转换为 map[string]any。
+// 例如 struct{I int, S string}{I: 1, S: "a"} 会转为 map["I":1 "S":"a"]。
+// 注意：结构体中未导出的字段会被忽略，无法被转换。
+// 参数：a 为任意结构体值。
+// 返回：以字段名为键、字段值为值的 map[string]any；当 a 不是结构体类型时返回 nil。
 func Struct2Map(a any) map[string]any {
 	// Check param.
 	v := reflect.ValueOf(a)
@@ -26,9 +28,11 @@ func Struct2Map(a any) map[string]any {
 	return m
 }
 
-// Struct2MapString converts struct to map[string]string.
-// Such as struct{I int, S string}{I: 1, S: "a"} to map[I:1 S:a].
-// Note that unexported fields of struct can't be converted.
+// Struct2MapString 将结构体转换为 map[string]string（字段值使用 ToAny[string] 转为字符串）。
+// 例如 struct{I int, S string}{I: 1, S: "a"} 会转为 map["I":"1" "S":"a"]。
+// 注意：结构体中未导出的字段会被忽略，无法被转换。
+// 参数：obj 为任意结构体值。
+// 返回：以字段名为键、字段值字符串为值的 map[string]string；当 obj 不是结构体类型时返回 nil。
 func Struct2MapString(obj any) map[string]string {
 	// Check param.
 	v := reflect.ValueOf(obj)
@@ -46,13 +50,17 @@ func Struct2MapString(obj any) map[string]string {
 	return m
 }
 
-// ToMapStrStr casts any type to a map[string]string type.
+// ToMapStrStr 将任意类型转换为 map[string]string（转换失败时返回空 map）。
+// 参数：i 为要转换的任意类型值。
+// 返回：转换得到的 map[string]string；底层调用 ToMapStrStrE，转换失败时返回空 map（不返回错误）。
 func ToMapStrStr(i any) map[string]string {
 	v, _ := ToMapStrStrE(i)
 	return v
 }
 
-// ToMapStrStrE casts any type to a map[string]string type.
+// ToMapStrStrE 将任意类型转换为 map[string]string 并在失败时返回错误。
+// 参数：i 为要转换的任意类型值（支持 map[string]string / map[string]any / map[any]string / map[any]any / JSON 字符串）。
+// 返回：转换得到的 map[string]string 与 nil 错误；当 i 为字符串时会尝试 JSON 反序列化；不支持的类型返回 error。
 func ToMapStrStrE(i any) (map[string]string, error) {
 	var m = map[string]string{}
 
@@ -82,8 +90,9 @@ func ToMapStrStrE(i any) (map[string]string, error) {
 	}
 }
 
-// jsonStringToObject attempts to unmarshall a string as JSON into
-// the object passed as pointer.
+// jsonStringToObject 尝试将字符串 s 作为 JSON 反序列化到 v 指向的对象中。
+// 参数：s 为 JSON 字符串，v 为目标对象的指针。
+// 返回：json.Unmarshal 的错误（成功时为 nil）。
 func jsonStringToObject(s string, v any) error {
 	data := []byte(s)
 	return json.Unmarshal(data, v)

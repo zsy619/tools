@@ -1,11 +1,11 @@
 package xmath
 
 type decimal struct {
-	d     [800]byte // digits, big-endian representation
-	nd    int       // number of digits used
-	dp    int       // decimal point
-	neg   bool      // negative flag
-	trunc bool      // discarded nonzero digits beyond d[:nd]
+	d     [800]byte // 数字，大端表示
+	nd    int       // 已使用的数字位数
+	dp    int       // 小数点位置
+	neg   bool      // 负数标记
+	trunc bool      // 超出 d[:nd] 而被丢弃的非零数字
 }
 
 func (a *decimal) String() string {
@@ -24,7 +24,7 @@ func (a *decimal) String() string {
 		return "0"
 
 	case a.dp <= 0:
-		// zeros fill space between decimal point and digits
+		// 用 0 填充小数点与数字之间的空隙
 		buf[w] = '0'
 		w++
 		buf[w] = '.'
@@ -33,14 +33,14 @@ func (a *decimal) String() string {
 		w += copy(buf[w:], a.d[0:a.nd])
 
 	case a.dp < a.nd:
-		// decimal point in middle of digits
+		// 小数点位于数字中间
 		w += copy(buf[w:], a.d[0:a.dp])
 		buf[w] = '.'
 		w++
 		w += copy(buf[w:], a.d[a.dp:a.nd])
 
 	default:
-		// zeros fill space between digits and decimal point
+		// 用 0 填充数字与小数点之间的空隙
 		w += copy(buf[w:], a.d[0:a.nd])
 		w += digitZero(buf[w : w+a.dp-a.nd])
 	}
@@ -54,9 +54,8 @@ func digitZero(dst []byte) int {
 	return len(dst)
 }
 
-// trim trailing zeros from number.
-// (They are meaningless; the decimal point is tracked
-// independent of the number of digits.)
+// 去掉数字末尾的 0。
+// （末尾的 0 没有意义；小数点的位置是独立于数字位数单独记录的。）
 func trim(a *decimal) {
 	for a.nd > 0 && a.d[a.nd-1] == '0' {
 		a.nd--
@@ -66,11 +65,11 @@ func trim(a *decimal) {
 	}
 }
 
-// Assign v to a.
+// 将 v 赋值给 a。
 func (a *decimal) Assign(v uint64) {
 	var buf [24]byte
 
-	// Write reversed decimal in buf.
+	// 将十进制数字逆序写入 buf。
 	n := 0
 	for v > 0 {
 		v1 := v / 10
@@ -80,7 +79,7 @@ func (a *decimal) Assign(v uint64) {
 		v = v1
 	}
 
-	// Reverse again to produce forward decimal in a.d.
+	// 再次反转，得到正向的十进制数字存入 a.d。
 	a.nd = 0
 	for n--; n >= 0; n-- {
 		a.d[a.nd] = buf[n]
@@ -90,24 +89,24 @@ func (a *decimal) Assign(v uint64) {
 	trim(a)
 }
 
-// Maximum shift that we can do in one pass without overflow.
-// A uint has 32 or 64 bits, and we have to be able to accommodate 9<<k.
+// 单次操作中不会发生溢出的最大移位位数。
+// uint 为 32 位或 64 位，必须能容纳 9<<k。
 const (
 	uintSize = 32 << (^uint(0) >> 63)
 	maxShift = uintSize - 4
 )
 
-// Binary shift right (/ 2) by k bits.  k <= maxShift to avoid overflow.
+// 按 k 位进行二进制右移（即除以 2）。为避免溢出，要求 k <= maxShift。
 func rightShift(a *decimal, k uint) {
-	r := 0 // read pointer
-	w := 0 // write pointer
+	r := 0 // 读指针
+	w := 0 // 写指针
 
-	// Pick up enough leading digits to cover first shift.
+	// 先取出足以完成首次移位的前导数字。
 	var n uint
 	for ; n>>k == 0; r++ {
 		if r >= a.nd {
 			if n == 0 {
-				// a == 0; shouldn't get here, but handle anyway.
+				// a == 0；正常情况下到不了这里，但仍处理一下。
 				a.nd = 0
 				return
 			}
@@ -124,7 +123,7 @@ func rightShift(a *decimal, k uint) {
 
 	var mask uint = (1 << k) - 1
 
-	// Pick up a digit, put down a digit.
+	// 读取一位数字，同时写出一位数字。
 	for ; r < a.nd; r++ {
 		c := uint(a.d[r])
 		dig := n >> k
@@ -134,7 +133,7 @@ func rightShift(a *decimal, k uint) {
 		n = n*10 + c - '0'
 	}
 
-	// Put down extra digits.
+	// 写出多余的数字。
 	for n > 0 {
 		dig := n >> k
 		n &= mask
@@ -151,26 +150,24 @@ func rightShift(a *decimal, k uint) {
 	trim(a)
 }
 
-// Cheat sheet for left shift: table indexed by shift count giving
-// number of new digits that will be introduced by that shift.
+// 左移速查表：按下标（移位位数）给出该次移位将引入的新增数字位数。
 //
-// For example, leftcheats[4] = {2, "625"}.  That means that
-// if we are shifting by 4 (multiplying by 16), it will add 2 digits
-// when the string prefix is "625" through "999", and one fewer digit
-// if the string prefix is "000" through "624".
+// 例如 leftcheats[4] = {2, "625"}，表示当左移 4 位（即乘以 16）时：
+// 若字符串前缀为 "625" 到 "999"，会新增 2 位数字；
+// 若字符串前缀为 "000" 到 "624"，则只新增 1 位数字。
 //
-// Credit for this trick goes to Ken.
+// 这一技巧的功劳归于 Ken。
 
 type leftCheat struct {
-	delta  int    // number of new digits
-	cutoff string // minus one digit if original < a.
+	delta  int    // 新增数字位数
+	cutoff string // 当原数字前缀小于该阈值时少增加一位
 }
 
 var leftcheats = []leftCheat{
-	// Leading digits of 1/2^i = 5^i.
-	// 5^23 is not an exact 64-bit floating point number,
-	// so have to use bc for the math.
-	// Go up to 60 to be large enough for 32bit and 64bit platforms.
+	// 1/2^i = 5^i 的十进制前导数字。
+	// 5^23 不是精确的 64 位浮点数，
+	// 因此需要用 bc 来计算。
+	// 一直算到 60，以保证在 32 位与 64 位平台上都足够用。
 	/*
 		seq 60 | sed 's/^/5^/' | bc |
 		awk 'BEGIN{ print "\t{ 0, \"\" }," }
@@ -243,7 +240,7 @@ var leftcheats = []leftCheat{
 	{19, "867361737988403547205962240695953369140625"}, // * 1152921504606846976
 }
 
-// Is the leading prefix of b lexicographically less than s?
+// b 的前缀是否按字典序小于 s？
 func prefixIsLessThan(b []byte, s string) bool {
 	for i := 0; i < len(s); i++ {
 		if i >= len(b) {
@@ -256,17 +253,17 @@ func prefixIsLessThan(b []byte, s string) bool {
 	return false
 }
 
-// Binary shift left (* 2) by k bits.  k <= maxShift to avoid overflow.
+// 按 k 位进行二进制左移（即乘以 2）。为避免溢出，要求 k <= maxShift。
 func leftShift(a *decimal, k uint) {
 	delta := leftcheats[k].delta
 	if prefixIsLessThan(a.d[0:a.nd], leftcheats[k].cutoff) {
 		delta--
 	}
 
-	r := a.nd         // read index
-	w := a.nd + delta // write index
+	r := a.nd         // 读索引
+	w := a.nd + delta // 写索引
 
-	// Pick up a digit, put down a digit.
+	// 读取一位数字，同时写出一位数字。
 	var n uint
 	for r--; r >= 0; r-- {
 		n += (uint(a.d[r]) - '0') << k
@@ -281,7 +278,7 @@ func leftShift(a *decimal, k uint) {
 		n = quo
 	}
 
-	// Put down extra digits.
+	// 写出多余的数字。
 	for n > 0 {
 		quo := n / 10
 		rem := n - 10*quo
@@ -302,11 +299,11 @@ func leftShift(a *decimal, k uint) {
 	trim(a)
 }
 
-// Binary shift left (k > 0) or right (k < 0).
+// 按 k 位二进制左移（k > 0）或右移（k < 0）。
 func (a *decimal) Shift(k int) {
 	switch {
 	case a.nd == 0:
-		// nothing to do: a == 0
+		// 无需处理：a == 0
 	case k > 0:
 		for k > maxShift {
 			leftShift(a, maxShift)
@@ -322,26 +319,25 @@ func (a *decimal) Shift(k int) {
 	}
 }
 
-// If we chop a at nd digits, should we round up?
+// 若将 a 截断到 nd 位，是否应进位？
 func shouldRoundUp(a *decimal, nd int) bool {
 	if nd < 0 || nd >= a.nd {
 		return false
 	}
-	if a.d[nd] == '5' && nd+1 == a.nd { // exactly halfway - round to even
-		// if we truncated, a little higher than what's recorded - always round up
+	if a.d[nd] == '5' && nd+1 == a.nd { // 恰好处于中间——四舍五入取偶数（银行家舍入）
+		// 若发生过截断，实际值会比记录值略高——总是进位
 		if a.trunc {
 			return true
 		}
 		return nd > 0 && (a.d[nd-1]-'0')%2 != 0
 	}
-	// not halfway - digit tells all
+	// 并非恰好一半——由下一位数字决定
 	return a.d[nd] >= '5'
 }
 
-// Round a to nd digits (or fewer).
-// If nd is zero, it means we're rounding
-// just to the left of the digits, as in
-// 0.09 -> 0.1.
+// 将 a 四舍五入到 nd 位（或更少位）。
+// 若 nd 为 0，表示在小数点左侧一位处进行舍入，
+// 例如 0.09 -> 0.1。
 func (a *decimal) Round(nd int) {
 	if nd < 0 || nd >= a.nd {
 		return
@@ -353,7 +349,7 @@ func (a *decimal) Round(nd int) {
 	}
 }
 
-// Round a down to nd digits (or fewer).
+// 将 a 向下舍入（截断）到 nd 位（或更少位）。
 func (a *decimal) RoundDown(nd int) {
 	if nd < 0 || nd >= a.nd {
 		return
@@ -362,31 +358,31 @@ func (a *decimal) RoundDown(nd int) {
 	trim(a)
 }
 
-// Round a up to nd digits (or fewer).
+// 将 a 向上进位到 nd 位（或更少位）。
 func (a *decimal) RoundUp(nd int) {
 	if nd < 0 || nd >= a.nd {
 		return
 	}
 
-	// round up
+	// 向上进位
 	for i := nd - 1; i >= 0; i-- {
 		c := a.d[i]
-		if c < '9' { // can stop after this digit
+		if c < '9' { // 该位之后即可停止进位
 			a.d[i]++
 			a.nd = i + 1
 			return
 		}
 	}
 
-	// Number is all 9s.
-	// Change to single 1 with adjusted decimal point.
+	// 数字全部为 9。
+	// 改为单个 1，并相应调整小数点位置。
 	a.d[0] = '1'
 	a.nd = 1
 	a.dp++
 }
 
-// Extract integer part, rounded appropriately.
-// No guarantees about overflow.
+// 提取整数部分，并按需进行舍入。
+// 不保证不会发生溢出。
 func (a *decimal) RoundedInteger() uint64 {
 	if a.dp > 20 {
 		return 0xFFFFFFFFFFFFFFFF

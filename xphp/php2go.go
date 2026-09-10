@@ -16,10 +16,9 @@ import (
 	"unicode"
 )
 
-// IsNumeric is_numeric()
-// Numeric strings consist of optional sign, any number of digits, optional decimal part and optional exponential part.
-// Thus +0123.45e6 is a valid numeric value.
-// In PHP hexadecimal (e.g. 0xf4c3b00c) is not supported, but IsNumeric is supported.
+// IsNumeric 实现 PHP is_numeric() 的语义。
+// 数值字符串由可选符号、若干数字、可选小数部分和可选指数部分组成，例如 +0123.45e6。
+// 与 PHP 不同：本实现额外支持十六进制（0x 前缀）；空字符串返回 false。
 func IsNumeric(val interface{}) bool {
 	switch val := val.(type) {
 	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64:
@@ -71,11 +70,16 @@ func IsNumeric(val interface{}) bool {
 	return false
 }
 
-// Empty Determine whether a variable is empty
+// Empty 实现 PHP empty() 的判定。
 //
-//	Determine whether a variable is considered to be empty.
-//	A variable is considered empty if it does not exist or if its value equals FALSE.
-//	empty() does not generate a warning if the variable does not exist.
+// 判定规则：
+//   - nil（接口/指针）：视为空；
+//   - 字符串/数组：长度为 0 视为空；
+//   - Map/Slice：长度为 0 或为 nil 视为空；
+//   - 布尔：值为 false 视为空；
+//   - 整型/浮点：值为 0 视为空；
+//   - 其它：与对应零值比较；
+//   - 变量不存在时也不会产生告警。
 func Empty(val interface{}) bool {
 	v := reflect.ValueOf(val)
 	switch v.Kind() {
@@ -98,13 +102,11 @@ func Empty(val interface{}) bool {
 	return reflect.DeepEqual(val, reflect.Zero(v.Type()).Interface())
 }
 
-// Exec exec()
-// returnVar, 0: succ; 1: fail
-// Return the last line from the result of the command.
-// command format eg:
+// Exec 实现 PHP exec() 的语义。
 //
-//	"ls -a"
-//	"/bin/bash -c \"ls -a\""
+// returnVar：0 表示成功，1 表示失败；output 接收按行切分的命令输出（去掉末尾换行）。
+// 返回值为 output 的最后一行；若命令执行失败则返回空串。
+// 命令字符串支持形如 "ls -a" 或 "/bin/bash -c \"ls -a\"" 的格式。
 func Exec(command string, output *[]string, returnVar *int) string {
 	q := rune(0)
 	parts := strings.FieldsFunc(command, func(r rune) bool {
@@ -142,9 +144,8 @@ func Exec(command string, output *[]string, returnVar *int) string {
 	return ""
 }
 
-// System system()
-// returnVar, 0: succ; 1: fail
-// Returns the last line of the command output on success, and "" on failure.
+// System 实现 PHP system() 的语义：实时把 stdout/stderr 打印到当前进程并返回最后一行。
+// returnVar：0 表示成功，1 表示失败；启动或执行失败时返回空串。
 func System(command string, returnVar *int) string {
 	*returnVar = 0
 	var stdBuf bytes.Buffer
@@ -216,8 +217,8 @@ func System(command string, returnVar *int) string {
 	return ""
 }
 
-// Passthru passthru()
-// returnVar, 0: succ; 1: fail
+// Passthru 实现 PHP passthru() 的语义：直接把命令输出原样转发到当前进程的 stdout/stderr。
+// returnVar：0 表示成功，1 表示失败；失败时会打印错误信息。
 func Passthru(command string, returnVar *int) {
 	q := rune(0)
 	parts := strings.FieldsFunc(command, func(r rune) bool {
@@ -253,34 +254,34 @@ func Passthru(command string, returnVar *int) {
 	}
 }
 
-// Echo echo
+// Echo 实现 PHP echo：将参数依次输出到标准输出，不带换行。
 func Echo(args ...interface{}) {
 	fmt.Print(args...)
 }
 
-// Uniqid uniqid()
+// Uniqid 实现 PHP uniqid(prefix)：生成带前缀的“唯一 ID”，由 Unix 秒 + 纳秒后 20 位组成。
 func Uniqid(prefix string) string {
 	now := time.Now()
 	return fmt.Sprintf("%s%08x%05x", prefix, now.Unix(), now.UnixNano()%0x100000)
 }
 
-// Exit exit()
+// Exit 实现 PHP exit(status)：以给定状态码终止当前进程。
 func Exit(status int) {
 	os.Exit(status)
 }
 
-// Die die()
+// Die 是 Exit 的别名。
 func Die(status int) {
 	os.Exit(status)
 }
 
-// Getenv getenv()
+// Getenv 实现 PHP getenv(varname)：读取环境变量，不存在时返回空串。
 func Getenv(varname string) string {
 	return os.Getenv(varname)
 }
 
-// Putenv putenv()
-// The setting, like "FOO=BAR"
+// Putenv 实现 PHP putenv(setting)：解析 "NAME=VALUE" 形式并写入环境变量。
+// setting 不包含 "=" 时会 panic。
 func Putenv(setting string) error {
 	s := strings.Split(setting, "=")
 	if len(s) != 2 {
@@ -289,22 +290,28 @@ func Putenv(setting string) error {
 	return os.Setenv(s[0], s[1])
 }
 
-// MemoryGetUsage memory_get_usage()
-// return in bytes
+// MemoryGetUsage 实现 PHP memory_get_usage()：返回当前分配的堆内存字节数。
+// realUsage 当前未使用；保留以匹配 PHP 行为。
 func MemoryGetUsage(realUsage bool) uint64 {
 	stat := new(runtime.MemStats)
 	runtime.ReadMemStats(stat)
 	return stat.Alloc
 }
 
-// VersionCompare version_compare()
-// The possible operators are: <, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne respectively.
-// special version strings these are handled in the following order,
-// (any string not found) < dev < alpha = a < beta = b < RC = rc < # < pl = p
-// Usage:
-// VersionCompare("1.2.3-alpha", "1.2.3RC7", '>=')
-// VersionCompare("1.2.3-beta", "1.2.3pl", 'lt')
-// VersionCompare("1.1_dev", "1.2any", 'eq')
+// VersionCompare 实现 PHP version_compare()。
+//
+// 支持的运算符：<, lt, <=, le, >, gt, >=, ge, ==, =, eq, !=, <>, ne。
+// 特殊版本字符串按以下顺序比较：
+//
+//	(任意未识别) < dev < alpha = a < beta = b < RC = rc < # < pl = p
+//
+// 示例：
+//
+//	VersionCompare("1.2.3-alpha", "1.2.3RC7", ">=")
+//	VersionCompare("1.2.3-beta", "1.2.3pl", "lt")
+//	VersionCompare("1.1_dev", "1.2any", "eq")
+//
+// 非法 operator 会触发 panic。
 func VersionCompare(version1, version2, operator string) bool {
 	var vcompare func(string, string) int
 	var canonicalize func(string) string
@@ -502,12 +509,13 @@ func VersionCompare(version1, version2, operator string) bool {
 	}
 }
 
-// ZipOpen zip_open()
+// ZipOpen 打开一个 zip 文件并返回 *zip.ReadCloser。
 func ZipOpen(filename string) (*zip.ReadCloser, error) {
 	return zip.OpenReader(filename)
 }
 
-// Pack pack()
+// Pack 按指定的字节序 order 将 data 编码为字符串。
+// 写入失败时返回错误；data 必须为定长类型。
 func Pack(order binary.ByteOrder, data interface{}) (string, error) {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, order, data)
@@ -518,7 +526,7 @@ func Pack(order binary.ByteOrder, data interface{}) (string, error) {
 	return buf.String(), nil
 }
 
-// Unpack unpack()
+// Unpack 是 Pack 的逆操作：从 data 字符串按字节序 order 解码到 []byte。
 func Unpack(order binary.ByteOrder, data string) (interface{}, error) {
 	var result []byte
 	r := bytes.NewReader([]byte(data))
@@ -530,8 +538,8 @@ func Unpack(order binary.ByteOrder, data string) (interface{}, error) {
 	return result, nil
 }
 
-// Ternary Ternary expression
-// max := Ternary(a > b, a, b).(int)
+// Ternary 实现三元表达式：根据 condition 返回 trueVal 或 falseVal。
+// 调用方需自行做类型断言，例如 max := Ternary(a > b, a, b).(int)。
 func Ternary(condition bool, trueVal, falseVal interface{}) interface{} {
 	if condition {
 		return trueVal
