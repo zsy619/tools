@@ -333,7 +333,7 @@ func (code *QrCode) CreateQrCode(content string, size int, level qrcode.Recovery
 		return "", errors.New("无二维码内容")
 	}
 	if code.IsOne {
-		code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
+		code.Root = "./downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
 		if err := os.MkdirAll(code.Root, os.ModePerm); err != nil {
 			fmt.Println("CreateQrCode：", err.Error())
 			return "", err
@@ -350,9 +350,9 @@ func (code *QrCode) CreateQrCode(content string, size int, level qrcode.Recovery
 	code.QrCodeConfig.Level = level
 	if xphp.Empty(code.Root) {
 		if code.IsOne {
-			code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
+			code.Root = "./downloads/temp/qrcode_" + time.Now().Format("20060102") + "/"
 		} else {
-			code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
+			code.Root = "./downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
 		}
 	}
 	if err := os.MkdirAll(code.Root, os.ModePerm); err != nil {
@@ -419,7 +419,7 @@ func (code *QrCode) checkAttribute() error {
 		code.QrCodeConfig.Size = 620
 	}
 	if xphp.Empty(code.Root) {
-		code.Root = "./Downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
+		code.Root = "./downloads/temp/qrcode_" + time.Now().Format("20060102150405") + "/"
 	}
 	if err := os.MkdirAll(code.Root, os.ModePerm); err != nil {
 		fmt.Println("CreateQrCode：", err.Error())
