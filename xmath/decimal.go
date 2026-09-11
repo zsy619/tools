@@ -189,8 +189,9 @@ func NewFromString(value string) (Decimal, error) {
 	}
 
 	var dValue *big.Int
-	// strconv.ParseInt 比 new(big.Int).SetString 更快，因此对已知不会溢出的字符串
-	// 直接走这个捷径
+	// strconv.ParseInt 比 new(big.Int).SetString 更快,因此对长度小于 19 位的整数
+	// (绝对值不会超出 int64 范围)直接走这个捷径
+	if len(intString) < 19 {
 		parsed64, err := strconv.ParseInt(intString, 10, 64)
 		if err != nil {
 			return Decimal{}, fmt.Errorf("can't convert %s to decimal", value)
